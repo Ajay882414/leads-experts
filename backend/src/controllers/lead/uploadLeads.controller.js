@@ -2,6 +2,9 @@ const Lead = require("../../models/Lead");
 const Platform = require("../../models/Platform");
 const asyncHandler = require("../../utils/asyncHandler");
 const parseFile = require("../../utils/csvParser");
+const createNotification = require("../../utils/createNotification");
+
+
 
 const uploadLeads = asyncHandler(async (req, res) => {
   if (!req.file) {
@@ -114,6 +117,14 @@ const phone =
       leads.length;
 
     await platformExists.save();
+
+    await createNotification({
+  title: "Leads Uploaded",
+
+  message: `${leads.length} new leads uploaded to ${platformExists.name}.`,
+
+  type: "Lead",
+});
   }
 
   res.json({

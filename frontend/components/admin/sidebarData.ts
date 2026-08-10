@@ -7,6 +7,8 @@ import {
   CreditCard,
   BarChart3,
   Settings,
+  Bell,
+  Download,
 } from "lucide-react";
 
 export const sidebarLinks = [
@@ -40,6 +42,16 @@ export const sidebarLinks = [
     href: "/admin/payments",
     icon: CreditCard,
   },
+  {
+  title: "Notifications",
+  href: "/admin/notifications",
+  icon: Bell,
+},
+{
+  title: "Downloads",
+  href: "/admin/downloads",
+  icon: Download,
+},
   {
     title: "Reports",
     href: "/admin/reports",

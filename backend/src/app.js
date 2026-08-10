@@ -13,6 +13,16 @@ const resetPasswordRoute = require("./routes/resetPassword.route");
 const platformRoutes = require("./routes/platform.routes");
 const leadRoutes = require("./routes/lead.routes");
 const userRoutes = require("./routes/user.routes");
+const orderRoutes = require("./routes/order.routes");
+const paymentRoutes =
+require("./routes/payment.routes");
+const notificationRoutes =
+  require("./routes/notification.routes");
+  const downloadRoutes = require("./routes/download.routes");
+  const reportRoutes =
+require("./routes/report.routes");
+const settingRoutes =
+require("./routes/setting.routes");
 const errorHandler = require("./middlewares/error.middleware");
 const notFound = require("./middlewares/notFound.middleware");
 
@@ -67,6 +77,36 @@ app.use(
 app.use(
   "/api/users",
   userRoutes
+);
+
+app.use(
+  "/api/orders",
+  orderRoutes
+);
+
+app.use(
+  "/api/payments",
+  paymentRoutes
+);
+
+app.use(
+  "/api/downloads",
+  downloadRoutes
+);
+
+app.use(
+  "/api/notifications",
+  notificationRoutes
+);
+
+app.use(
+  "/api/reports",
+  reportRoutes
+);
+
+app.use(
+  "/api/settings",
+  settingRoutes
 );
 
 app.use(notFound);

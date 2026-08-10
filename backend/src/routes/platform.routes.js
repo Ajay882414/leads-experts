@@ -13,10 +13,18 @@ const getPlatforms = require("../controllers/platform/getPlatforms.controller");
 const getPlatform = require("../controllers/platform/getPlatform.controller");
 const updatePlatform = require("../controllers/platform/updatePlatform.controller");
 const deletePlatform = require("../controllers/platform/deletePlatform.controller");
+const getPlatformPrice = require("../controllers/platform/getPlatformPrice.controller");
+
+
 
 router.get("/", getPlatforms);
 
 router.get("/:id", getPlatform);
+
+router.get(
+    "/:id/price",
+    getPlatformPrice
+);
 
 router.post(
   "/",
