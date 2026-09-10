@@ -2,7 +2,6 @@ const express = require("express");
 
 const router = express.Router();
 
-// const protect = require("../middlewares/authMiddleware");
 const protect = require("../middlewares/auth.middleware");
 const admin = require("../middlewares/admin.middleware");
 
@@ -15,16 +14,28 @@ const updatePlatform = require("../controllers/platform/updatePlatform.controlle
 const deletePlatform = require("../controllers/platform/deletePlatform.controller");
 const getPlatformPrice = require("../controllers/platform/getPlatformPrice.controller");
 
-
+// ==========================
+// Get All Platforms
+// ==========================
 
 router.get("/", getPlatforms);
 
+// ==========================
+// Get Platform Price
+// IMPORTANT: before /:id
+// ==========================
+
+router.get("/:id/price", getPlatformPrice);
+
+// ==========================
+// Get Single Platform
+// ==========================
+
 router.get("/:id", getPlatform);
 
-router.get(
-    "/:id/price",
-    getPlatformPrice
-);
+// ==========================
+// Create Platform - ADMIN
+// ==========================
 
 router.post(
   "/",
@@ -34,6 +45,10 @@ router.post(
   createPlatform
 );
 
+// ==========================
+// Update Platform - ADMIN
+// ==========================
+
 router.put(
   "/:id",
   protect,
@@ -41,6 +56,10 @@ router.put(
   validatePlatform,
   updatePlatform
 );
+
+// ==========================
+// Delete Platform - ADMIN
+// ==========================
 
 router.delete(
   "/:id",

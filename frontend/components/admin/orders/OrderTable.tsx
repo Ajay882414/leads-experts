@@ -1,84 +1,151 @@
 "use client";
 
+import { useEffect, useState } from "react";
+
 import { getOrders } from "@/services/orderApi";
-import { useState } from "react";
 
 import OrderRow from "./OrderRow";
 
-interface Props {
+interface OrderTableProps {
   orders: any[];
+  onRefresh?: () => void;
 }
 
 export default function OrderTable({
   orders: initialOrders,
-}: Props) {
+  onRefresh,
+}: OrderTableProps) {
+  const [orders, setOrders] = useState<any[]>(
+    initialOrders || []
+  );
 
-  const [orders, setOrders] =
-    useState(initialOrders);
+  const [refreshing, setRefreshing] =
+    useState(false);
 
-  const refresh =
-    async () => {
-      const res =
-        await getOrders();
+  // Keep local table data synced
+  // with parent page data
+  useEffect(() => {
+    setOrders(initialOrders || []);
+  }, [initialOrders]);
 
-      setOrders(
-        res.orders
+  // ==========================================
+  // REFRESH ORDERS
+  // ==========================================
+
+  const refresh = async () => {
+    try {
+      setRefreshing(true);
+
+      const response = await getOrders();
+
+      const updatedOrders =
+        response?.orders || [];
+
+      setOrders(updatedOrders);
+
+      // Also refresh parent page
+      if (onRefresh) {
+        onRefresh();
+      }
+    } catch (error) {
+      console.error(
+        "Failed to refresh orders:",
+        error
       );
-    };
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
+  // ==========================================
+  // EMPTY
+  // ==========================================
+
+  if (!orders.length) {
+    return (
+      <div className="bg-white rounded-2xl shadow p-10 text-center">
+        <h2 className="text-xl font-semibold">
+          No Orders Found
+        </h2>
+
+        <p className="text-gray-500 mt-2">
+          There are no customer orders available.
+        </p>
+      </div>
+    );
+  }
+
+  // ==========================================
+  // TABLE
+  // ==========================================
 
   return (
-    <div className="bg-white rounded-xl shadow overflow-hidden">
+    <div className="relative bg-white rounded-2xl shadow overflow-hidden">
+      {/* Refresh Overlay */}
 
-      <table className="w-full">
+      {refreshing && (
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/60 backdrop-blur-sm">
+          <div className="rounded-xl bg-white px-5 py-3 shadow-lg">
+            <span className="text-sm font-medium text-gray-700">
+              Refreshing orders...
+            </span>
+          </div>
+        </div>
+      )}
 
-        <thead className="bg-gray-100">
+      <div className="w-full overflow-x-auto">
+        <table className="w-full min-w-[900px]">
+          {/* ======================================
+              HEADER
+          ====================================== */}
 
-          <tr>
+          <thead className="bg-gray-50 border-b">
+            <tr>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-gray-700">
+                Customer
+              </th>
 
-            <th className="p-4 text-left">
-              Customer
-            </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-gray-700">
+                Platform
+              </th>
 
-            <th className="text-left">
-              Platform
-            </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-gray-700">
+                Quantity
+              </th>
 
-            <th className="text-left">
-              Quantity
-            </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-gray-700">
+                Amount
+              </th>
 
-            <th className="text-left">
-              Amount
-            </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-gray-700">
+                Status
+              </th>
 
-            <th className="text-left">
-              Status
-            </th>
+              <th className="px-5 py-4 text-left text-sm font-semibold text-gray-700">
+                Date
+              </th>
 
-            <th className="text-left">
-              Action
-            </th>
+              <th className="px-5 py-4 text-center text-sm font-semibold text-gray-700">
+                Actions
+              </th>
+            </tr>
+          </thead>
 
-          </tr>
+          {/* ======================================
+              BODY
+          ====================================== */}
 
-        </thead>
-
-        <tbody>
-
-          {orders.map(
-            (order: any) => (
+          <tbody className="divide-y">
+            {orders.map((order) => (
               <OrderRow
                 key={order._id}
                 order={order}
                 refresh={refresh}
               />
-            )
-          )}
-
-        </tbody>
-
-      </table>
-
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

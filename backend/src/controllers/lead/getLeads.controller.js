@@ -1,24 +1,85 @@
 const Lead = require("../../models/Lead");
 const asyncHandler = require("../../utils/asyncHandler");
 
-const getLeads = asyncHandler(
-  async (req, res) => {
-    const page =
-      Number(req.query.page) || 1;
+const getLeads = asyncHandler(async (req, res) => {
+  // ========================================
+  // PAGINATION
+  // ========================================
 
-    const limit =
-      Number(req.query.limit) || 20;
+  const page = Math.max(
+    Number(req.query.page) || 1,
+    1
+  );
 
-    const skip =
-      (page - 1) * limit;
+  const limit = Math.min(
+    Math.max(
+      Number(req.query.limit) || 20,
+      1
+    ),
+    100
+  );
 
-      const {
+  const skip = (page - 1) * limit;
+
+  // ========================================
+  // QUERY PARAMETERS
+  // ========================================
+
+  const {
     search,
     platform,
     status,
+    profession,
+    gender,
   } = req.query;
 
+  // ========================================
+  // FILTER
+  // ========================================
+
   const filter = {};
+
+  // ========================================
+  // PLATFORM
+  // ========================================
+
+  if (platform) {
+    filter.platform = platform;
+  }
+
+  // ========================================
+  // STATUS
+  // ========================================
+
+  if (status) {
+    filter.status = status;
+  }
+
+  // ========================================
+  // PROFESSION
+  // ========================================
+
+  if (profession) {
+    filter.profession = {
+      $regex: profession,
+      $options: "i",
+    };
+  }
+
+  // ========================================
+  // GENDER
+  // ========================================
+
+  if (gender) {
+    filter.gender = {
+      $regex: gender,
+      $options: "i",
+    };
+  }
+
+  // ========================================
+  // SEARCH
+  // ========================================
 
   if (search) {
     filter.$or = [
@@ -29,13 +90,25 @@ const getLeads = asyncHandler(
         },
       },
       {
-        email: {
+        phone: {
           $regex: search,
           $options: "i",
         },
       },
       {
-        phone: {
+        profession: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        source: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        gender: {
           $regex: search,
           $options: "i",
         },
@@ -43,39 +116,53 @@ const getLeads = asyncHandler(
     ];
   }
 
-  if (platform) {
-    filter.platform = platform;
-  }
+  // ========================================
+  // FETCH
+  // ========================================
 
-  if (status) {
-    filter.status = status;
-  }
-  
-    const leads =
-      await Lead.find()
-        .populate(
-          "platform",
-          "name"
-        )
-        .sort({
-          createdAt: -1,
-        })
-        .skip(skip)
-        .limit(limit);
+  const [leads, total] = await Promise.all([
+    Lead.find(filter)
+      .populate(
+        "platform",
+        "name slug pricePerLead"
+      )
+      .populate(
+        "soldTo",
+        "fullName email"
+      )
+      .populate(
+        "order",
+        "_id status totalAmount"
+      )
+      .sort({
+        createdAt: -1,
+      })
+      .skip(skip)
+      .limit(limit)
+      .lean(),
 
-    const total =
-      await Lead.countDocuments();
+    Lead.countDocuments(filter),
+  ]);
 
-    res.json({
-      success: true,
-      total,
-      page,
-      totalPages: Math.ceil(
-        total / limit
-      ),
-      leads,
-    });
-  }
-);
+  // ========================================
+  // RESPONSE
+  // ========================================
+
+  res.status(200).json({
+    success: true,
+
+    total,
+
+    page,
+
+    limit,
+
+    totalPages: Math.ceil(
+      total / limit
+    ),
+
+    leads,
+  });
+});
 
 module.exports = getLeads;

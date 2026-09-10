@@ -1,12 +1,20 @@
 import api from "@/lib/axios";
+import { MyDownloadsResponse } from "@/types/download";
 
-// Get All Downloads
+/* =====================================================
+   GET ALL DOWNLOADS - ADMIN
+===================================================== */
+
 export const getDownloads = async () => {
   const response = await api.get("/downloads");
+
   return response.data;
 };
 
-// Get Single Download
+/* =====================================================
+   GET SINGLE DOWNLOAD - ADMIN
+===================================================== */
+
 export const getDownload = async (
   id: string
 ) => {
@@ -17,35 +25,79 @@ export const getDownload = async (
   return response.data;
 };
 
-// Download Stats
-export const getDownloadStats =
-  async () => {
-    const response =
-      await api.get(
-        "/downloads/stats"
-      );
+/* =====================================================
+   GET DOWNLOAD STATS - ADMIN
+===================================================== */
 
-    return response.data;
-  };
+export const getDownloadStats = async () => {
+  const response = await api.get(
+    "/downloads/stats"
+  );
 
-// Delete Download
-export const deleteDownload =
-  async (id: string) => {
-    const response =
-      await api.delete(
-        `/downloads/${id}`
-      );
+  return response.data;
+};
 
-    return response.data;
-  };
+/* =====================================================
+   DELETE DOWNLOAD - ADMIN
+===================================================== */
 
-// Download Leads
-export const downloadLeadFile =
-  async (orderId: string) => {
-    const response =
-      await api.get(
-        `/downloads/download/${orderId}`
-      );
+export const deleteDownload = async (
+  id: string
+) => {
+  const response = await api.delete(
+    `/downloads/${id}`
+  );
 
-    return response.data;
-  };
+  return response.data;
+};
+
+/* =====================================================
+   GET LEADS FOR ORDER
+===================================================== */
+
+export const downloadLeadFile = async (
+  orderId: string
+) => {
+  const response = await api.get(
+    `/downloads/download/${orderId}`
+  );
+
+  return response.data;
+};
+
+
+
+
+
+/* =====================================================
+   GET MY DOWNLOADS - USER
+===================================================== */
+export const getMyDownloads = async (): Promise<MyDownloadsResponse> => {
+  const response = await api.get<MyDownloadsResponse>("/downloads/my-downloads");
+  return response.data;
+};
+
+/* =====================================================
+   DOWNLOAD CSV FILE DIRECTLY
+===================================================== */
+export const triggerCsvDownload = async (
+  orderId: string,
+  platformName: string = "leads"
+): Promise<void> => {
+  const response = await api.get(`/downloads/download/${orderId}`, {
+    responseType: "blob",
+  });
+
+  const blob = new Blob([response.data], { type: "text/csv;charset=utf-8;" });
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute(
+    "download",
+    `${platformName.toLowerCase().replace(/\s+/g, "_")}_leads_${orderId.slice(-6)}.csv`
+  );
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};

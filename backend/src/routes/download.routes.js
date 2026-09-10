@@ -5,17 +5,41 @@ const router = express.Router();
 const protect = require("../middlewares/auth.middleware");
 const admin = require("../middlewares/admin.middleware");
 
-const createDownload = require("../controllers/download/createDownload.controller");
-const getDownloads = require("../controllers/download/getDownloads.controller");
-const getDownload = require("../controllers/download/getDownload.controller");
-const getMyDownloads = require("../controllers/download/getMyDownloads.controller");
-const getDownloadStats = require("../controllers/download/getDownloadStats.controller");
-const deleteDownload = require("../controllers/download/deleteDownload.controller");
-const downloadOrderLead = require("../controllers/download/downloadOrderLead.controller");
+// ==========================================
+// CONTROLLERS
+// ==========================================
 
-// =====================
-// Download Stats
-// =====================
+const createDownload = require(
+  "../controllers/download/createDownload.controller"
+);
+
+const getDownloads = require(
+  "../controllers/download/getDownloads.controller"
+);
+
+const getDownload = require(
+  "../controllers/download/getDownload.controller"
+);
+
+const getMyDownloads = require(
+  "../controllers/download/getMyDownloads.controller"
+);
+
+const getDownloadStats = require(
+  "../controllers/download/getDownloadStats.controller"
+);
+
+const deleteDownload = require(
+  "../controllers/download/deleteDownload.controller"
+);
+
+const downloadOrderLead = require(
+  "../controllers/download/downloadOrderLead.controller"
+);
+
+// ==========================================
+// ADMIN - DOWNLOAD STATS
+// ==========================================
 
 router.get(
   "/stats",
@@ -24,9 +48,9 @@ router.get(
   getDownloadStats
 );
 
-// =====================
-// My Downloads
-// =====================
+// ==========================================
+// USER - MY DOWNLOAD HISTORY
+// ==========================================
 
 router.get(
   "/my-downloads",
@@ -34,9 +58,11 @@ router.get(
   getMyDownloads
 );
 
-// =====================
-// Download Lead File
-// =====================
+// ==========================================
+// USER - DOWNLOAD ORDER CSV
+// IMPORTANT:
+// Must be before "/:id"
+// ==========================================
 
 router.get(
   "/download/:orderId",
@@ -44,9 +70,9 @@ router.get(
   downloadOrderLead
 );
 
-// =====================
-// Get All Downloads
-// =====================
+// ==========================================
+// ADMIN - GET ALL DOWNLOADS
+// ==========================================
 
 router.get(
   "/",
@@ -55,9 +81,9 @@ router.get(
   getDownloads
 );
 
-// =====================
-// Get Single Download
-// =====================
+// ==========================================
+// ADMIN - GET SINGLE DOWNLOAD
+// ==========================================
 
 router.get(
   "/:id",
@@ -66,9 +92,9 @@ router.get(
   getDownload
 );
 
-// =====================
-// Create Download
-// =====================
+// ==========================================
+// ADMIN - CREATE DOWNLOAD RECORD
+// ==========================================
 
 router.post(
   "/",
@@ -77,9 +103,9 @@ router.post(
   createDownload
 );
 
-// =====================
-// Delete Download
-// =====================
+// ==========================================
+// ADMIN - DELETE DOWNLOAD
+// ==========================================
 
 router.delete(
   "/:id",

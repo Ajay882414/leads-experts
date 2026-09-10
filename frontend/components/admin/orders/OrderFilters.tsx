@@ -1,8 +1,12 @@
 "use client";
 
+import type { OrderStatus } from "@/types/order";
+
 interface Props {
-  status: string;
-  setStatus: (value: string) => void;
+  status: OrderStatus | "";
+  setStatus: (
+    value: OrderStatus | ""
+  ) => void;
 }
 
 export default function OrderFilters({
@@ -10,14 +14,18 @@ export default function OrderFilters({
   setStatus,
 }: Props) {
   return (
-    <div className="flex gap-4 mb-5">
+    <div className="w-full">
 
       <select
         value={status}
-        onChange={(e) =>
-          setStatus(e.target.value)
+        onChange={(event) =>
+          setStatus(
+            event.target.value as
+              | OrderStatus
+              | ""
+          )
         }
-        className="border rounded-lg px-4 py-2"
+        className="w-full border border-gray-200 rounded-xl px-4 py-3 bg-white outline-none focus:ring-2 focus:ring-blue-500"
       >
         <option value="">
           All Orders

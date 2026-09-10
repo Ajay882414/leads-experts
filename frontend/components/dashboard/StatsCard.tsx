@@ -1,39 +1,42 @@
-import { ReactNode } from "react";
+"use client";
+
+import { LucideIcon } from "lucide-react";
 
 interface StatsCardProps {
   title: string;
-  value: string;
-  icon: ReactNode;
+  value: string | number;
+  icon: LucideIcon;
+  color?: string;
+  subtitle?: string;
 }
 
 export default function StatsCard({
   title,
   value,
-  icon,
+  icon: Icon,
+  color = "#3B82F6",
+  subtitle,
 }: StatsCardProps) {
   return (
-    <div className="bg-white rounded-2xl border p-6 shadow-sm hover:shadow-md transition-all">
-
+    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-md">
       <div className="flex items-center justify-between">
-
         <div>
-
-          <p className="text-gray-500 text-sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500">
             {title}
           </p>
-
-          <h2 className="text-3xl font-bold mt-2">
-            {value}
-          </h2>
-
+          <h3 className="mt-2 text-2xl font-bold text-gray-900">{value}</h3>
+          {subtitle && (
+            <p className="mt-1 text-xs text-gray-400">{subtitle}</p>
+          )}
         </div>
 
-        <div className="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
-          {icon}
+        <div
+          className="flex h-12 w-12 items-center justify-center rounded-2xl text-white shadow-sm"
+          style={{ backgroundColor: color }}
+        >
+          <Icon size={24} />
         </div>
-
       </div>
-
     </div>
   );
 }

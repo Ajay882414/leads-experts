@@ -1,30 +1,43 @@
+const mongoose = require("mongoose");
+
 const Order = require("../../models/Order");
-const User = require("../../models/User");
 const Platform = require("../../models/Platform");
 const Lead = require("../../models/Lead");
+const Download = require("../../models/Download"); // <-- Download model import kiya
+
 const asyncHandler = require("../../utils/asyncHandler");
 const createNotification = require("../../utils/createNotification");
 
 const createOrder = asyncHandler(async (req, res) => {
+  // =====================================================
+  // USER
+  // =====================================================
+  const userId = req.user._id;
 
-  const {
-    user,
-    platform,
-    quantity,
-  } = req.body;
+  // =====================================================
+  // REQUEST DATA
+  // =====================================================
+  const { platform, quantity } = req.body;
+  const requestedQuantity = Number(quantity);
 
-  const userExists =
-    await User.findById(user);
-
-  if (!userExists) {
-    return res.status(404).json({
+  if (!platform) {
+    return res.status(400).json({
       success: false,
-      message: "User not found",
+      message: "Platform is required",
     });
   }
 
-  const platformExists =
-    await Platform.findById(platform);
+  if (!Number.isInteger(requestedQuantity) || requestedQuantity < 1) {
+    return res.status(400).json({
+      success: false,
+      message: "Quantity must be greater than 0",
+    });
+  }
+
+  // =====================================================
+  // PLATFORM CHECK
+  // =====================================================
+  const platformExists = await Platform.findById(platform);
 
   if (!platformExists) {
     return res.status(404).json({
@@ -33,94 +46,163 @@ const createOrder = asyncHandler(async (req, res) => {
     });
   }
 
-  if (
-    platformExists.availableLeads <
-    quantity
-  ) {
+  if (platformExists.status !== "ACTIVE") {
     return res.status(400).json({
       success: false,
-      message:
-        "Not enough leads available",
+      message: "This platform is currently inactive",
     });
   }
 
-  const pricePerLead =
-    platformExists.pricePerLead;
-
-  const totalAmount =
-    quantity * pricePerLead;
-
-  const leads =
-    await Lead.find({
-      platform,
-      isSold: false,
-    }).limit(quantity);
-
-  if (
-    leads.length < quantity
-  ) {
+  if (Number(platformExists.availableLeads || 0) < requestedQuantity) {
     return res.status(400).json({
       success: false,
-      message:
-        "Requested leads not available",
+      message: "Not enough leads available",
+      availableLeads: platformExists.availableLeads,
+      requestedQuantity,
     });
   }
 
-  const leadIds =
-    leads.map(
-      (lead) => lead._id
-    );
+  // =====================================================
+  // PRICE CALCULATION
+  // =====================================================
+  const pricePerLead = Number(platformExists.pricePerLead || 0);
+  const totalAmount = requestedQuantity * pricePerLead;
 
-  await Lead.updateMany(
-    {
-      _id: {
-        $in: leadIds,
-      },
-    },
-    {
-      isSold: true,
-    }
-  );
+  // =====================================================
+  // MONGODB TRANSACTION
+  // =====================================================
+  const session = await mongoose.startSession();
 
-  platformExists.availableLeads -=
-    quantity;
+  try {
+    let createdOrder = null;
+    let purchasedLeadIds = [];
 
-  platformExists.soldLeads +=
-    quantity;
+    await session.withTransaction(async () => {
+      // 1. GET AVAILABLE LEADS
+      const availableLeads = await Lead.find({
+        platform: platformExists._id,
+        status: "AVAILABLE",
+      })
+        .sort({ createdAt: 1 })
+        .limit(requestedQuantity)
+        .select("_id")
+        .session(session);
 
-  await platformExists.save();
+      if (availableLeads.length < requestedQuantity) {
+        throw new Error("NOT_ENOUGH_LEADS");
+      }
 
-  const order =
-    await Order.create({
-      user,
-      platform,
-      quantity,
-      pricePerLead,
+      purchasedLeadIds = availableLeads.map((lead) => lead._id);
+
+      // 2. CREATE ORDER
+      const orderDocuments = await Order.create(
+        [
+          {
+            user: userId,
+            platform: platformExists._id,
+            quantity: requestedQuantity,
+            pricePerLead,
+            totalAmount,
+            status: "Completed",
+            purchasedLeads: purchasedLeadIds,
+          },
+        ],
+        { session }
+      );
+
+      createdOrder = orderDocuments[0];
+
+      // 3. MARK LEADS AS SOLD
+      const leadUpdate = await Lead.updateMany(
+        {
+          _id: { $in: purchasedLeadIds },
+          status: "AVAILABLE",
+        },
+        {
+          $set: {
+            status: "SOLD",
+            soldTo: userId,
+            soldAt: new Date(),
+            order: createdOrder._id,
+            soldPrice: pricePerLead,
+          },
+        },
+        { session }
+      );
+
+      if (leadUpdate.modifiedCount !== requestedQuantity) {
+        throw new Error("LEAD_ASSIGNMENT_FAILED");
+      }
+
+      // 4. UPDATE PLATFORM COUNTERS
+      await Platform.updateOne(
+        {
+          _id: platformExists._id,
+          availableLeads: { $gte: requestedQuantity },
+        },
+        {
+          $inc: {
+            availableLeads: -requestedQuantity,
+            soldLeads: requestedQuantity,
+          },
+        },
+        { session }
+      );
+
+      // 5. CREATE DOWNLOAD ENTRY FOR USER (Directly in Transaction)
+      await Download.create(
+        [
+          {
+            user: userId,
+            order: createdOrder._id,
+            platform: platformExists._id,
+            totalLeads: requestedQuantity,
+            fileName: `order-${createdOrder._id}.csv`,
+          },
+        ],
+        { session }
+      );
+    });
+
+    // =====================================================
+    // NOTIFICATION
+    // =====================================================
+    await createNotification({
+      title: "New Lead Purchase",
+      message: `A user purchased ${requestedQuantity} ${platformExists.name} leads.`,
+      type: "Order",
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Leads purchased successfully",
+      order: createdOrder,
+      purchasedLeads: purchasedLeadIds.length,
       totalAmount,
-      purchasedLeads:
-        leadIds,
+      platform: {
+        id: platformExists._id,
+        name: platformExists.name,
+      },
     });
+  } catch (error) {
+    if (error.message === "NOT_ENOUGH_LEADS") {
+      return res.status(400).json({
+        success: false,
+        message: "Requested leads are no longer available",
+      });
+    }
 
-  // ==========================
-  // Create Notification
-  // ==========================
+    if (error.message === "LEAD_ASSIGNMENT_FAILED") {
+      return res.status(409).json({
+        success: false,
+        message: "Some leads were already purchased. Please try again.",
+      });
+    }
 
-  await createNotification({
-    title: "New Order Created",
-
-    message: `${userExists.fullName} purchased ${quantity} ${platformExists.name} leads.`,
-
-    type: "Order",
-  });
-
-  res.status(201).json({
-    success: true,
-    message:
-      "Order created successfully",
-    order,
-  });
-
+    throw error;
+  } finally {
+    await session.endSession();
+  }
 });
 
-module.exports =
-  createOrder;
+module.exports = createOrder;

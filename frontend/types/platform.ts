@@ -1,3 +1,5 @@
+export type PlatformStatus = "ACTIVE" | "INACTIVE";
+
 export interface Platform {
   _id: string;
 
@@ -17,7 +19,7 @@ export interface Platform {
 
   minimumPurchase: number;
 
-  status: "ACTIVE" | "INACTIVE";
+  status: PlatformStatus;
 
   totalLeads: number;
 
@@ -47,5 +49,17 @@ export interface PlatformFormData {
 
   minimumPurchase: number;
 
-  status: "ACTIVE" | "INACTIVE";
+  status: PlatformStatus;
+}
+
+export interface PlatformPriceResponse {
+  name: string;
+
+  pricePerLead: number;
+
+  minimumPurchase: number;
+
+  availableLeads: number;
+
+  status: PlatformStatus;
 }

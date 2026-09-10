@@ -1,4 +1,4 @@
-interface Props {
+interface OrderStatsProps {
   stats: {
     totalOrders: number;
     pendingOrders: number;
@@ -9,50 +9,50 @@ interface Props {
 
 export default function OrderStats({
   stats,
-}: Props) {
+}: OrderStatsProps) {
+  const cards = [
+    {
+      title: "Total Orders",
+      value: stats.totalOrders,
+      wrapper: "bg-white",
+      text: "text-gray-500",
+    },
+    {
+      title: "Pending",
+      value: stats.pendingOrders,
+      wrapper: "bg-yellow-50",
+      text: "text-yellow-700",
+    },
+    {
+      title: "Completed",
+      value: stats.completedOrders,
+      wrapper: "bg-green-50",
+      text: "text-green-700",
+    },
+    {
+      title: "Cancelled",
+      value: stats.cancelledOrders,
+      wrapper: "bg-red-50",
+      text: "text-red-700",
+    },
+  ];
+
   return (
-    <div className="grid grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
+      {cards.map((card) => (
+        <div
+          key={card.title}
+          className={`rounded-2xl p-5 shadow ${card.wrapper}`}
+        >
+          <p className={`text-sm font-medium ${card.text}`}>
+            {card.title}
+          </p>
 
-      <div className="bg-white rounded-xl shadow p-5">
-        <p className="text-gray-500">
-          Total Orders
-        </p>
-
-        <h2 className="text-3xl font-bold mt-2">
-          {stats.totalOrders}
-        </h2>
-      </div>
-
-      <div className="bg-yellow-50 rounded-xl shadow p-5">
-        <p className="text-yellow-700">
-          Pending
-        </p>
-
-        <h2 className="text-3xl font-bold mt-2">
-          {stats.pendingOrders}
-        </h2>
-      </div>
-
-      <div className="bg-green-50 rounded-xl shadow p-5">
-        <p className="text-green-700">
-          Completed
-        </p>
-
-        <h2 className="text-3xl font-bold mt-2">
-          {stats.completedOrders}
-        </h2>
-      </div>
-
-      <div className="bg-red-50 rounded-xl shadow p-5">
-        <p className="text-red-700">
-          Cancelled
-        </p>
-
-        <h2 className="text-3xl font-bold mt-2">
-          {stats.cancelledOrders}
-        </h2>
-      </div>
-
+          <h2 className="mt-2 text-3xl font-bold text-gray-900">
+            {card.value}
+          </h2>
+        </div>
+      ))}
     </div>
   );
 }

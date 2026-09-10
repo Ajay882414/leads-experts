@@ -26,3 +26,24 @@ export interface Download {
   downloadedAt: string;
 
 }
+
+
+export interface DownloadLeadItem {
+  _id: string;
+  fullName: string;
+  phone: string;
+  age?: number;
+  gender?: string;
+  profession?: string;
+  source?: string;
+}
+
+export interface MyDownloadsResponse {
+  success: boolean;
+  downloads: Download[];
+}
+
+export interface DownloadLeadsResponse {
+  success: boolean;
+  leads: DownloadLeadItem[];
+}

@@ -1,14 +1,15 @@
 import api from "@/lib/axios";
 
-import { LeadFormData } from "@/types/lead";
+import {
+  LeadFilters,
+} from "@/types/lead";
 
-// Get All Leads
+// ========================================
+// GET ALL LEADS
+// ========================================
+
 export const getLeads = async (
-  params?: {
-    search?: string;
-    platform?: string;
-    status?: string;
-  }
+  params?: LeadFilters
 ) => {
   const response = await api.get(
     "/leads",
@@ -20,7 +21,10 @@ export const getLeads = async (
   return response.data;
 };
 
-// Get Single Lead
+// ========================================
+// GET SINGLE LEAD
+// ========================================
+
 export const getLead = async (
   id: string
 ) => {
@@ -31,22 +35,13 @@ export const getLead = async (
   return response.data;
 };
 
-// Create Lead
-export const createLead = async (
-  data: LeadFormData
-) => {
-  const response = await api.post(
-    "/leads",
-    data
-  );
+// ========================================
+// UPDATE LEAD
+// ========================================
 
-  return response.data;
-};
-
-// Update Lead
 export const updateLead = async (
   id: string,
-  data: LeadFormData
+  data: any
 ) => {
   const response = await api.put(
     `/leads/${id}`,
@@ -56,7 +51,10 @@ export const updateLead = async (
   return response.data;
 };
 
-// Delete Lead
+// ========================================
+// DELETE LEAD
+// ========================================
+
 export const deleteLead = async (
   id: string
 ) => {
@@ -67,8 +65,9 @@ export const deleteLead = async (
   return response.data;
 };
 
-
-// Lead Statistics
+// ========================================
+// LEAD STATISTICS
+// ========================================
 
 export const getLeadStats = async () => {
   const response = await api.get(
@@ -78,24 +77,16 @@ export const getLeadStats = async () => {
   return response.data;
 };
 
-
-
-
-
-// Upload Leads CSV / Excel
+// ========================================
+// BULK CSV / EXCEL UPLOAD
+// ========================================
 
 export const uploadLeads = async (
   formData: FormData
 ) => {
   const response = await api.post(
     "/leads/upload",
-    formData,
-    {
-      headers: {
-        "Content-Type":
-          "multipart/form-data",
-      },
-    }
+    formData
   );
 
   return response.data;

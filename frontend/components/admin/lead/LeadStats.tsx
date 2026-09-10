@@ -7,17 +7,54 @@ interface Props {
     soldLeads: number;
     reservedLeads: number;
   };
+
+  loading?: boolean;
 }
 
 export default function LeadStats({
   stats,
+  loading = false,
 }: Props) {
+
+  // ==========================================
+  // LOADING CARD
+  // ==========================================
+
+  const StatSkeleton = () => {
+    return (
+      <div className="bg-white rounded-2xl shadow p-6 animate-pulse">
+
+        <div className="h-4 bg-gray-200 rounded w-24" />
+
+        <div className="h-10 bg-gray-200 rounded w-20 mt-4" />
+
+      </div>
+    );
+  };
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+
+        <StatSkeleton />
+        <StatSkeleton />
+        <StatSkeleton />
+        <StatSkeleton />
+
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
 
-      <div className="bg-white rounded-xl shadow p-6">
+      {/* =====================================
+          TOTAL
+      ===================================== */}
 
-        <p className="text-gray-500">
+      <div className="bg-white rounded-2xl shadow p-6">
+
+        <p className="text-gray-500 font-medium">
           Total Leads
         </p>
 
@@ -27,9 +64,13 @@ export default function LeadStats({
 
       </div>
 
-      <div className="bg-green-50 rounded-xl shadow p-6">
+      {/* =====================================
+          AVAILABLE
+      ===================================== */}
 
-        <p className="text-green-700">
+      <div className="bg-green-50 rounded-2xl shadow p-6">
+
+        <p className="text-green-700 font-medium">
           Available
         </p>
 
@@ -39,9 +80,13 @@ export default function LeadStats({
 
       </div>
 
-      <div className="bg-blue-50 rounded-xl shadow p-6">
+      {/* =====================================
+          SOLD
+      ===================================== */}
 
-        <p className="text-blue-700">
+      <div className="bg-blue-50 rounded-2xl shadow p-6">
+
+        <p className="text-blue-700 font-medium">
           Sold
         </p>
 
@@ -51,9 +96,13 @@ export default function LeadStats({
 
       </div>
 
-      <div className="bg-yellow-50 rounded-xl shadow p-6">
+      {/* =====================================
+          RESERVED
+      ===================================== */}
 
-        <p className="text-yellow-700">
+      <div className="bg-yellow-50 rounded-2xl shadow p-6">
+
+        <p className="text-yellow-700 font-medium">
           Reserved
         </p>
 

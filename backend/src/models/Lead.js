@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const leadSchema = new mongoose.Schema(
   {
+    // ========================================
+    // PLATFORM
+    // ========================================
+
     platform: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Platform",
@@ -9,83 +13,93 @@ const leadSchema = new mongoose.Schema(
       index: true,
     },
 
+    // ========================================
+    // LEAD INFORMATION
+    // ========================================
+
     fullName: {
       type: String,
-      required: true,
+      required: [true, "Lead name is required"],
       trim: true,
-    },
-
-    email: {
-      type: String,
-      required: true,
-      lowercase: true,
-      trim: true,
-      index: true,
     },
 
     phone: {
       type: String,
-      required: true,
+      required: [true, "Lead phone is required"],
       trim: true,
       index: true,
     },
 
-    country: {
-      type: String,
-      default: "",
-    },
-
-    state: {
-      type: String,
-      default: "",
-    },
-
-    city: {
-      type: String,
-      default: "",
-    },
-
-    business: {
-      type: String,
-      default: "",
-    },
-
-    category: {
-      type: String,
-      default: "",
-    },
-
-    price: {
+    age: {
       type: Number,
-      default: 0,
+      required: [true, "Lead age is required"],
+      min: 0,
+      max: 120,
     },
+
+    gender: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    profession: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
+
+    source: {
+      type: String,
+      trim: true,
+      default: "",
+      index: true,
+    },
+
+    sourceTimestamp: {
+      type: Date,
+      default: null,
+    },
+
+    // ========================================
+    // LEAD STATUS
+    // ========================================
 
     status: {
       type: String,
-      enum: [
-        "AVAILABLE",
-        "RESERVED",
-        "SOLD",
-      ],
+      enum: ["AVAILABLE", "RESERVED", "SOLD"],
       default: "AVAILABLE",
       index: true,
     },
 
-    isSold: {
-      type: Boolean,
-      default: false,
-      index: true,
-    },
+    // ========================================
+    // PURCHASE / OWNERSHIP
+    // ========================================
 
     soldTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
+      index: true,
     },
 
     soldAt: {
       type: Date,
       default: null,
+    },
+
+    order: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      default: null,
+      index: true,
+    },
+
+    soldPrice: {
+      type: Number,
+      default: null,
+      min: 0,
     },
   },
   {
@@ -93,17 +107,40 @@ const leadSchema = new mongoose.Schema(
   }
 );
 
+// ========================================
+// INDEXES
+// ========================================
+
+// Platform + status
 leadSchema.index({
   platform: 1,
   status: 1,
 });
 
+// Platform + profession + status
 leadSchema.index({
-  email: 1,
-  phone: 1,
+  platform: 1,
+  profession: 1,
+  status: 1,
 });
 
-module.exports = mongoose.model(
-  "Lead",
-  leadSchema
+// IMPORTANT:
+// Same phone cannot exist twice
+// inside the same platform.
+leadSchema.index(
+  {
+    platform: 1,
+    phone: 1,
+  },
+  {
+    unique: true,
+  }
 );
+
+// Ownership lookup
+leadSchema.index({
+  soldTo: 1,
+  order: 1,
+});
+
+module.exports = mongoose.model("Lead", leadSchema);

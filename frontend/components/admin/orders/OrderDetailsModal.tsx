@@ -1,6 +1,6 @@
 "use client";
 
-interface Props {
+interface OrderDetailsModalProps {
   open: boolean;
   onClose: () => void;
   order: any;
@@ -10,74 +10,140 @@ export default function OrderDetailsModal({
   open,
   onClose,
   order,
-}: Props) {
-
-  if (!open || !order) return null;
+}: OrderDetailsModalProps) {
+  if (!open || !order) {
+    return null;
+  }
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Order Details
+          </h2>
 
-      <div className="bg-white rounded-2xl p-8 w-[500px]">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg px-3 py-2 text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+          >
+            ✕
+          </button>
+        </div>
 
-        <h2 className="text-2xl font-bold mb-6">
-          Order Details
-        </h2>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm text-gray-500">
+              Customer
+            </p>
 
-        <div className="space-y-3">
+            <p className="font-semibold text-gray-900">
+              {order.user?.fullName || "N/A"}
+            </p>
+          </div>
 
-          <p>
-            <strong>User:</strong>{" "}
-            {order.user?.fullName}
-          </p>
+          <div>
+            <p className="text-sm text-gray-500">
+              Email
+            </p>
 
-          <p>
-            <strong>Email:</strong>{" "}
-            {order.user?.email}
-          </p>
+            <p className="font-semibold text-gray-900">
+              {order.user?.email || "N/A"}
+            </p>
+          </div>
 
-          <p>
-            <strong>Platform:</strong>{" "}
-            {order.platform?.name}
-          </p>
+          <div>
+            <p className="text-sm text-gray-500">
+              Platform
+            </p>
 
-          <p>
-            <strong>Quantity:</strong>{" "}
-            {order.quantity}
-          </p>
+            <p className="font-semibold text-gray-900">
+              {order.platform?.name || "N/A"}
+            </p>
+          </div>
 
-          <p>
-            <strong>Price / Lead:</strong> ₹
-            {order.pricePerLead}
-          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-sm text-gray-500">
+                Quantity
+              </p>
 
-          <p>
-            <strong>Total:</strong> ₹
-            {order.totalAmount}
-          </p>
+              <p className="font-semibold text-gray-900">
+                {order.quantity}
+              </p>
+            </div>
 
-          <p>
-            <strong>Status:</strong>{" "}
-            {order.status}
-          </p>
+            <div>
+              <p className="text-sm text-gray-500">
+                Price / Lead
+              </p>
 
-          <p>
-            <strong>Date:</strong>{" "}
-            {new Date(
-              order.createdAt
-            ).toLocaleString()}
-          </p>
+              <p className="font-semibold text-gray-900">
+                ₹{order.pricePerLead}
+              </p>
+            </div>
+          </div>
 
+          <div>
+            <p className="text-sm text-gray-500">
+              Total Amount
+            </p>
+
+            <p className="text-xl font-bold text-gray-900">
+              ₹{order.totalAmount}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-500">
+              Status
+            </p>
+
+            <p className="font-semibold text-gray-900">
+              {order.status}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-500">
+              Order Date
+            </p>
+
+            <p className="font-semibold text-gray-900">
+              {order.createdAt
+                ? new Date(
+                    order.createdAt
+                  ).toLocaleString()
+                : "N/A"}
+            </p>
+          </div>
+
+          <div>
+            <p className="text-sm text-gray-500">
+              Order ID
+            </p>
+
+            <p className="break-all text-sm font-medium text-gray-700">
+              {order._id}
+            </p>
+          </div>
         </div>
 
         <button
+          type="button"
           onClick={onClose}
-          className="mt-8 w-full bg-blue-600 text-white rounded-xl py-3"
+          className="mt-8 w-full rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
         >
           Close
         </button>
-
       </div>
-
     </div>
   );
 }

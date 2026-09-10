@@ -1,27 +1,72 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
+
+import { Lead } from "@/types/lead";
 
 import LeadTable from "@/components/admin/lead/LeadTable";
 import LeadStats from "@/components/admin/lead/LeadStats";
 import LeadFilters from "@/components/admin/lead/LeadFilters";
 import CsvUploadButtons from "@/components/admin/lead/CsvUploadButton";
+
 import {
   getLeads,
-  deleteLead,
   getLeadStats,
 } from "@/services/leadApi";
 
 import { getPlatforms } from "@/services/platformApi";
 
-export default function LeadsPage() {
-  const [leads, setLeads] = useState<any[]>([]);
+// ==========================================
+// PLATFORM TYPE
+// ==========================================
 
-  const [platforms, setPlatforms] = useState<any[]>([]);
+interface Platform {
+  _id: string;
+  name: string;
+}
+
+// ==========================================
+// LEAD STATS TYPE
+// ==========================================
+
+interface LeadStatsData {
+  totalLeads: number;
+  availableLeads: number;
+  soldLeads: number;
+  reservedLeads: number;
+}
+
+// ==========================================
+// PAGE
+// ==========================================
+
+export default function LeadsPage() {
+  // ========================================
+  // LEADS
+  // ========================================
+
+  const [leads, setLeads] = useState<Lead[]>([]);
+
+  // ========================================
+  // PLATFORMS
+  // ========================================
+
+  const [platforms, setPlatforms] =
+    useState<Platform[]>([]);
+
+  // ========================================
+  // LOADING
+  // ========================================
 
   const [loading, setLoading] =
     useState(true);
+
+  const [statsLoading, setStatsLoading] =
+    useState(true);
+
+  // ========================================
+  // FILTERS
+  // ========================================
 
   const [search, setSearch] =
     useState("");
@@ -30,104 +75,127 @@ export default function LeadsPage() {
     useState("");
 
   const [status, setStatus] =
-    useState("");
+    useState<"" | Lead["status"]>("");
+
+  // ========================================
+  // STATS
+  // ========================================
 
   const [stats, setStats] =
-    useState({
+    useState<LeadStatsData>({
       totalLeads: 0,
       availableLeads: 0,
       soldLeads: 0,
       reservedLeads: 0,
     });
 
-  // ===========================
-  // Fetch Leads
-  // ===========================
+  // ==========================================
+  // FETCH LEADS
+  // ==========================================
 
   const fetchLeads = async () => {
     try {
       setLoading(true);
 
-      const res = await getLeads({
-        search,
-        platform,
-        status,
+      const response = await getLeads({
+        search:
+          search.trim() || undefined,
+
+        platform:
+          platform || undefined,
+
+        status:
+          status || undefined,
       });
 
-      setLeads(res.leads);
+      setLeads(
+        response?.leads || []
+      );
     } catch (error) {
-      console.log(error);
+      console.error(
+        "Failed to fetch leads:",
+        error
+      );
+
+      setLeads([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // ===========================
-  // Fetch Platforms
-  // ===========================
+  // ==========================================
+  // FETCH PLATFORMS
+  // ==========================================
 
-  const fetchPlatforms =
-    async () => {
-      try {
-        const res =
-          await getPlatforms();
+  const fetchPlatforms = async () => {
+    try {
+      const response =
+        await getPlatforms();
 
-        setPlatforms(
-          res.platforms
-        );
-      } catch (error) {
-        console.log(error);
-      }
-    };
+      setPlatforms(
+        response?.platforms || []
+      );
+    } catch (error) {
+      console.error(
+        "Failed to fetch platforms:",
+        error
+      );
 
-  // ===========================
-  // Fetch Stats
-  // ===========================
+      setPlatforms([]);
+    }
+  };
+
+  // ==========================================
+  // FETCH LEAD STATS
+  // ==========================================
 
   const fetchStats = async () => {
     try {
-      const res =
+      setStatsLoading(true);
+
+      const response =
         await getLeadStats();
 
-      setStats(res.stats);
+      setStats(
+        response?.stats || {
+          totalLeads: 0,
+          availableLeads: 0,
+          soldLeads: 0,
+          reservedLeads: 0,
+        }
+      );
     } catch (error) {
-      console.log(error);
+      console.error(
+        "Failed to fetch lead stats:",
+        error
+      );
+    } finally {
+      setStatsLoading(false);
     }
   };
 
-  // ===========================
-  // Delete Lead
-  // ===========================
+  // ==========================================
+  // STATUS CHANGE
+  // ==========================================
 
-  const handleDelete = async (
-    id: string
+  const handleStatusChange = (
+    value: "" | Lead["status"]
   ) => {
-    const ok = confirm(
-      "Delete this lead?"
-    );
-
-    if (!ok) return;
-
-    try {
-      await deleteLead(id);
-
-      fetchLeads();
-
-      fetchStats();
-    } catch (error) {
-      console.log(error);
-    }
+    setStatus(value);
   };
 
-  // ===========================
-  // Effects
-  // ===========================
+  // ==========================================
+  // INITIAL DATA
+  // ==========================================
 
   useEffect(() => {
     fetchPlatforms();
-
     fetchStats();
   }, []);
+
+  // ==========================================
+  // FILTER DATA
+  // ==========================================
 
   useEffect(() => {
     fetchLeads();
@@ -137,81 +205,117 @@ export default function LeadsPage() {
     status,
   ]);
 
-  // ===========================
-  // Loading
-  // ===========================
+  // ==========================================
+  // REFRESH LEADS
+  // ==========================================
 
-  if (loading) {
+  const refreshLeads = async () => {
+    await Promise.all([
+      fetchLeads(),
+      fetchStats(),
+    ]);
+  };
+
+  // ==========================================
+  // LOADING SCREEN
+  // ==========================================
+
+  if (
+    loading &&
+    leads.length === 0
+  ) {
     return (
-      <div className="p-10">
-        Loading...
-      </div>
-    );
-  }
+      <div className="space-y-8">
 
-  // ===========================
-  // UI
-  // ===========================
-
-  return (
-    <div className="space-y-8">
-
-      {/* Page Header */}
-
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
+        {/* HEADER */}
 
         <div>
-
           <h1 className="text-3xl font-bold">
             Leads
           </h1>
 
           <p className="text-gray-500 mt-1">
-            Manage all leads
+            Manage uploaded leads and inventory
           </p>
-
         </div>
 
-        <Link
-          href="/admin/leads/create"
-          className="bg-blue-600 hover:bg-blue-700 w-fit text-white px-6 py-3 rounded-lg"
-        >
-          + Add Lead
-        </Link>
+        {/* LOADING */}
+
+        <div className="bg-white rounded-xl shadow p-10 text-center text-gray-500">
+          Loading leads...
+        </div>
+
+      </div>
+    );
+  }
+
+  // ==========================================
+  // UI
+  // ==========================================
+
+  return (
+    <div className="space-y-8">
+
+      {/* ======================================
+          HEADER
+      ====================================== */}
+
+      <div>
+
+        <h1 className="text-3xl font-bold">
+          Leads
+        </h1>
+
+        <p className="text-gray-500 mt-1">
+          Manage uploaded leads and inventory
+        </p>
 
       </div>
 
+      {/* ======================================
+          CSV UPLOAD
+      ====================================== */}
+
       <CsvUploadButtons />
 
-      {/* Statistics */}
+      {/* ======================================
+          STATISTICS
+      ====================================== */}
 
-      <LeadStats stats={stats} />
+      <LeadStats
+        stats={stats}
+        loading={statsLoading}
+      />
 
-      {/* Filters */}
+      {/* ======================================
+          FILTERS
+      ====================================== */}
 
       <LeadFilters
         search={search}
         platform={platform}
         status={status}
         platforms={platforms}
-        onSearchChange={
-          setSearch
-        }
-        onPlatformChange={
-          setPlatform
-        }
+        onSearchChange={setSearch}
+        onPlatformChange={setPlatform}
         onStatusChange={
-          setStatus
+          (value: string) => {
+            setStatus(
+              value as
+                | ""
+                | Lead["status"]
+            );
+          }
         }
       />
 
-      {/* Table */}
+      {/* ======================================
+          LEADS TABLE
+      ====================================== */}
 
       <LeadTable
         leads={leads}
-        onDelete={
-          handleDelete
-        }
+        onRefresh={refreshLeads}
       />
 
     </div>

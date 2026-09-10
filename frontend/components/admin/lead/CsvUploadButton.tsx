@@ -1,17 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { Upload, Download } from "lucide-react";
+
+import {
+  Upload,
+  Download,
+} from "lucide-react";
 
 export default function CsvUploadButtons() {
-  const downloadSample = () => {
-    const csv = `Full Name,Email,Phone,Country,State,City,Business,Category,Price
-Ajay Sharma,ajay@gmail.com,9876543210,India,Rajasthan,Jaipur,Ecommerce,Instagram,150
-Rahul Sharma,rahul@gmail.com,9999999999,India,Delhi,Delhi,Education,Facebook,200`;
 
-    const blob = new Blob([csv], {
-      type: "text/csv;charset=utf-8;",
-    });
+  // ==========================================
+  // DOWNLOAD SAMPLE CSV
+  // ==========================================
+
+  const downloadSample = () => {
+    const csv = `Timestamp,Name,Phone,Age,Gender,Profession,Source
+2026-08-20 10:30:00,Ajay Sharma,9876543210,28,Male,Business Owner,Instagram
+2026-08-20 11:00:00,Rahul Sharma,9876543211,32,Male,Teacher,Facebook
+2026-08-20 11:30:00,Priya Sharma,9876543212,26,Female,Designer,Instagram`;
+
+    const blob = new Blob(
+      [csv],
+      {
+        type: "text/csv;charset=utf-8;",
+      }
+    );
 
     const url =
       window.URL.createObjectURL(blob);
@@ -20,9 +33,14 @@ Rahul Sharma,rahul@gmail.com,9999999999,India,Delhi,Delhi,Education,Facebook,200
       document.createElement("a");
 
     link.href = url;
-    link.download = "sample-leads.csv";
+    link.download =
+      "sample-leads.csv";
+
+    document.body.appendChild(link);
 
     link.click();
+
+    document.body.removeChild(link);
 
     window.URL.revokeObjectURL(url);
   };
@@ -30,19 +48,30 @@ Rahul Sharma,rahul@gmail.com,9999999999,India,Delhi,Delhi,Education,Facebook,200
   return (
     <div className="flex flex-wrap gap-4">
 
+      {/* =====================================
+          UPLOAD
+      ===================================== */}
+
       <Link
         href="/admin/leads/upload"
-        className="flex items-center gap-2 bg-blue-600 text-white px-5 py-3 rounded-xl hover:bg-blue-700"
+        className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-semibold transition"
       >
         <Upload size={18} />
-        Upload CSV
+
+        Upload Leads
       </Link>
 
+      {/* =====================================
+          SAMPLE
+      ===================================== */}
+
       <button
+        type="button"
         onClick={downloadSample}
-        className="flex items-center gap-2 border border-gray-300 px-5 py-3 rounded-xl hover:bg-gray-100"
+        className="inline-flex items-center gap-2 border border-gray-300 hover:bg-gray-100 px-5 py-3 rounded-xl font-semibold transition"
       >
         <Download size={18} />
+
         Download Sample CSV
       </button>
 

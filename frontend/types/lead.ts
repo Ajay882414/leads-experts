@@ -1,30 +1,63 @@
+export type LeadStatus =
+  | "AVAILABLE"
+  | "RESERVED"
+  | "SOLD";
+
+export interface LeadPlatform {
+  _id: string;
+  name: string;
+  slug?: string;
+  pricePerLead?: number;
+}
+
+export interface LeadUser {
+  _id: string;
+  fullName?: string;
+  email?: string;
+}
+
+export interface LeadOrder {
+  _id: string;
+  status?: string;
+  totalAmount?: number;
+}
+
 export interface Lead {
   _id: string;
 
-  platform: {
-    _id: string;
-    name: string;
-  };
+  platform:
+    | LeadPlatform
+    | string;
 
   fullName: string;
 
-  email: string;
-
   phone: string;
 
-  country: string;
+  age: number;
 
-  state: string;
+  gender: string;
 
-  city: string;
+  profession: string;
 
-  business: string;
+  source: string;
 
-  category: string;
+  sourceTimestamp?: string | null;
 
-  price: number;
+  status: LeadStatus;
 
-  status: "AVAILABLE" | "RESERVED" | "SOLD";
+  soldTo?:
+    | LeadUser
+    | string
+    | null;
+
+  soldAt?: string | null;
+
+  order?:
+    | LeadOrder
+    | string
+    | null;
+
+  soldPrice?: number | null;
 
   createdAt: string;
 
@@ -36,21 +69,41 @@ export interface LeadFormData {
 
   fullName: string;
 
-  email: string;
-
   phone: string;
 
-  country: string;
+  age: number;
 
-  state: string;
+  gender: string;
 
-  city: string;
+  profession: string;
 
-  business: string;
+  source: string;
 
-  category: string;
+  status?: LeadStatus;
+}
 
-  price: number;
+export interface LeadFilters {
+  search?: string;
 
-  status: "AVAILABLE" | "RESERVED" | "SOLD";
+  platform?: string;
+
+  status?: LeadStatus;
+
+  profession?: string;
+
+  gender?: string;
+
+  page?: number;
+
+  limit?: number;
+}
+
+export interface LeadStatsData {
+  totalLeads: number;
+
+  availableLeads: number;
+
+  reservedLeads: number;
+
+  soldLeads: number;
 }

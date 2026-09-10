@@ -4,7 +4,9 @@ import {
   PlatformFormData,
 } from "@/types/platform";
 
-// Get All Platforms
+// ========================================
+// GET ALL PLATFORMS
+// ========================================
 
 export const getPlatforms = async () => {
   const response = await api.get("/platforms");
@@ -12,7 +14,9 @@ export const getPlatforms = async () => {
   return response.data;
 };
 
-// Get Single Platform
+// ========================================
+// GET SINGLE PLATFORM
+// ========================================
 
 export const getPlatform = async (
   id: string
@@ -24,44 +28,61 @@ export const getPlatform = async (
   return response.data;
 };
 
-// Create Platform
+// ========================================
+// GET PLATFORM PRICE
+// ========================================
 
-export const createPlatform =
-  async (
-    data: PlatformFormData
-  ) => {
-    const response = await api.post(
-      "/platforms",
-      data
-    );
+export const getPlatformPrice = async (
+  id: string
+) => {
+  const response = await api.get(
+    `/platforms/${id}/price`
+  );
 
-    return response.data;
-  };
+  return response.data;
+};
 
-// Update Platform
+// ========================================
+// CREATE PLATFORM - ADMIN
+// ========================================
 
-export const updatePlatform =
-  async (
-    id: string,
-    data: PlatformFormData
-  ) => {
-    const response = await api.put(
-      `/platforms/${id}`,
-      data
-    );
+export const createPlatform = async (
+  data: PlatformFormData
+) => {
+  const response = await api.post(
+    "/platforms",
+    data
+  );
 
-    return response.data;
-  };
+  return response.data;
+};
 
-// Delete Platform
+// ========================================
+// UPDATE PLATFORM - ADMIN
+// ========================================
 
-export const deletePlatform =
-  async (
-    id: string
-  ) => {
-    const response = await api.delete(
-      `/platforms/${id}`
-    );
+export const updatePlatform = async (
+  id: string,
+  data: PlatformFormData
+) => {
+  const response = await api.put(
+    `/platforms/${id}`,
+    data
+  );
 
-    return response.data;
-  };
+  return response.data;
+};
+
+// ========================================
+// DELETE PLATFORM - ADMIN
+// ========================================
+
+export const deletePlatform = async (
+  id: string
+) => {
+  const response = await api.delete(
+    `/platforms/${id}`
+  );
+
+  return response.data;
+};

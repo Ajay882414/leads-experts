@@ -12,61 +12,72 @@ const platformSchema = new mongoose.Schema(
 
     slug: {
       type: String,
-      required: true,
+      required: [true, "Platform slug is required"],
       unique: true,
       lowercase: true,
       trim: true,
+      maxlength: 60,
     },
 
     description: {
       type: String,
       default: "",
+      trim: true,
     },
 
     icon: {
       type: String,
       default: "",
+      trim: true,
     },
-    color:{
-type:String,
-default:"#3B82F6"
-},
+
+    color: {
+      type: String,
+      default: "#3B82F6",
+      trim: true,
+    },
 
     banner: {
       type: String,
       default: "",
+      trim: true,
     },
 
     pricePerLead: {
       type: Number,
-      required: true,
-      min: 1,
+      required: [true, "Price per lead is required"],
+      min: [0.01, "Price per lead must be greater than zero"],
     },
 
     minimumPurchase: {
       type: Number,
-      default: 10,
+      default: 1,
+      min: [1, "Minimum purchase must be at least 1"],
     },
 
     status: {
       type: String,
       enum: ["ACTIVE", "INACTIVE"],
       default: "ACTIVE",
+      index: true,
     },
 
     totalLeads: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     availableLeads: {
       type: Number,
       default: 0,
+      min: 0,
     },
 
     soldLeads: {
       type: Number,
       default: 0,
+      min: 0,
     },
   },
   {
@@ -77,7 +88,4 @@ default:"#3B82F6"
 platformSchema.index({ slug: 1 });
 platformSchema.index({ status: 1 });
 
-module.exports = mongoose.model(
-  "Platform",
-  platformSchema
-);
+module.exports = mongoose.model("Platform", platformSchema);

@@ -8,7 +8,9 @@ module.exports = [
     ),
 
   body("quantity")
-    .isInt({ min: 1 })
+    .isInt({
+      min: 1,
+    })
     .withMessage(
       "Quantity must be greater than 0"
     ),

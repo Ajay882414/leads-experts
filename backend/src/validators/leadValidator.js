@@ -1,25 +1,52 @@
-const validateLead = (
-  req,
-  res,
-  next
-) => {
+const mongoose = require("mongoose");
+
+const validateLead = (req, res, next) => {
   const {
     platform,
     fullName,
-    email,
     phone,
+    age,
   } = req.body;
 
+  if (!platform) {
+    return res.status(400).json({
+      success: false,
+      message: "Platform is required",
+    });
+  }
+
+  if (!mongoose.Types.ObjectId.isValid(platform)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid platform ID",
+    });
+  }
+
+  if (!fullName || !String(fullName).trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Lead name is required",
+    });
+  }
+
+  if (!phone || !String(phone).trim()) {
+    return res.status(400).json({
+      success: false,
+      message: "Lead phone is required",
+    });
+  }
+
   if (
-    !platform ||
-    !fullName ||
-    !email ||
-    !phone
+    age === undefined ||
+    age === null ||
+    age === "" ||
+    Number.isNaN(Number(age)) ||
+    Number(age) < 0 ||
+    Number(age) > 120
   ) {
     return res.status(400).json({
       success: false,
-      message:
-        "Platform, Name, Email and Phone are required",
+      message: "Valid lead age is required",
     });
   }
 

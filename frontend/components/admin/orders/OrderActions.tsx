@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Trash2, Pencil, Eye } from "lucide-react";
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { deleteOrder } from "@/services/orderApi";
 
-interface Props {
+interface OrderActionsProps {
   orderId: string;
   refresh: () => void;
 }
@@ -12,51 +12,56 @@ interface Props {
 export default function OrderActions({
   orderId,
   refresh,
-}: Props) {
+}: OrderActionsProps) {
   const handleDelete = async () => {
-    const ok = confirm(
-      "Delete this order?"
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this order?"
     );
 
-    if (!ok) return;
+    if (!confirmed) return;
 
     try {
       await deleteOrder(orderId);
 
-      alert(
-        "Order Deleted Successfully"
-      );
+      alert("Order deleted successfully");
 
       refresh();
-    } catch {
-      alert("Delete Failed");
+    } catch (error) {
+      console.error("Delete order error:", error);
+
+      alert("Failed to delete order");
     }
   };
 
   return (
-    <div className="flex gap-3">
-
+    <div className="flex items-center gap-3">
+      {/* VIEW */}
       <Link
         href={`/admin/orders/${orderId}`}
-        className="text-blue-600"
+        title="View Order"
+        className="inline-flex items-center justify-center rounded-lg p-2 text-blue-600 transition hover:bg-blue-50"
       >
         <Eye size={18} />
       </Link>
 
+      {/* EDIT */}
       <Link
         href={`/admin/orders/edit/${orderId}`}
-        className="text-green-600"
+        title="Edit Order"
+        className="inline-flex items-center justify-center rounded-lg p-2 text-green-600 transition hover:bg-green-50"
       >
         <Pencil size={18} />
       </Link>
 
+      {/* DELETE */}
       <button
+        type="button"
         onClick={handleDelete}
-        className="text-red-600"
+        title="Delete Order"
+        className="inline-flex items-center justify-center rounded-lg p-2 text-red-600 transition hover:bg-red-50"
       >
         <Trash2 size={18} />
       </button>
-
     </div>
   );
 }

@@ -1,79 +1,175 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   getOrders,
   getOrderStats,
 } from "@/services/orderApi";
 
-import OrderStats from "@/components/admin/orders/OrderStats";
+import type {
+  Order,
+  OrderStats,
+  OrderStatus,
+} from "@/types/order";
+
+import OrderStatsComponent from "@/components/admin/orders/OrderStats";
 import OrderTable from "@/components/admin/orders/OrderTable";
 import OrderSearch from "@/components/admin/orders/OrderSearch";
 import OrderFilters from "@/components/admin/orders/OrderFilters";
 import OrderEmpty from "@/components/admin/orders/OrderEmpty";
+import OrderLoading from "@/components/admin/orders/OrderLoading";
 
 export default function OrdersPage() {
   const [orders, setOrders] =
-    useState<any[]>([]);
+    useState<Order[]>([]);
 
   const [stats, setStats] =
-    useState<any>(null);
+    useState<OrderStats | null>(null);
 
   const [loading, setLoading] =
     useState(true);
+
+  const [error, setError] =
+    useState("");
 
   const [search, setSearch] =
     useState("");
 
   const [status, setStatus] =
-    useState("");
+    useState<OrderStatus | "">("");
+
+  // ========================================
+  // FETCH ORDERS
+  // ========================================
+
+  const fetchOrders =
+    useCallback(async () => {
+      try {
+        setError("");
+
+        const response =
+          await getOrders();
+
+        setOrders(
+          response.orders || []
+        );
+      } catch (error) {
+        console.error(
+          "Failed to fetch orders:",
+          error
+        );
+
+        setError(
+          "Failed to load orders. Please try again."
+        );
+
+        setOrders([]);
+      }
+    }, []);
+
+  // ========================================
+  // FETCH STATS
+  // ========================================
+
+  const fetchStats =
+    useCallback(async () => {
+      try {
+        const response =
+          await getOrderStats();
+
+        setStats(
+          response.stats
+        );
+      } catch (error) {
+        console.error(
+          "Failed to fetch order stats:",
+          error
+        );
+      }
+    }, []);
+
+  // ========================================
+  // FETCH ALL DATA
+  // ========================================
+
+  const fetchData =
+    useCallback(async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        await Promise.all([
+          fetchOrders(),
+          fetchStats(),
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    }, [
+      fetchOrders,
+      fetchStats,
+    ]);
+
+  // ========================================
+  // INITIAL LOAD
+  // ========================================
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-
-      const [orderRes, statsRes] =
-        await Promise.all([
-          getOrders(),
-          getOrderStats(),
-        ]);
-
-      setOrders(orderRes.orders);
-
-      setStats(statsRes.stats);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // ========================================
+  // FILTER ORDERS
+  // ========================================
 
   const filteredOrders =
     useMemo(() => {
-      return orders.filter(
-        (item: any) => {
-          const matchSearch =
-            item.user?.fullName
-              ?.toLowerCase()
-              .includes(
-                search.toLowerCase()
-              ) ||
-            item.user?.email
-              ?.toLowerCase()
-              .includes(
-                search.toLowerCase()
-              );
+      const searchValue =
+        search
+          .trim()
+          .toLowerCase();
 
-          const matchStatus =
+      return orders.filter(
+        (order) => {
+          const customerName =
+            order.user?.fullName
+              ?.toLowerCase() || "";
+
+          const customerEmail =
+            order.user?.email
+              ?.toLowerCase() || "";
+
+          const platformName =
+            order.platform?.name
+              ?.toLowerCase() || "";
+
+          const orderId =
+            order._id
+              ?.toLowerCase() || "";
+
+          const matchesSearch =
+            !searchValue ||
+            customerName.includes(
+              searchValue
+            ) ||
+            customerEmail.includes(
+              searchValue
+            ) ||
+            platformName.includes(
+              searchValue
+            ) ||
+            orderId.includes(
+              searchValue
+            );
+
+          const matchesStatus =
             !status ||
-            item.status === status;
+            order.status === status;
 
           return (
-            matchSearch &&
-            matchStatus
+            matchesSearch &&
+            matchesStatus
           );
         }
       );
@@ -83,11 +179,92 @@ export default function OrdersPage() {
       status,
     ]);
 
+  // ========================================
+  // REFRESH
+  // ========================================
+
+  const refreshOrders =
+    async () => {
+      await Promise.all([
+        fetchOrders(),
+        fetchStats(),
+      ]);
+    };
+
+  // ========================================
+  // LOADING
+  // ========================================
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+
+        <div>
+          <h1 className="text-3xl font-bold">
+            Orders
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Manage customer purchases
+          </p>
+        </div>
+
+        <OrderLoading />
+
+      </div>
+    );
+  }
+
+  // ========================================
+  // ERROR
+  // ========================================
+
+  if (error && orders.length === 0) {
+    return (
+      <div className="space-y-6">
+
+        <div>
+          <h1 className="text-3xl font-bold">
+            Orders
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Manage customer purchases
+          </p>
+        </div>
+
+        <div className="bg-white rounded-xl shadow p-10 text-center">
+
+          <p className="text-red-600 font-medium">
+            {error}
+          </p>
+
+          <button
+            type="button"
+            onClick={fetchData}
+            className="mt-5 bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700"
+          >
+            Try Again
+          </button>
+
+        </div>
+
+      </div>
+    );
+  }
+
+  // ========================================
+  // UI
+  // ========================================
+
   return (
     <div className="space-y-6">
 
-      <div>
+      {/* ====================================
+          HEADER
+      ==================================== */}
 
+      <div>
         <h1 className="text-3xl font-bold">
           Orders
         </h1>
@@ -95,14 +272,23 @@ export default function OrdersPage() {
         <p className="text-gray-500 mt-2">
           Manage customer purchases
         </p>
-
       </div>
 
+      {/* ====================================
+          STATS
+      ==================================== */}
+
       {stats && (
-        <OrderStats stats={stats} />
+        <OrderStatsComponent
+          stats={stats}
+        />
       )}
 
-      <div className="grid md:grid-cols-2 gap-4">
+      {/* ====================================
+          SEARCH + FILTER
+      ==================================== */}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <OrderSearch
           search={search}
@@ -116,18 +302,49 @@ export default function OrdersPage() {
 
       </div>
 
-      {loading ? (
-        <div className="bg-white rounded-xl shadow p-12 text-center">
-          Loading Orders...
+      {/* ====================================
+          SEARCH RESULT INFO
+      ==================================== */}
+
+      {(search || status) && (
+        <div className="flex items-center justify-between">
+
+          <p className="text-sm text-gray-500">
+            Showing{" "}
+            <span className="font-semibold text-gray-700">
+              {filteredOrders.length}
+            </span>{" "}
+            of{" "}
+            <span className="font-semibold text-gray-700">
+              {orders.length}
+            </span>{" "}
+            orders
+          </p>
+
+          <button
+            type="button"
+            onClick={() => {
+              setSearch("");
+              setStatus("");
+            }}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            Clear Filters
+          </button>
+
         </div>
-      ) : filteredOrders.length ===
-        0 ? (
+      )}
+
+      {/* ====================================
+          ORDERS
+      ==================================== */}
+
+      {filteredOrders.length === 0 ? (
         <OrderEmpty />
       ) : (
         <OrderTable
-          orders={
-            filteredOrders
-          }
+          orders={filteredOrders}
+          onRefresh={refreshOrders}
         />
       )}
 

@@ -1,109 +1,73 @@
 "use client";
 
-import {
-  Bell,
-  Search,
-  Settings,
-  ChevronDown,
-  LogOut,
-} from "lucide-react";
-
-import { useRouter } from "next/navigation";
+import { Bell, Settings, ChevronDown, Wallet } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import Link from "next/link";
 
 export default function Header() {
-  const router = useRouter();
-
-  const { user, logout } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await logout();
-
-      router.replace("/login");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  const { user } = useAuth();
 
   return (
-    <header className="sticky top-0 z-40 h-20 bg-white border-b border-gray-200 px-8">
+    <header className="fixed top-0 left-0 lg:left-64 xl:left-72 right-0 z-30 h-16 sm:h-20 bg-white/90 backdrop-blur-md border-b border-gray-200/80 px-4 sm:px-8 flex items-center justify-between transition-all duration-200">
+      
+      {/* Left: Title & Subtitle (Mobile menu button space handled via pl-12) */}
+      <div className="pl-12 lg:pl-0">
+        <h1 className="text-lg sm:text-2xl font-medium text-slate-800 tracking-tight leading-none">
+          Dashboard
+        </h1>
+        <p className="text-[11px] sm:text-xs text-gray-500 font-medium mt-1 truncate">
+          Welcome back 👋
+        </p>
+      </div>
 
-      <div className="h-full flex items-center justify-between">
+      {/* Right Controls: Wallet, Alerts, Settings, User */}
+      <div className="flex items-center gap-2 sm:gap-4">
+        
+        {/* Wallet Balance Badge */}
+        {/* <Link
+          href="/wallet"
+          className="flex items-center gap-1.5 sm:gap-2 bg-[#0c2419] text-white px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:bg-[#081a12] transition-colors border border-emerald-900/60 flex-shrink-0"
+        >
+          <Wallet size={15} className="text-[#a3e635]" />
+          <span className="whitespace-nowrap">₹ 12,450</span>
+        </Link> */}
 
-        {/* Left */}
+        {/* Notifications Link Button */}
+        <Link
+          href="/notifications"
+          className="relative p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+          aria-label="Notifications"
+        >
+          <Bell size={18} className="sm:w-5 sm:h-5" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
+        </Link>
+        
 
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800">
-            Dashboard
-          </h1>
+        {/* Settings Icon Button */}
+        <Link
+          href="/settings"
+          className="hidden sm:flex p-2 rounded-xl text-gray-600 hover:bg-gray-100 transition-colors"
+          aria-label="Settings"
+        >
+          <Settings size={18} className="sm:w-5 sm:h-5" />
+        </Link>
 
-          <p className="text-sm text-gray-500">
-            Welcome back 👋
-          </p>
-        </div>
-
-        {/* Search */}
-
-        <div className="hidden lg:block w-[450px]">
-          <div className="relative">
-            <Search
-              size={18}
-              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
-            />
-
-            <input
-              type="text"
-              placeholder="Search Leads..."
-              className="w-full h-12 rounded-xl border border-gray-300 pl-12 pr-5 outline-none focus:border-blue-600"
-            />
-          </div>
-        </div>
-
-        {/* Right */}
-
-        <div className="flex items-center gap-5">
-
-          <button className="relative">
-            <Bell size={22} />
-            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-red-500"></span>
-          </button>
-
-          <button>
-            <Settings size={22} />
-          </button>
-
-          {/* User */}
-
-          <div className="flex items-center gap-3">
-
-            <div className="w-11 h-11 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
-              {user?.fullName?.charAt(0).toUpperCase()}
-            </div>
-
-            <div className="hidden md:block">
-              <h3 className="font-semibold">
-                {user?.fullName}
-              </h3>
-
-              <p className="text-xs text-gray-500">
-                {user?.email}
-              </p>
-            </div>
-
-            <ChevronDown size={18} />
+        {/* User Identity Pill */}
+        <div className="flex items-center gap-2 sm:gap-2.5 pl-1 sm:pl-2 sm:border-l sm:border-gray-200">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-[#38ef7d] to-[#a3e635] text-slate-950 flex items-center justify-center font-black text-xs sm:text-sm shadow-sm flex-shrink-0">
+            {user?.fullName?.charAt(0).toUpperCase() || "A"}
           </div>
 
-          {/* Logout */}
+          <div className="hidden md:flex flex-col text-left leading-tight">
+            <span className="font-bold text-xs sm:text-sm text-slate-800 truncate max-w-[120px]">
+              {user?.fullName || "Ajay Sharma"}
+            </span>
+            <span className="text-[10px] text-gray-400 truncate max-w-[120px]">
+              Active Account
+            </span>
+          </div>
 
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"
-          >
-            <LogOut size={18} />
-            Logout
-          </button>
-
+          <ChevronDown size={14} className="text-gray-400 hidden sm:block" />
         </div>
 
       </div>
