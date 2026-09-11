@@ -28,11 +28,6 @@ const login = asyncHandler(async (req, res) => {
   // Compare password
   const isMatch = await user.comparePassword(password);
 
-
- console.log("Email:", email);
-console.log("Entered Password:", password);
-console.log("Stored Password:", user.password);
-console.log("Password Match:", isMatch);
   if (!isMatch) {
     return res.status(401).json({
       success: false,
@@ -48,12 +43,19 @@ console.log("Password Match:", isMatch);
   const token = generateToken(user._id);
 
   // Send Cookie
+  // res.cookie("token", token, {
+  //   httpOnly: true,
+  //   secure: false, // Production => true
+  //   sameSite: "lax",
+  //   maxAge: 7 * 24 * 60 * 60 * 1000,
+  // });
+
   res.cookie("token", token, {
-    httpOnly: true,
-    secure: false, // Production => true
-    sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  });
+  httpOnly: true,
+  secure: true,
+  sameSite: "none",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
 
   res.status(200).json({
     success: true,
