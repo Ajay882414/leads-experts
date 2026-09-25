@@ -64,7 +64,7 @@ export default function Sidebar() {
             L
           </div>
           <span className="text-xl font-black tracking-wider text-white">
-            LEADFLOW
+            Leadsvero
           </span>
         </div>
 
@@ -107,7 +107,7 @@ export default function Sidebar() {
           </div>
 
           <p className="text-[11.5px] font-semibold text-slate-900 leading-snug mb-2.5">
-            Download the LeadFlow app for instant lead access on the go.
+            Download the Leadsvero app for instant lead access on the go.
           </p>
 
           <div className="grid grid-cols-2 gap-2">

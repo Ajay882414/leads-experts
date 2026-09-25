@@ -25,7 +25,7 @@ export default function Header() {
     { label: "Home", href: "/" },
     { label: "Marketplace", href: "/marketplace" },
     { label: "How It Works", href: "/how-it-works" },
-    { label: "Why Us", href: "/lead-quality" },
+    { label: "Why Us", href: "/why-us" },
     { label: "Contact us", href: "/contact" },
   ];
 
@@ -34,18 +34,16 @@ export default function Header() {
       <nav
         className={`w-full max-w-5xl text-white px-4 sm:px-6 py-2.5 rounded-full flex items-center justify-between border transition-all duration-300 ${
           scrolled
-            ? "shadow-2xl border-emerald-900/60 bg-[#071a13]/95 backdrop-blur-md"
+            ? "shadow-2xl border-emerald-900/60 bg-[#092219]/95 backdrop-blur-md"
             : "shadow-xl border-emerald-950/80 bg-[#092219]/95"
         }`}
       >
-        {/* Brand Logo - LEADFLOW */}
+        {/* Brand Logo - Leadsvero */}
         <Link href="/" className="flex items-center gap-2.5 group flex-shrink-0">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#38ef7d] to-[#a3e635] flex items-center justify-center font-normal text-slate-950 text-base shadow-sm group-hover:scale-105 transition-transform">
-            L
+          <div className="">
+            <img src="/image 17.png" className="w-[200]" alt="" />
           </div>
-          <span className="text-sm sm:text-base font-normal tracking-wider text-white">
-            LEADFLOW
-          </span>
+         
         </Link>
 
         {/* Center Navigation Links */}

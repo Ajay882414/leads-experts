@@ -102,7 +102,7 @@ export default function ResetPasswordPage() {
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight">
               Create New Password <br />
               <span className="font-extrabold tracking-wide uppercase text-slate-950">
-                LEADFLOW
+                Leadsvero
               </span>
             </h1>
             <p className="text-xs text-slate-500 mt-1 font-normal">

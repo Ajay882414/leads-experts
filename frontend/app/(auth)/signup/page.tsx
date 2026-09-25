@@ -69,7 +69,7 @@ export default function SignupPage() {
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight">
               Create Account on <br />
               <span className="font-extrabold tracking-wide uppercase text-slate-950">
-                LEADFLOW
+                Leadsvero
               </span>
             </h1>
           </div>

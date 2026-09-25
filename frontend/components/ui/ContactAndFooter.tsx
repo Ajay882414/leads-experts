@@ -38,7 +38,7 @@ export default function ContactAndFooter() {
                 From the Founder&apos;s Desk!!
               </h2>
               <p className="mt-3 text-xs sm:text-sm text-slate-400 font-medium">
-                Uncover the purpose, passion, and vision that drives LEADFLOW forward.
+                Uncover the purpose, passion, and vision that drives Leadsvero forward.
               </p>
 
               {/* Quote Mark */}
@@ -48,11 +48,11 @@ export default function ContactAndFooter() {
 
               {/* Quote Body */}
               <p className="mt-4 text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed font-normal max-w-xl">
-                Businesses don&apos;t fail due to bad products; they fail because of a lack of targeted, high-intent buyers. LEADFLOW is built to eliminate cold outreach friction and give entrepreneurs, creators, and sales professionals instant access to genuine, verified leads.
+                Businesses don&apos;t fail due to bad products; they fail because of a lack of targeted, high-intent buyers. Leadsvero is built to eliminate cold outreach friction and give entrepreneurs, creators, and sales professionals instant access to genuine, verified leads.
               </p>
 
               <p className="mt-4 text-xs sm:text-sm text-slate-400 font-medium">
-                — Founder & CEO, LeadFlow
+                — Founder & CEO, Leadsvero
               </p>
             </div>
 
@@ -172,7 +172,7 @@ export default function ContactAndFooter() {
               </div>
               <div className="flex flex-col">
                 <span className="text-sm sm:text-base font-medium tracking-wider leading-none text-white">
-                  LEADFLOW
+                  Leadsvero
                 </span>
                 <span className="text-[8px] text-slate-400 font-semibold tracking-widest uppercase mt-0.5">
                   The Lead Acquisition Engine
@@ -212,9 +212,9 @@ export default function ContactAndFooter() {
               </h4>
               <ul className="space-y-2.5 text-xs text-slate-400">
                 <li><Link href="/about" className="hover:text-white transition-colors">About</Link></li>
-                <li><Link href="/affiliate" className="hover:text-white transition-colors">Free Affiliate</Link></li>
+                <li><Link href="/marketplace" className="hover:text-white transition-colors">Marketplace</Link></li>
+                <li><Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link></li>
                 <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
-                <li><Link href="/disclaimer" className="hover:text-white transition-colors">Disclaimer</Link></li>
               </ul>
             </div>
 
@@ -238,7 +238,7 @@ export default function ContactAndFooter() {
         {/* ================= COPYRIGHT & LEGAL BAR ================= */}
         <div className="pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] sm:text-xs text-slate-400">
           <div>
-            © 2026 Leadflow. Copyright and rights reserved
+            © 2026 Leadsvero. Copyright and rights reserved
           </div>
 
           <div className="flex items-center gap-4 text-slate-400">

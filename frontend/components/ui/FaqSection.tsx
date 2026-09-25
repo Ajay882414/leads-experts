@@ -23,9 +23,9 @@ const faqsData: FaqItem[] = [
   },
   {
     id: 3,
-    question: "What makes LeadFlow different from scraped web databases?",
+    question: "What makes Leadsvero different from scraped web databases?",
     answer:
-      "Unlike outdated scraped numbers that bounce or fail on WhatsApp, LeadFlow delivers opted-in users collected within the last 24-48 hours specifically interested in digital products and services.",
+      "Unlike outdated scraped numbers that bounce or fail on WhatsApp, Leadsvero delivers opted-in users collected within the last 24-48 hours specifically interested in digital products and services.",
   },
   {
     id: 4,
