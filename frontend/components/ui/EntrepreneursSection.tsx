@@ -20,8 +20,8 @@ const entrepreneursData: Entrepreneur[] = [
     highlightedName: "Gupta",
     role: "Co-Founder & CMO",
     company: "boAt Lifestyle",
-    quote: "Customer intent aur distribution channel agar sharp hain, toh brand ko scale karne se koi nahi rok sakta.",
-    image: "/image.png",
+    quote: "Building a consumer brand requires continuous relevance, sharp pricing, and understanding what the modern Indian youth actually wants.",
+    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "2",
@@ -29,35 +29,35 @@ const entrepreneursData: Entrepreneur[] = [
     highlightedName: "Bansal",
     role: "Founder & CEO",
     company: "Lenskart",
-    quote: "Technology aur operational precision milkar offline aur online commerce ke customer acquisition cost ko drastically cut karti hain.",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80",
+    quote: "Customer obsession and disciplined operational technology turn traditional, unorganized offline markets into high-efficiency businesses.",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "3",
     firstName: "Anupam",
     highlightedName: "Mittal",
     role: "Founder & Director",
-    company: "People Group",
-    quote: "Agile sales engines aur targeted demographic data hi founders ko high conversion pipelines create karne me help karte hain.",
+    company: "Shaadi.com (People Group)",
+    quote: "The core of enterprise scaling is sustainable unit economics and identifying genuine high-intent customer segments early.",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=800&q=80",
   },
   {
     id: "4",
     firstName: "Ashneer",
     highlightedName: "Grover",
-    role: "Fintech Leader",
+    role: "Fintech Leader & Founder",
     company: "Third Unicorn",
-    quote: "Business me vanity metrics chhod kar real cashflow, high connect calls aur seedhi customer utility par focus hona chahiye.",
+    quote: "Growth is nothing without profitability. If your sales funnel cannot close real cash-paying users with speed, nothing else matters.",
     image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80",
   },
   {
-    id: "6",
+    id: "5",
     firstName: "Akash",
     highlightedName: "Aanand",
     role: "Founder",
-    company: "Bella Vita",
-    quote: "Direct-to-consumer reach tab scale hoti hai jab aapka audience filtering aur tele-outreach pitch bilkul synchronous ho.",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80",
+    company: "Bella Vita Organic",
+    quote: "Agile performance distribution and targeted direct-to-consumer outreach create compounding trust faster than any broad campaign.",
+    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80",
   },
 ];
 
@@ -76,7 +76,7 @@ export default function EntrepreneursSection() {
 
   return (
     <section className="relative w-full bg-[#fafcfb] py-16 sm:py-24 px-4 sm:px-8 lg:px-12 overflow-hidden selection:bg-[#99db32] selection:text-black border-b border-slate-200/80">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-6xl mx-auto">
         
         {/* ================= SECTION HEADER ================= */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 sm:mb-14">
