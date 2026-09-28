@@ -431,7 +431,7 @@ export default function PrivacyPolicyPage() {
                   </div>
                   <div className="p-3.5 rounded-xl bg-white/10 border border-white/10 text-white space-y-1">
                     <p className="text-slate-400 text-[10px] uppercase tracking-wider">Direct Email Address:</p>
-                    <p className="font-mono text-[#a3e635]">grievance@leadsvero.com</p>
+                    <p className="font-mono text-[#a3e635]">info@leadsvero.com</p>
                     <p className="text-slate-300">SLA Response: &lt; 48 Working Hours</p>
                   </div>
                 </div>

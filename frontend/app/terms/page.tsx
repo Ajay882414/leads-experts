@@ -1,6 +1,6 @@
 import Header from "@/components/common/Header";
 import TermsAndConditionsContent from "@/components/terms/TermsAndConditionsContent";
-import ContactAndFooter from "@/components/ui/ContactAndFooter";
+// import ContactAndFooter from "@/components/ui/ContactAndFooter";
 
 export const metadata = {
   title: "Terms and Conditions | LeadsVero",
@@ -12,7 +12,7 @@ export default function TermsPage() {
     <main className="w-full min-h-screen bg-white">
         <Header/>
       <TermsAndConditionsContent />
-      <ContactAndFooter/>
+      {/* <ContactAndFooter/> */}
     </main>
   );
 }
