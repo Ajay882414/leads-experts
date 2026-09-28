@@ -189,10 +189,10 @@ export default function CancellationAndRefundContent() {
               </p>
               <div className="space-y-1 pt-1">
                 <a
-                  href="mailto:support@leadsvero.com"
+                  href="mailto:info@leadsvero.com"
                   className="flex items-center gap-1.5 text-xs font-normal text-[#a3e635] hover:underline"
                 >
-                  <span>support@leadsvero.com</span>
+                  <span>info@leadsvero.com</span>
                   <ArrowRight size={12} />
                 </a>
                 <a

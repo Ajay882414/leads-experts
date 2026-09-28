@@ -77,7 +77,7 @@ export default function ContactAndFooter() {
               </a>
 
               <a
-                href="mailto:support@leadsvero.com"
+                href="mailto:info@leadsvero.com"
                 className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-slate-700 transition-all text-xs"
               >
                 <div className="w-8 h-8 rounded-lg bg-emerald-950/80 flex items-center justify-center text-[#a3e635] shrink-0">
@@ -85,7 +85,7 @@ export default function ContactAndFooter() {
                 </div>
                 <div className="truncate">
                   <p className="text-[10px] text-slate-400 uppercase tracking-wider">Support Desk</p>
-                  <p className="font-mono text-slate-200 text-xs truncate">support@leadsvero.com</p>
+                  <p className="font-mono text-slate-200 text-xs truncate">info@leadsvero.com</p>
                 </div>
               </a>
             </div>
@@ -202,7 +202,7 @@ export default function ContactAndFooter() {
             <address className="not-italic text-xs text-slate-400 space-y-1 leading-relaxed">
               <p className="text-slate-300 font-medium">LeadsVero Technologies</p>
               <p>City mall plus , Jagannathpuri Kanta road ,jhotwara jaipur 302012</p>
-              <p>Email: <a href="mailto:support@leadsvero.com" className="text-slate-300 underline">support@leadsvero.com</a></p>
+              <p>Email: <a href="mailto:info@leadsvero.com" className="text-slate-300 underline">info@leadsvero.com</a></p>
               <p>Phone: <a href="tel:+918769546871" className="text-slate-300 underline">+91 8769546871</a></p>
             </address>
           </div>
