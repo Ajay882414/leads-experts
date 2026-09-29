@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ArrowDown, Sparkles, MessageSquare, Clock, ShieldCheck, Zap } from "lucide-react";
+import { ArrowDown, Sparkles, MessageSquare } from "lucide-react";
 
 export default function ContactHero() {
   const scrollToForm = () => {
@@ -26,7 +26,7 @@ export default function ContactHero() {
         }}
       />
 
-      {/* Soft Glow Radial Circles (Header ke peeche seamless backdrop glow) */}
+      {/* Soft Glow Radial Circles */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-emerald-50/60 blur-3xl rounded-full pointer-events-none -z-1" />
 
       {/* ================= FLOATING 3D ENTERPRISE SUPPORT CARDS ================= */}
@@ -141,7 +141,7 @@ export default function ContactHero() {
         {/* Contact Badge */}
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#eef7ee] border border-[#d6ecd6] text-[#0c4731] text-xs font-normal">
           <Sparkles size={13} className="text-[#0c4731]" />
-          <span>Priority Bulk Inquiries & Enterprise Support</span>
+          <span>Priority Bulk Inquiries &amp; Enterprise Support</span>
         </div>
 
         {/* Headline */}
@@ -170,7 +170,7 @@ export default function ContactHero() {
           </button>
 
           <a
-            href="https://wa.me/919999999999"
+            href="https://wa.me/918769546871"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-slate-100 hover:bg-slate-200/90 text-slate-800 font-normal text-xs sm:text-sm md:text-base transition-all duration-200 active:scale-95"

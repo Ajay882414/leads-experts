@@ -27,7 +27,7 @@ export default function MarketplaceHero() {
         }}
       />
 
-      {/* Soft Glow Radial Circles (Header ke peeche seamless backdrop glow) */}
+      {/* Soft Glow Radial Circles */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-emerald-50/60 blur-3xl rounded-full pointer-events-none -z-1" />
 
       {/* ================= FLOATING 3D METRIC CARDS ================= */}
@@ -106,10 +106,6 @@ export default function MarketplaceHero() {
         </div>
       </div>
 
-      
-
-      
-
       {/* Google Ads (Bottom Left) */}
       <div className="hidden sm:flex absolute left-[6%] md:left-[10%] lg:left-[12%] bottom-28 z-10 pointer-events-none">
         <div className="w-11 h-11 lg:w-13 lg:h-13 rounded-2xl bg-white border border-slate-200 shadow-md flex items-center justify-center font-normal text-[#4285F4] text-base">
@@ -126,8 +122,6 @@ export default function MarketplaceHero() {
         </div>
       </div>
 
-      
-
       {/* YouTube Leads (Mid Right) */}
       <div className="hidden sm:flex absolute right-[4%] md:right-[12%] lg:right-[15%] top-[50%] z-10 pointer-events-none">
         <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl bg-[#FF0000] shadow-lg flex items-center justify-center font-normal text-xs text-white">
@@ -142,7 +136,7 @@ export default function MarketplaceHero() {
         </div>
       </div>
 
-      {/* ================= HERO CENTER CONTENT (No Search Bar) ================= */}
+      {/* ================= HERO CENTER CONTENT ================= */}
       <div className="relative z-20 max-w-3xl lg:max-w-3xl mx-auto text-center px-4 sm:px-6 my-auto space-y-4 sm:space-y-6">
         
         {/* Marketplace Tag */}
@@ -177,8 +171,6 @@ export default function MarketplaceHero() {
           </button>
         </div>
       </div>
-
-      
 
     </section>
   );

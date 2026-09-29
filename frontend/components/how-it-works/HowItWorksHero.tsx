@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { ArrowDown, Sparkles } from "lucide-react";
+import { ArrowDown, Sparkles, HelpCircle } from "lucide-react";
 
-export default function MarketplaceHero() {
-  const scrollToCatalog = () => {
-    const el = document.getElementById("lead-packs");
+export default function HowItWorksHero() {
+  const scrollToProcess = () => {
+    const el = document.getElementById("process-steps");
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
@@ -26,12 +26,12 @@ export default function MarketplaceHero() {
         }}
       />
 
-      {/* Soft Glow Radial Circles (Header ke peeche seamless backdrop glow) */}
+      {/* Soft Glow Radial Circles */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-emerald-50/60 blur-3xl rounded-full pointer-events-none -z-1" />
 
       {/* ================= FLOATING 3D METRIC CARDS ================= */}
 
-      {/* 1. Left Card: 50k+ Live Inventory */}
+      {/* 1. Left Card: 4 Simple Steps */}
       <div className="hidden lg:block absolute left-4 xl:left-12 2xl:left-24 top-1/2 -translate-y-8 z-10 pointer-events-none transition-transform duration-300">
         <div className="w-36 h-36 bg-[#161c24] text-white p-4 rounded-2xl shadow-2xl border border-slate-800 flex flex-col justify-between relative overflow-hidden backdrop-blur-sm">
           <div className="flex gap-1.5">
@@ -40,9 +40,9 @@ export default function MarketplaceHero() {
             <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" />
           </div>
           <div>
-            <h4 className="text-2xl font-normal tracking-tight text-white">50k+</h4>
+            <h4 className="text-2xl font-normal tracking-tight text-white">4 Steps</h4>
             <p className="text-[11px] text-slate-400 font-normal leading-tight">
-              Live Leads<br />In Inventory
+              From Niche Filter<br />To Live CSV
             </p>
           </div>
           <svg className="absolute -bottom-2 -right-2 w-20 h-20 text-slate-700/30" viewBox="0 0 100 100" fill="none" stroke="currentColor">
@@ -63,7 +63,7 @@ export default function MarketplaceHero() {
           <div>
             <h4 className="text-2xl font-normal tracking-tight text-white">100%</h4>
             <p className="text-[11px] text-emerald-200/90 font-normal leading-tight">
-              Single-Buyer<br />Exclusive Data
+              Single-Buyer<br />Exclusive Lock
             </p>
           </div>
           <svg className="absolute -bottom-2 -right-2 w-20 h-20 text-emerald-600/30" viewBox="0 0 100 100" fill="none" stroke="currentColor">
@@ -73,7 +73,7 @@ export default function MarketplaceHero() {
         </div>
       </div>
 
-      {/* 3. Right Bottom Card: 5 Active Channels */}
+      {/* 3. Right Bottom Card: 24h SLA */}
       <div className="hidden lg:block absolute right-24 xl:right-48 2xl:right-64 bottom-24 z-10 pointer-events-none transition-transform duration-300">
         <div className="w-36 h-36 bg-[#102d25] text-white p-4 rounded-2xl shadow-2xl border border-teal-900/80 flex flex-col justify-between relative overflow-hidden backdrop-blur-sm">
           <div className="flex gap-1.5">
@@ -82,9 +82,9 @@ export default function MarketplaceHero() {
             <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" />
           </div>
           <div>
-            <h4 className="text-2xl font-normal tracking-tight text-white">5 Channels</h4>
+            <h4 className="text-2xl font-normal tracking-tight text-white">24h SLA</h4>
             <p className="text-[11px] text-teal-200/90 font-normal leading-tight">
-              Verified Social<br />Lead Pools
+              Defective Record<br />Replacement
             </p>
           </div>
           <svg className="absolute -bottom-2 -right-2 w-20 h-20 text-teal-600/30" viewBox="0 0 100 100" fill="none" stroke="currentColor">
@@ -94,41 +94,36 @@ export default function MarketplaceHero() {
         </div>
       </div>
 
-      {/* ================= FLOATING PLATFORM ICONS ================= */}
-
-      
-
-      {/* ================= HERO CENTER CONTENT (No Search Bar) ================= */}
+      {/* ================= HERO CENTER CONTENT ================= */}
       <div className="relative z-20 max-w-3xl lg:max-w-3xl mx-auto text-center px-4 sm:px-6 my-auto space-y-4 sm:space-y-6">
         
-        {/* Marketplace Tag */}
+        {/* Page Flow Tag */}
         <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#eef7ee] border border-[#d6ecd6] text-[#0c4731] text-xs font-normal">
           <Sparkles size={13} className="text-[#0c4731]" />
-          <span>Real-time Lead Marketplace</span>
+          <span>The Acquisition Engine Architecture</span>
         </div>
 
         {/* Headline */}
         <h1 className="text-3xl sm:text-5xl md:text-[58px] font-normal text-[#111827] tracking-tight leading-[1.2] sm:leading-[1.12]">
-          Browse Verified{" "}
+          How LeadsVero Delivers{" "}
           <span className="inline-block bg-[#97df2c] text-white px-3 sm:px-4 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl shadow-sm transform -rotate-1 font-normal">
-            Lead Packs.
-          </span>{" "}
-          Direct CSV Access.
+            Verified Buyers.
+          </span>
         </h1>
 
         {/* Subtitle */}
         <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-slate-600 max-w-xl mx-auto font-normal leading-relaxed">
-          Zero guesswork, single-buyer data guarantee. Pick your platform, filter target audiences, and download instantly.
+          Understand how our dynamic filtering, Single-Buyer anti-resell lock, and instant dashboard unlocks guarantee clean closing pipelines.
         </p>
 
-        {/* Quick Scroll to Catalog Button (CTA) */}
+        {/* Quick Scroll CTA */}
         <div className="pt-2 sm:pt-4 flex items-center justify-center gap-3.5">
           <button
             type="button"
-            onClick={scrollToCatalog}
+            onClick={scrollToProcess}
             className="inline-flex items-center gap-2 px-8 sm:px-10 py-3 sm:py-3.5 rounded-full bg-[#1b4b3e] hover:bg-[#153c32] active:scale-95 text-white font-normal text-xs sm:text-sm md:text-base transition-all duration-200 shadow-md hover:shadow-lg cursor-pointer"
           >
-            <span>Explore Lead Packs</span>
+            <span>See Step-by-Step Flow</span>
             <ArrowDown size={15} className="text-[#a3e635] animate-bounce" />
           </button>
         </div>
@@ -138,23 +133,23 @@ export default function MarketplaceHero() {
       <div className="relative z-20 mt-8 w-full max-w-4xl mx-auto px-4">
         <div className="rounded-2xl bg-white/80 border border-slate-200/90 shadow-sm backdrop-blur-md p-3.5 sm:p-4 flex flex-wrap items-center justify-around gap-4 text-center">
           <div>
-            <p className="text-base sm:text-xl font-normal text-slate-900 tracking-tight">50,000+</p>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">Active Stock</p>
+            <p className="text-base sm:text-xl font-normal text-slate-900 tracking-tight">Step 1</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">Select Platform</p>
           </div>
           <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
           <div>
-            <p className="text-base sm:text-xl font-normal text-[#0c4731] tracking-tight">100% Unique</p>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">Single-Buyer Lock</p>
+            <p className="text-base sm:text-xl font-normal text-[#0c4731] tracking-tight">Step 2</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">Choose Lead Count</p>
           </div>
           <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
           <div>
-            <p className="text-base sm:text-xl font-normal text-slate-900 tracking-tight">Instant CSV</p>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">Direct File Export</p>
+            <p className="text-base sm:text-xl font-normal text-slate-900 tracking-tight">Step 3</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">1-Click Checkout</p>
           </div>
           <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
           <div>
-            <p className="text-base sm:text-xl font-normal text-[#0c4731] tracking-tight">₹8 - ₹24</p>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">Per Lead Range</p>
+            <p className="text-base sm:text-xl font-normal text-[#0c4731] tracking-tight">Step 4</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">Instant CSV Export</p>
           </div>
         </div>
       </div>

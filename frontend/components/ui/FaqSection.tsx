@@ -11,33 +11,39 @@ interface FaqItem {
 const faqsData: FaqItem[] = [
   {
     id: 1,
-    question: "What happens after I buy?",
+    question: "Payment complete hone ke baad leads kaise milengi?",
     answer:
-      "You get instant access to your dashboard with real-time download links to your verified CSV database, delivery tracking, and dedicated WhatsApp support — no waiting, no friction.",
+      "Payment confirm hote hi aapke user dashboard me instant file unlock ho jati hai. Aap live leads ki list preview kar sakte hain aur ek click me structured UTF-8 .CSV ya Excel spreadsheet download kar sakte hain.",
   },
   {
     id: 2,
-    question: "Are these leads verified and active buyers?",
+    question: "Kya yeh leads kisi aur buyer ko dobara bechi jati hain?",
     answer:
-      "Yes, 100%. All leads are sourced dynamically through high-intent ad campaigns (Meta, Google, LinkedIn) and filtered by age, active engagement, and recent buying behavior.",
+      "Bilkul nahi. LeadsVero strict Single-Buyer Exclusive Lock par kaam karta hai. Jo specific lead batch aap check out karte hain, woh hamare database me permanent 'Retired' flag ho jati hai aur kisi doosre competitor ko kabhi allocate nahi hoti.",
   },
   {
     id: 3,
-    question: "What makes Leadsvero different from scraped web databases?",
+    question: "Agar file me invalid ya switch-off numbers mile toh?",
     answer:
-      "Unlike outdated scraped numbers that bounce or fail on WhatsApp, Leadsvero delivers opted-in users collected within the last 24-48 hours specifically interested in digital products and services.",
+      "Humari 24-Hour Replacement SLA policy ke tehat, agar batch me 10% se zyada invalid ya disconnected numbers hote hain, toh aap direct support desk ya order tab se claim raise kar sakte hain. Verify hone par automated replacement records ya wallet credits provide kiye jate hain.",
   },
   {
     id: 4,
-    question: "Can I choose my specific target audience and niche?",
+    question: "LeadsVero ka data random internet scraping se alag kaise hai?",
     answer:
-      "Absolutely. You can filter by specific customer profiles including Housewife, Working Professionals, Students, Business Owners, or Location-based criteria before checking out.",
+      "Random scrapers internet se dead ya expired numbers uthate hain. LeadsVero par leads active digital campaigns (Instagram reels, Meta ads, inbound opt-in forms, aur B2B queries) se filter hoti hain, jisme active WhatsApp connect rate kaafi high rehta hai.",
   },
   {
     id: 5,
-    question: "Is there a way to upgrade or buy in bulk later?",
+    question: "Kya specific category, gender ya location filter mil sakta hai?",
     answer:
-      "Yes, your dashboard allows one-click top-ups. You can scale from 50 leads to 5,000+ leads anytime with discounted volume tiers and priority custom extraction.",
+      "Haan. Aap marketplace me category (Students, Work from Home, Business Owners, Corporate Executives) ke saath demographics aur state/city filters choose kar sakte hain taaki aapki sales team sirf relevant prospects par call kare.",
+  },
+  {
+    id: 6,
+    question: "Kya mujhe purchase ka official invoice milega?",
+    answer:
+      "Haan, har successful transaction par system automatically tax-compliant digital invoice generate karta hai jise aap apne billing dashboard se anytime download kar sakte hain.",
   },
 ];
 
@@ -63,8 +69,11 @@ export default function FaqSection() {
                 FAQ
               </div>
               <h2 className="text-3xl sm:text-4xl font-medium font-black text-[#0f172a] tracking-tight leading-[1.15]">
-                What would you like to know about Us
+                Everything You Need to Know About LeadsVero
               </h2>
+              <p className="mt-3 text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
+                Clear answers regarding our single-buyer data lock, instant CSV unlocks, connect SLAs, and verification process.
+              </p>
             </div>
 
             {/* Connected Node Platform Network Graphic */}
@@ -72,15 +81,15 @@ export default function FaqSection() {
               
               {/* SVG Connecting Dashed/Light Lines */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 400 240" fill="none">
-                <line x1="40" y1="120" x2="110" y2="60" stroke="#fecaca" strokeWidth="1.5" />
-                <line x1="40" y1="120" x2="160" y2="150" stroke="#fecaca" strokeWidth="1.5" />
-                <line x1="110" y1="60" x2="220" y2="70" stroke="#fecaca" strokeWidth="1.5" />
-                <line x1="160" y1="150" x2="220" y2="70" stroke="#fecaca" strokeWidth="1.5" />
-                <line x1="220" y1="70" x2="300" y2="65" stroke="#fecaca" strokeWidth="1.5" />
-                <line x1="220" y1="70" x2="290" y2="165" stroke="#fecaca" strokeWidth="1.5" />
-                <line x1="40" y1="210" x2="130" y2="195" stroke="#fecaca" strokeWidth="1.5" />
-                <line x1="130" y1="195" x2="230" y2="200" stroke="#fecaca" strokeWidth="1.5" />
-                <line x1="290" y1="165" x2="380" y2="185" stroke="#fecaca" strokeWidth="1.5" />
+                <line x1="40" y1="120" x2="110" y2="60" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
+                <line x1="40" y1="120" x2="160" y2="150" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
+                <line x1="110" y1="60" x2="220" y2="70" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
+                <line x1="160" y1="150" x2="220" y2="70" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
+                <line x1="220" y1="70" x2="300" y2="65" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
+                <line x1="220" y1="70" x2="290" y2="165" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
+                <line x1="40" y1="210" x2="130" y2="195" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
+                <line x1="130" y1="195" x2="230" y2="200" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
+                <line x1="290" y1="165" x2="380" y2="185" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="3 3" />
               </svg>
 
               {/* Node 1: Meta (Far Left) */}
@@ -90,12 +99,12 @@ export default function FaqSection() {
 
               {/* Node 2: Python / AI (Top-Left) */}
               <div className="absolute left-[24%] top-[12%] w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center text-sm">
-                🐍
+                ⚡
               </div>
 
               {/* Node 3: Excel (Center-Left) */}
               <div className="absolute left-[36%] top-[52%] w-9 h-9 rounded-xl bg-[#107c41] shadow-md flex items-center justify-center text-white font-bold text-xs">
-                X
+                CSV
               </div>
 
               {/* Node 4: LinkedIn (Top-Center) */}
@@ -103,19 +112,19 @@ export default function FaqSection() {
                 in
               </div>
 
-              {/* Node 5: VN Editor (Top-Right) */}
-              <div className="absolute left-[70%] top-[14%] w-9 h-9 rounded-xl bg-white shadow-md border border-slate-200 flex items-center justify-center font-black text-xs text-slate-800">
-                VN
+              {/* Node 5: Verified Tag (Top-Right) */}
+              <div className="absolute left-[70%] top-[14%] w-9 h-9 rounded-xl bg-white shadow-md border border-slate-200 flex items-center justify-center font-black text-xs text-emerald-600">
+                ✓
               </div>
 
-              {/* Node 6: Trading / Stocks (Center-Right) */}
+              {/* Node 6: Analytics / Scale (Center-Right) */}
               <div className="absolute left-[68%] top-[56%] w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center text-sm">
                 📊
               </div>
 
-              {/* Node 7: ChatGPT (Far Right) */}
-              <div className="absolute right-4 top-[64%] w-10 h-10 rounded-xl bg-[#10a37f] shadow-md flex items-center justify-center text-white font-bold text-xs">
-                GPT
+              {/* Node 7: Instant DB (Far Right) */}
+              <div className="absolute right-4 top-[64%] w-10 h-10 rounded-xl bg-[#0c4731] shadow-md flex items-center justify-center text-[#a3e635] font-bold text-xs">
+                LIVE
               </div>
 
               {/* Node 8: Google Ads (Bottom Left) */}
@@ -123,12 +132,12 @@ export default function FaqSection() {
                 G
               </div>
 
-              {/* Node 9: Shopify (Bottom Center-Left) */}
-              <div className="absolute left-[28%] bottom-3 w-9 h-9 rounded-full bg-[#95bf47] shadow-md flex items-center justify-center text-white font-bold text-xs">
-                🛍️
+              {/* Node 9: WhatsApp Direct (Bottom Center-Left) */}
+              <div className="absolute left-[28%] bottom-3 w-9 h-9 rounded-full bg-[#25D366] shadow-md flex items-center justify-center text-white font-bold text-xs">
+                WA
               </div>
 
-              {/* Node 10: Shorts / Video (Bottom Center) */}
+              {/* Node 10: Video / Engagement (Bottom Center) */}
               <div className="absolute left-[54%] bottom-1 w-10 h-10 rounded-full bg-white shadow-md border border-slate-100 flex items-center justify-center text-red-600 font-bold text-sm">
                 ▶
               </div>
@@ -196,4 +205,4 @@ export default function FaqSection() {
       </div>
     </section>
   );
-}
+} 

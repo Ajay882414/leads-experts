@@ -14,55 +14,55 @@ interface PathCard {
 const pathsData: PathCard[] = [
   {
     id: "1",
-    emoji: "🎬",
-    title: "Video Editor",
+    emoji: "🎓",
+    title: "Student Prospects",
     description:
-      "Master industry-leading editing tools like Premiere Pro, Filmora, and After Effects to create cinematic videos, engaging reels, YouTube content, and professional brand campaigns that stand out.",
+      "Target verified high-intent students looking for online skill courses, competitive exam prep, university admissions, and career mentorship programs with active WhatsApp connectivity.",
     rotation: "-rotate-4",
     pinColor: "dark-green",
   },
   {
     id: "2",
-    emoji: "🤖",
-    title: "AI Specialist",
+    emoji: "🏡",
+    title: "Work From Home",
     description:
-      "Learn AI tools, automation systems, and prompt engineering to build smarter workflows, boost productivity, and create the next generation of AI-powered solutions.",
+      "Connect with motivated individuals and homemakers seeking flexible remote jobs, reselling platforms, affiliate networks, and part-time independent digital income opportunities.",
     rotation: "rotate-0",
     pinColor: "black",
   },
   {
     id: "3",
-    emoji: "📱",
-    title: "Social Media Expert",
+    emoji: "🏢",
+    title: "Business Owners",
     description:
-      "Master Instagram growth, YouTube strategy, and content marketing to build personal brands, grow businesses, and create high-performing social media campaigns.",
+      "Reach verified local MSME entrepreneurs, shop owners, and service founders looking for B2B tools, performance advertising, digital marketing, and automated business operations.",
     rotation: "rotate-2",
     pinColor: "lime",
   },
   {
     id: "4",
     emoji: "📈",
-    title: "Performance Marketer",
+    title: "Affiliate & Network",
     description:
-      "Run high-ROI ad campaigns across Meta, Google Ads, and TikTok. Analyze key metrics, scale budgets effectively, and generate predictable sales funnels.",
+      "Engage active lead profiles seeking high-converting affiliate sales funnels, community memberships, business growth mentorships, and predictable monthly commissions.",
     rotation: "rotate-4",
     pinColor: "dark-green",
   },
   {
     id: "5",
     emoji: "💼",
-    title: "Lead Closer & Sales",
+    title: "Working Executives",
     description:
-      "Develop direct client outreach mastery, pitch high-ticket retainers on WhatsApp and calls, handle objections effortlessly, and close regular paying clients.",
+      "Target corporate employees and mid-level professionals seeking career upgrades, executive coaching, financial investments, and certified skill masterclasses.",
     rotation: "rotate-1",
     pinColor: "black",
   },
   {
     id: "6",
-    emoji: "🚀",
-    title: "Digital Freelancer",
+    emoji: "🏙️",
+    title: "Real Estate Buyers",
     description:
-      "Package your high-demand skills, build a strong portfolio, secure international remote clients, and establish a steady stream of independent digital revenue.",
+      "Access high-ticket property seekers filtered across Tier-1 and Tier-2 metro cities ready for commercial spaces, residential apartments, and site visits.",
     rotation: "-rotate-2",
     pinColor: "lime",
   },
@@ -77,12 +77,12 @@ export default function CareerPathsSection() {
         <div className="max-w-3xl mb-16 sm:mb-20 text-left">
 
           <h2 className="text-3xl sm:text-4xl font-medium tracking-tight text-black">
-               Choose Your Career Path
-            </h2>
-            
-            <p className="mt-3 text-sm sm:text-base text-slate-500 font-medium max-w-md tracking-tight">
-              Explore industry-ready skills and discover the path that matches your passion and future goals.
-            </p>
+            Choose Your Target Category
+          </h2>
+          
+          <p className="mt-3 text-sm sm:text-base text-slate-500 font-medium max-w-md tracking-tight">
+            Explore high-converting audience categories tailored for your specific sales offer and campaign targets.
+          </p>
         </div>
 
         {/* ================= 6 PINNED CARDS GRID ================= */}

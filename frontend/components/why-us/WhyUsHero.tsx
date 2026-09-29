@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowDown, Sparkles, ShieldCheck, CheckCircle2, TrendingUp, ArrowRight } from "lucide-react";
+import { ArrowDown, Sparkles, ArrowRight } from "lucide-react";
 
 export default function WhyUsHero() {
   const scrollToProof = () => {
@@ -27,7 +27,7 @@ export default function WhyUsHero() {
         }}
       />
 
-      {/* Soft Glow Radial Circles (Header ke peeche seamless backdrop glow) */}
+      {/* Soft Glow Radial Circles */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-emerald-50/60 blur-3xl rounded-full pointer-events-none -z-1" />
 
       {/* ================= FLOATING 3D CREDIBILITY CARDS ================= */}
@@ -64,7 +64,7 @@ export default function WhyUsHero() {
           <div>
             <h4 className="text-2xl font-normal tracking-tight text-white">3.4x</h4>
             <p className="text-[11px] text-emerald-200/90 font-normal leading-tight">
-              Higher Connect<br />& Call Pickup Rate
+              Higher Connect<br />&amp; Call Pickup Rate
             </p>
           </div>
           <svg className="absolute -bottom-2 -right-2 w-20 h-20 text-emerald-600/30" viewBox="0 0 100 100" fill="none" stroke="currentColor">
@@ -106,12 +106,6 @@ export default function WhyUsHero() {
         </div>
       </div>
 
-      
-
-     
-
-      
-
       {/* Verified Lead Badge (Bottom Right) */}
       <div className="hidden sm:flex absolute right-[5%] md:right-[8%] bottom-28 z-10 pointer-events-none">
         <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-emerald-500 shadow-lg flex items-center justify-center text-white text-lg">
@@ -130,7 +124,7 @@ export default function WhyUsHero() {
 
         {/* Headline */}
         <h1 className="text-3xl sm:text-5xl md:text-[58px] font-normal text-[#111827] tracking-tight leading-[1.2] sm:leading-[1.12]">
-          We Don't Just Supply Data.{" "}
+          We Don&apos;t Just Supply Data.{" "}
           <span className="inline-block bg-[#97df2c] text-white px-3 sm:px-4 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl shadow-sm transform -rotate-1 font-normal">
             We Deliver
           </span>{" "}
@@ -154,7 +148,7 @@ export default function WhyUsHero() {
           </button>
 
           <Link
-            href="/platforms"
+            href="/marketplace"
             className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-slate-100 hover:bg-slate-200/90 text-slate-800 font-normal text-xs sm:text-sm md:text-base transition-all duration-200 active:scale-95"
           >
             <span>Browse Available Leads</span>
@@ -183,7 +177,7 @@ export default function WhyUsHero() {
           <div className="h-7 w-[1px] bg-slate-200 hidden sm:block" />
           <div>
             <p className="text-base sm:text-xl font-normal text-[#0c4731] tracking-tight">Verified SIMs</p>
-            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">WhatsApp & Active Reach</p>
+            <p className="text-[10px] sm:text-xs text-slate-500 font-normal">WhatsApp &amp; Active Reach</p>
           </div>
         </div>
       </div>

@@ -11,11 +11,11 @@ export default function WhyUsSection() {
         {/* ================= TOP HEADER + SOCIAL PILL ================= */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8 sm:mb-10">
           <div>
-              <h2 className="text-3xl sm:text-4xl font-medium tracking-tight text-black">
-                Why Us?
+            <h2 className="text-3xl sm:text-4xl font-medium tracking-tight text-black">
+              Why Us?
             </h2>
             <p className="mt-3 text-sm sm:text-base text-slate-500 font-medium tracking-tight">
-              We Don&apos;t Just Supply Data. We Deliver High-Converting Customers.
+              We Don&apos;t Just Supply Raw Data. We Deliver Verified Buyer Intent.
             </p>
           </div>
 
@@ -54,21 +54,21 @@ export default function WhyUsSection() {
                   50k+
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1.5">
-                  Verified Leads Generated
+                  Verified Leads Dispatched
                 </p>
               </div>
 
               <div>
                 <h3 className="text-4xl sm:text-5xl font-black text-slate-900 font-medium tracking-tight leading-none">
-                  10k+
+                  100%
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1.5">
-                  Active Paying Clients
+                  Single-Buyer Exclusive Lock
                 </p>
               </div>
             </div>
 
-            {/* Right Side: 3D Avatar Connection Graph (Pure Vector Representation) */}
+            {/* Right Side: 3D Avatar Connection Graph */}
             <div className="w-full sm:w-1/2 flex items-center justify-center relative h-52 sm:h-60">
               
               {/* Connection Lines (SVG) */}
@@ -130,7 +130,7 @@ export default function WhyUsSection() {
               </span>
 
               <h3 className="text-2xl sm:text-[28px] font-black font-medium text-slate-900 tracking-tight leading-[1.25]">
-                Filter by niche, track delivery, and access leads anytime, anywhere.
+                Filter by niche, verify connectivity, and download clean CSVs instantly.
               </h3>
             </div>
 
@@ -158,19 +158,19 @@ export default function WhyUsSection() {
                 {/* Header inside phone */}
                 <div className="flex items-center justify-between text-[8px] font-bold text-slate-800 mb-1">
                   <span>Hello Lead Closer 👋</span>
-                  <span className="px-1.5 py-0.5 bg-lime-200 text-slate-900 rounded-full font-black">21 New</span>
+                  <span className="px-1.5 py-0.5 bg-lime-200 text-slate-900 rounded-full font-black">Active</span>
                 </div>
 
                 {/* Search Bar inside phone */}
                 <div className="w-full h-4 bg-slate-100 rounded-full px-2 text-[7px] text-slate-400 flex items-center mb-1.5">
-                  🔍 Search Niche...
+                  🔍 Search Category...
                 </div>
 
                 {/* Mock Card Preview inside phone */}
                 <div className="w-full h-24 bg-gradient-to-br from-slate-900 to-slate-800 rounded-xl p-2 text-white flex flex-col justify-between relative overflow-hidden">
                   <div className="flex justify-between items-start">
                     <span className="text-[7px] font-bold text-lime-400 uppercase">INSTAGRAM LEADS</span>
-                    <span className="text-[7px] text-slate-400">99.4% Verified</span>
+                    <span className="text-[7px] text-slate-400">Verified SLA</span>
                   </div>
                   <div>
                     <p className="text-[9px] font-extrabold leading-tight">High Ticket Buyers</p>
@@ -196,9 +196,9 @@ export default function WhyUsSection() {
         {/* ================= BOTTOM PUNCHLINE HEADLINE ================= */}
         <div className="mt-16 sm:mt-24 text-center max-w-4xl mx-auto px-2">
           <h3 className="text-2xl sm:text-4xl md:text-[42px] font-black font-medium text-slate-900 tracking-tight leading-[1.25]">
-            Loved by thousands <span className="inline-block">😍</span> who turned <br className="hidden sm:inline" />
-            their targeted leads <span className="inline-block">📊</span> into real income and <span className="inline-block">💰</span> <br className="hidden sm:inline" />
-            scaling opportunities online
+            Trusted by modern closers <span className="inline-block">⚡</span> who turned <br className="hidden sm:inline" />
+            targeted directory leads <span className="inline-block">📊</span> into predictable conversions and <span className="inline-block">💰</span>
+            repeat business deals
           </h3>
         </div>
 
