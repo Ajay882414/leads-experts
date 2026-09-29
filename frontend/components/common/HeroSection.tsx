@@ -23,8 +23,8 @@ export default function Hero() {
             <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" />
           </div>
           <div>
-            <h4 className="text-2xl font-black tracking-tight">50k+</h4>
-            <p className="text-[11px] text-slate-400 font-medium leading-tight">Fresh Leads<br />Generated</p>
+            {/* <h4 className="text-2xl font-black tracking-tight">50k+</h4> */}
+            <p className="text-[11px] text-slate-400 font-medium leading-tight">Instant CSV <br />Unlocked</p>
           </div>
           <svg className="absolute -bottom-2 -right-2 w-20 h-20 text-slate-700/30" viewBox="0 0 100 100" fill="none" stroke="currentColor">
             <path d="M0,80 Q50,20 100,70" strokeWidth="2" />
@@ -42,8 +42,8 @@ export default function Hero() {
             <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" />
           </div>
           <div>
-            <h4 className="text-2xl font-black tracking-tight">99.4%</h4>
-            <p className="text-[11px] text-emerald-200/90 font-medium leading-tight">Verified Buyer<br />Conversion</p>
+            <h4 className="text-2xl font-black tracking-tight">100%</h4>
+            <p className="text-[11px] text-emerald-200/90 font-medium leading-tight"> Single-Buyer <br />Lock</p>
           </div>
           <svg className="absolute -bottom-2 -right-2 w-20 h-20 text-emerald-600/30" viewBox="0 0 100 100" fill="none" stroke="currentColor">
             <path d="M0,80 Q50,20 100,70" strokeWidth="2" />
@@ -61,8 +61,8 @@ export default function Hero() {
             <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e]" />
           </div>
           <div>
-            <h4 className="text-2xl font-black tracking-tight">120+</h4>
-            <p className="text-[11px] text-teal-200/90 font-medium leading-tight">Targeted Target<br />Categories</p>
+            <h4 className="text-2xl font-black tracking-tight">50+</h4>
+            <p className="text-[11px] text-teal-200/90 font-medium leading-tight">High-Intent<br />Niches</p>
           </div>
           <svg className="absolute -bottom-2 -right-2 w-20 h-20 text-teal-600/30" viewBox="0 0 100 100" fill="none" stroke="currentColor">
             <path d="M0,80 Q50,20 100,70" strokeWidth="2" />
@@ -136,34 +136,36 @@ export default function Hero() {
       {/* ================= HERO CENTER CONTENT ================= */}
       <div className="relative z-20 max-w-3xl lg:max-w-3xl mx-auto text-center px-4 sm:px-6 my-auto">
         <h1 className="text-3xl sm:text-5xl md:text-[62px] font-medium text-[#111827] tracking-tight leading-[1.2] sm:leading-[1.12]">
-           Buy Real{" "}
+          High-Converting {" "}
           <span className="inline-block bg-[#97df2c] text-white px-3 sm:px-4 py-0.5 sm:py-1 rounded-xl sm:rounded-2xl shadow-sm transform -rotate-1">
             Leads.
           </span>{" "}
-          Grow Your Business.
+        Instant CSV Access.
         </h1>
+
+
+ 
 
        
 
 
         <p className="mt-4 sm:mt-6 text-sm sm:text-base md:text-lg text-slate-600 max-w-xl mx-auto font-normal leading-relaxed">
-          Select targeted platforms like Instagram, Facebook & LinkedIn. <br className="hidden sm:inline" />
-          Get instant, verified buyers and scale your revenue with ease.
+         Filter targeted buyers across Instagram, Meta & LinkedIn by demographic & niche. Unlock verified batches, preview records live, and download instantly to scale your outreach.
         </p>
 
         {/* Global Action CTA Buttons */}
         <div className="mt-7 sm:mt-9 flex items-center justify-center gap-3.5">
           <Link
-            href="/packages"
+            href="/marketplace"
             className="px-7 sm:px-9 py-2.5 sm:py-3.5 rounded-full bg-[#1b4b3e] hover:bg-[#153c32] text-white font-semibold text-xs sm:text-sm md:text-base transition-all duration-200 shadow-md hover:shadow-lg active:scale-95"
           >
-            Explore Lead Packages
+            Browse Marketplace
           </Link>
           <Link
             href="/register"
             className="px-6 sm:px-8 py-2.5 sm:py-3.5 rounded-full bg-slate-200/90 hover:bg-slate-300 text-slate-800 font-semibold text-xs sm:text-sm md:text-base transition-all duration-200 active:scale-95"
           >
-            Get Started Free
+            How It Works
           </Link>
         </div>
       </div>

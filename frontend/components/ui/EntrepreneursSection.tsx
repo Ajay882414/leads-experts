@@ -14,15 +14,15 @@ interface Entrepreneur {
 }
 
 const entrepreneursData: Entrepreneur[] = [
-  {
-    id: "1",
-    firstName: "Aman",
-    highlightedName: "Gupta",
-    role: "Co-Founder & CMO",
-    company: "boAt Lifestyle",
-    quote: "Building a consumer brand requires continuous relevance, sharp pricing, and understanding what the modern Indian youth actually wants.",
-    image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
-  },
+  // {
+  //   id: "1",
+  //   firstName: "Aman",
+  //   highlightedName: "Gupta",
+  //   role: "Co-Founder & CMO",
+  //   company: "boAt Lifestyle",
+  //   quote: "Building a consumer brand requires continuous relevance, sharp pricing, and understanding what the modern Indian youth actually wants.",
+  //   image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80",
+  // },
   {
     id: "2",
     firstName: "Peyush",

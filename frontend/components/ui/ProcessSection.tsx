@@ -6,7 +6,8 @@ interface StepItem {
   step: string;
   emoji: string;
   title: string;
-  description: string;
+  descriptionDesktop: string;
+  descriptionMobile: string;
   cardBg: string;
   pillBg: string;
   pillText: string;
@@ -17,37 +18,13 @@ interface StepItem {
 
 const stepsData: StepItem[] = [
   {
-    step: "Step - 1",
+    step: "STEP - 1",
     emoji: "📦",
-    title: "Choose Your Package.",
-    description:
-      "Select the platform and audience type that aligns with your business goals.",
-    cardBg: "bg-[#eaf8d9]", // Soft light lime tint
-    pillBg: "bg-[#0c4731]",
-    pillText: "text-white",
-    textColor: "text-[#0f172a]",
-    descColor: "text-slate-600",
-    align: "left",
-  },
-  {
-    step: "Step - 2",
-    emoji: "🎯",
-    title: "Select Lead Count.",
-    description:
-      "Pick how many leads you need — 50, 100, 250, or custom. Price auto-calculates.",
-    cardBg: "bg-[#f1f5f9]", // Clean light gray/blue tint
-    pillBg: "bg-[#1e293b]",
-    pillText: "text-white",
-    textColor: "text-[#0f172a]",
-    descColor: "text-slate-600",
-    align: "right",
-  },
-  {
-    step: "Step - 3",
-    emoji: "🚀",
-    title: "Make Payment.",
-    description:
-      "Pay securely via UPI, Card, or Wallet. Instant confirmation.",
+    title: "Choose Your Platform.",
+    descriptionDesktop:
+      "Select target channels from Instagram, Facebook, or LinkedIn and pick the audience demographic tailored for your outreach.",
+    descriptionMobile:
+      "Pick your target platform and audience demographic tailored for your sales outreach.",
     cardBg: "bg-[#eaf8d9]",
     pillBg: "bg-[#0c4731]",
     pillText: "text-white",
@@ -56,11 +33,43 @@ const stepsData: StepItem[] = [
     align: "left",
   },
   {
-    step: "Step - 4",
+    step: "STEP - 2",
+    emoji: "🎯",
+    title: "Select Lead Count.",
+    descriptionDesktop:
+      "Choose your required batch size from 500 to 5,000+ records and apply verified filters to match your campaign goals perfectly.",
+    descriptionMobile:
+      "Select batch volume from 500 to 5,000+ records with auto-calculated pricing.",
+    cardBg: "bg-[#f1f5f9]",
+    pillBg: "bg-[#1e293b]",
+    pillText: "text-white",
+    textColor: "text-[#0f172a]",
+    descColor: "text-slate-600",
+    align: "right",
+  },
+  {
+    step: "STEP - 3",
+    emoji: "🚀",
+    title: "Complete Secure Payment.",
+    descriptionDesktop:
+      "Authorize your order smoothly through 100% encrypted Razorpay gateway using UPI, Cards, or NetBanking with instant confirmation.",
+    descriptionMobile:
+      "Authorize your order smoothly via 100% encrypted UPI, Cards, or NetBanking.",
+    cardBg: "bg-[#eaf8d9]",
+    pillBg: "bg-[#0c4731]",
+    pillText: "text-white",
+    textColor: "text-[#0f172a]",
+    descColor: "text-slate-600",
+    align: "left",
+  },
+  {
+    step: "STEP - 4",
     emoji: "💰",
-    title: "Download & Convert.",
-    description:
-      "Get your CSV within 24 hours. Start calling, messaging, and closing deals.",
+    title: "Download CSV & Convert.",
+    descriptionDesktop:
+      "Preview assigned single-buyer contact records directly in your dashboard and export clean CSV sheets immediately to start closing.",
+    descriptionMobile:
+      "Preview single-buyer contact records and export clean CSV sheets to start closing.",
     cardBg: "bg-[#f1f5f9]",
     pillBg: "bg-[#1e293b]",
     pillText: "text-white",
@@ -74,45 +83,47 @@ export default function ProcessSection() {
   return (
     <section className="relative w-full bg-white py-20 sm:py-28 px-4 sm:px-8 lg:px-14 overflow-hidden selection:bg-[#99db32] selection:text-black">
       <div className="max-w-6xl mx-auto">
-        
         {/* ================= SECTION HEADER ================= */}
-        <div className=" max-w-3xl  mb-16 sm:mb-18">
+        <div className="max-w-3xl mb-16 sm:mb-18">
           <div className="inline-block px-3.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-bold uppercase tracking-widest mb-4">
             HOW IT WORKS
           </div>
 
           <h2 className="text-3xl sm:text-4xl font-medium tracking-tight text-black">
-              Choose. Buy. Download. Earn.
-            </h2>
-            <p className="mt-3 text-sm sm:text-base md:text-lg text-slate-600 max-w-2xl font-normal leading-relaxed">
-    Select your platform, purchase verified leads, download CSV, and start converting.
-  </p>
+            Choose. Buy. Download. Earn.
+          </h2>
+          <p className="mt-3 text-sm sm:text-base md:text-lg text-slate-600 max-w-2xl font-normal leading-relaxed">
+            Select your platform, purchase verified leads, download CSV, and start converting.
+          </p>
         </div>
 
         {/* ================= ZIG-ZAG STEP PROCESS CONTAINER ================= */}
-        <div className="relative flex flex-col space-y-12 sm:space-y-16 lg:space-y-20 ">
-          
+        <div className="relative flex flex-col space-y-12 sm:space-y-16 lg:space-y-20">
           {/* ----- STEP 1 (LEFT) ----- */}
           <div className="relative flex flex-col lg:flex-row items-start justify-start">
             <div className="w-full lg:w-[48%] bg-[#eaf8d9] rounded-3xl p-6 sm:p-8 flex items-start gap-4 sm:gap-6 shadow-sm border border-[#d3eec0] hover:shadow-md transition-shadow relative z-20">
-              
               {/* Vertical Pill Tag */}
               <div className="w-10 sm:w-10 self-stretch bg-[#0c4731] text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-inner select-none">
-  <span className="text-xs sm:text-[13px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 uppercase">
-    STEP - 1
-  </span>
-</div>
+                <span className="text-xs sm:text-[13px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 uppercase">
+                  {stepsData[0].step}
+                </span>
+              </div>
 
               {/* Content */}
               <div className="flex-1 pt-1">
-                <div className="flex items-center gap-2 mb-10">
-                  <span className="text-2xl sm:text-3xl">📦</span>
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <span className="text-2xl sm:text-3xl">{stepsData[0].emoji}</span>
                   <h3 className="text-lg sm:text-xl font-bold text-[#0f172a] tracking-tight">
-                    Choose Your Package.
+                    {stepsData[0].title}
                   </h3>
                 </div>
-                <p className="text-xs sm:text-[18px] text-slate-600 leading-relaxed max-w-md">
-                 Select the package that aligns with your career goals and unlock a complete roadmap of industry-focused skills designed for real-world success.
+                {/* Mobile Concise */}
+                <p className="block sm:hidden text-xs text-slate-600 leading-relaxed">
+                  {stepsData[0].descriptionMobile}
+                </p>
+                {/* Desktop Full */}
+                <p className="hidden sm:block text-sm md:text-[16px] text-slate-600 leading-relaxed max-w-md">
+                  {stepsData[0].descriptionDesktop}
                 </p>
               </div>
             </div>
@@ -134,26 +145,28 @@ export default function ProcessSection() {
           {/* ----- STEP 2 (RIGHT) ----- */}
           <div className="relative flex flex-col lg:flex-row items-start justify-end">
             <div className="w-full lg:w-[48%] bg-[#f1f5f9] rounded-3xl p-6 sm:p-8 flex items-start gap-4 sm:gap-6 shadow-sm border border-slate-200/80 hover:shadow-md transition-shadow relative z-20">
-              
               {/* Vertical Pill Tag */}
-              
-
               <div className="w-10 sm:w-10 self-stretch bg-[#1e293b] text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-inner select-none">
-  <span className="text-xs sm:text-[13px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 uppercase">
-     Step - 2
-  </span>
-</div>
+                <span className="text-xs sm:text-[13px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 uppercase">
+                  {stepsData[1].step}
+                </span>
+              </div>
 
               {/* Content */}
               <div className="flex-1 pt-1">
-                <div className="flex items-center gap-2 mb-10">
-                  <span className="text-2xl sm:text-3xl">🎯</span>
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <span className="text-2xl sm:text-3xl">{stepsData[1].emoji}</span>
                   <h3 className="text-lg sm:text-xl font-bold text-[#0f172a] tracking-tight">
-                    Select Lead Count.
+                    {stepsData[1].title}
                   </h3>
                 </div>
-                <p className="text-xs sm:text-[18px] text-slate-600 leading-relaxed max-w-md">
-                 Select the package that aligns with your career goals and unlock a complete roadmap of industry-focused skills designed for real-world success.
+                {/* Mobile Concise */}
+                <p className="block sm:hidden text-xs text-slate-600 leading-relaxed">
+                  {stepsData[1].descriptionMobile}
+                </p>
+                {/* Desktop Full */}
+                <p className="hidden sm:block text-sm md:text-[16px] text-slate-600 leading-relaxed max-w-md">
+                  {stepsData[1].descriptionDesktop}
                 </p>
               </div>
             </div>
@@ -175,26 +188,28 @@ export default function ProcessSection() {
           {/* ----- STEP 3 (LEFT) ----- */}
           <div className="relative flex flex-col lg:flex-row items-start justify-start">
             <div className="w-full lg:w-[48%] bg-[#eaf8d9] rounded-3xl p-6 sm:p-8 flex items-start gap-4 sm:gap-6 shadow-sm border border-[#d3eec0] hover:shadow-md transition-shadow relative z-20">
-              
               {/* Vertical Pill Tag */}
-              
-
               <div className="w-10 sm:w-10 self-stretch bg-[#0c4731] text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-inner select-none">
-  <span className="text-xs sm:text-[13px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 uppercase">
-   Step - 3
-  </span>
-</div>
+                <span className="text-xs sm:text-[13px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 uppercase">
+                  {stepsData[2].step}
+                </span>
+              </div>
 
               {/* Content */}
               <div className="flex-1 pt-1">
-                <div className="flex items-center gap-2 mb-10">
-                  <span className="text-2xl sm:text-3xl">🚀</span>
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <span className="text-2xl sm:text-3xl">{stepsData[2].emoji}</span>
                   <h3 className="text-lg sm:text-xl font-bold text-[#0f172a] tracking-tight">
-                    Make Payment.
+                    {stepsData[2].title}
                   </h3>
                 </div>
-                <p className="text-xs sm:text-[18px] text-slate-600 leading-relaxed max-w-md">
-                 Select the package that aligns with your career goals and unlock a complete roadmap of industry-focused skills designed for real-world success.
+                {/* Mobile Concise */}
+                <p className="block sm:hidden text-xs text-slate-600 leading-relaxed">
+                  {stepsData[2].descriptionMobile}
+                </p>
+                {/* Desktop Full */}
+                <p className="hidden sm:block text-sm md:text-[16px] text-slate-600 leading-relaxed max-w-md">
+                  {stepsData[2].descriptionDesktop}
                 </p>
               </div>
             </div>
@@ -216,33 +231,33 @@ export default function ProcessSection() {
           {/* ----- STEP 4 (RIGHT) ----- */}
           <div className="relative flex flex-col lg:flex-row items-start justify-end">
             <div className="w-full lg:w-[48%] bg-[#f1f5f9] rounded-3xl p-6 sm:p-8 flex items-start gap-4 sm:gap-6 shadow-sm border border-slate-200/80 hover:shadow-md transition-shadow relative z-20">
-              
               {/* Vertical Pill Tag */}
-              
-
               <div className="w-10 sm:w-10 self-stretch bg-[#1e293b] text-white rounded-full flex items-center justify-center flex-shrink-0 shadow-inner select-none">
-  <span className="text-xs sm:text-[13px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 uppercase">
-     Step - 4
-  </span>
-</div>
+                <span className="text-xs sm:text-[13px] font-bold tracking-widest [writing-mode:vertical-lr] rotate-180 uppercase">
+                  {stepsData[3].step}
+                </span>
+              </div>
 
               {/* Content */}
               <div className="flex-1 pt-1">
-                <div className="flex items-center gap-2 mb-10">
-                  <span className="text-2xl sm:text-3xl">💰</span>
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <span className="text-2xl sm:text-3xl">{stepsData[3].emoji}</span>
                   <h3 className="text-lg sm:text-xl font-bold text-[#0f172a] tracking-tight">
-                    Download & Convert.
+                    {stepsData[3].title}
                   </h3>
                 </div>
-                <p className="text-xs sm:text-[18px] text-slate-600 leading-relaxed max-w-md">
-                 Select the package that aligns with your career goals and unlock a complete roadmap of industry-focused skills designed for real-world success.
+                {/* Mobile Concise */}
+                <p className="block sm:hidden text-xs text-slate-600 leading-relaxed">
+                  {stepsData[3].descriptionMobile}
+                </p>
+                {/* Desktop Full */}
+                <p className="hidden sm:block text-sm md:text-[16px] text-slate-600 leading-relaxed max-w-md">
+                  {stepsData[3].descriptionDesktop}
                 </p>
               </div>
             </div>
           </div>
-
         </div>
-
       </div>
     </section>
   );

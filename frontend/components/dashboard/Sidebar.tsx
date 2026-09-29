@@ -99,7 +99,7 @@ export default function Sidebar() {
       {/* Bottom Fixed Area: App Card + User Details + Logout */}
       <div className="flex flex-col gap-3 pt-3 flex-shrink-0 border-t border-slate-800/60 mt-2">
         
-        {/* Mobile App Promo Card */}
+        {/* Mobile App Promo Card
         <div className="bg-[#a3e635] text-slate-950 p-3.5 rounded-[22px] shadow-lg flex flex-col justify-between">
           <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-slate-900 mb-0.5">
             <Smartphone size={14} className="stroke-[2.5]" />
@@ -121,7 +121,7 @@ export default function Sidebar() {
               <span>Android</span>
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* User Card + Logout */}
         <div className="bg-[#121a2d] border border-slate-800/80 rounded-[22px] p-3 flex flex-col gap-2.5">

@@ -22,7 +22,7 @@ const platformsData: LeadPlatform[] = [
   {
     id: "instagram",
     name: "Instagram",
-    description: "High-intent leads from DMs, Stories & Reels. Filtered by age, gender & location.",
+    description: "Active engaged prospects from Reels & DMs. Filter by gender, age & city for instant WhatsApp closing.",
     bgClass: "bg-[#1b4d34]",
     textClass: "text-white",
     descClass: "text-emerald-100/80",
@@ -40,7 +40,7 @@ const platformsData: LeadPlatform[] = [
   {
     id: "facebook",
     name: "Facebook",
-    description: "Targeted leads from Groups, Ads & Marketplace ready for outreach.",
+    description: "High-intent buyers from niche ad campaigns & community groups. Ideal for local businesses & services.",
     bgClass: "bg-[#e2e8f0]",
     textClass: "text-slate-900",
     descClass: "text-slate-600",
@@ -56,7 +56,7 @@ const platformsData: LeadPlatform[] = [
   {
     id: "linkedin",
     name: "LinkedIn",
-    description: "B2B professionals & decision makers perfect for high-ticket offers.",
+    description: "Verified CXOs, founders & decision-makers with corporate email & direct phone for high-ticket sales.",
     bgClass: "bg-[#b8e957]",
     textClass: "text-slate-950",
     descClass: "text-slate-800",
@@ -70,7 +70,7 @@ const platformsData: LeadPlatform[] = [
   {
     id: "youtube",
     name: "YouTube",
-    description: "Engaged subscribers & commenters from your niche with high conversion.",
+    description: "High-affinity viewers & course seekers. Best suited for webinars, coaching programs & digital tools.",
     bgClass: "bg-white",
     textClass: "text-slate-900",
     descClass: "text-slate-600",
@@ -89,7 +89,7 @@ const platformsData: LeadPlatform[] = [
   {
     id: "snapchat",
     name: "Snapchat",
-    description: "Gen-Z audience, quick responders for trendy products & courses.",
+    description: "Young, active Gen-Z buyers & students. High open rate for e-commerce, beauty & skill-based courses.",
     bgClass: "bg-[#e2e8f0]",
     textClass: "text-slate-900",
     descClass: "text-slate-600",
@@ -105,7 +105,7 @@ const platformsData: LeadPlatform[] = [
 ];
 
 const audiences = [
-  "Housewife",
+  "Homemakers",
   "Working Pro",
   "Students",
   "Business Owners",
@@ -163,7 +163,7 @@ export default function LeadPacks() {
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
-              Practice Leads <span className="text-emerald-600 font-bold ml-1">(4)</span>
+              Starter Packs (4) <span className="text-emerald-600 font-bold ml-1">(4)</span>
             </button>
           </div>
         </div>
@@ -196,7 +196,7 @@ export default function LeadPacks() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
                   </div>
-                  <span>Buy Now</span>
+                  <span>View Leads & Pricing</span>
                 </button>
 
                 {/* Platform Ghost / 3D Icon */}
