@@ -14,6 +14,7 @@ const platformRoutes = require("./routes/platform.routes");
 const leadRoutes = require("./routes/lead.routes");
 const userRoutes = require("./routes/user.routes");
 const orderRoutes = require("./routes/order.routes");
+const packageRoutes = require("./routes/package.routes");
 const paymentRoutes =
 require("./routes/payment.routes");
 const notificationRoutes =
@@ -63,6 +64,8 @@ app.use(
   "/api/platforms",
   platformRoutes
 );
+
+app.use("/api/packages", packageRoutes);
 
 app.use(
   "/api/leads",

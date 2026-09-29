@@ -3,13 +3,21 @@ const mongoose = require("mongoose");
 const leadSchema = new mongoose.Schema(
   {
     // ========================================
-    // PLATFORM
+    // PLATFORM & PACKAGE
     // ========================================
 
     platform: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Platform",
-      required: true,
+      required: [true, "Platform is required"],
+      index: true,
+    },
+
+    // Direct reference to the specific package card
+    package: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Package",
+      required: [true, "Package card is required"],
       index: true,
     },
 
@@ -111,25 +119,13 @@ const leadSchema = new mongoose.Schema(
 // INDEXES
 // ========================================
 
-// Platform + status
-leadSchema.index({
-  platform: 1,
-  status: 1,
-});
+leadSchema.index({ package: 1, status: 1 });
+leadSchema.index({ platform: 1, status: 1 });
 
-// Platform + profession + status
-leadSchema.index({
-  platform: 1,
-  profession: 1,
-  status: 1,
-});
-
-// IMPORTANT:
-// Same phone cannot exist twice
-// inside the same platform.
+// Same phone number cannot exist twice in the same package card
 leadSchema.index(
   {
-    platform: 1,
+    package: 1,
     phone: 1,
   },
   {
@@ -137,7 +133,6 @@ leadSchema.index(
   }
 );
 
-// Ownership lookup
 leadSchema.index({
   soldTo: 1,
   order: 1,

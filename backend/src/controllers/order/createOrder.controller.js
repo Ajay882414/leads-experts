@@ -1,29 +1,25 @@
 const mongoose = require("mongoose");
 
 const Order = require("../../models/Order");
+const Package = require("../../models/Package");
 const Platform = require("../../models/Platform");
 const Lead = require("../../models/Lead");
-const Download = require("../../models/Download"); // <-- Download model import kiya
+const Download = require("../../models/Download");
 
 const asyncHandler = require("../../utils/asyncHandler");
 const createNotification = require("../../utils/createNotification");
 
 const createOrder = asyncHandler(async (req, res) => {
-  // =====================================================
-  // USER
-  // =====================================================
   const userId = req.user._id;
 
-  // =====================================================
-  // REQUEST DATA
-  // =====================================================
-  const { platform, quantity } = req.body;
+  // Ab request body me package ID aayegi
+  const { packageId, quantity } = req.body;
   const requestedQuantity = Number(quantity);
 
-  if (!platform) {
+  if (!packageId) {
     return res.status(400).json({
       success: false,
-      message: "Platform is required",
+      message: "Package ID is required",
     });
   }
 
@@ -35,41 +31,39 @@ const createOrder = asyncHandler(async (req, res) => {
   }
 
   // =====================================================
-  // PLATFORM CHECK
+  // PACKAGE CHECK
   // =====================================================
-  const platformExists = await Platform.findById(platform);
+  const packageExists = await Package.findById(packageId).populate("platform");
 
-  if (!platformExists) {
+  if (!packageExists) {
     return res.status(404).json({
       success: false,
-      message: "Platform not found",
+      message: "Package card not found",
     });
   }
 
-  if (platformExists.status !== "ACTIVE") {
+  if (packageExists.status !== "ACTIVE") {
     return res.status(400).json({
       success: false,
-      message: "This platform is currently inactive",
+      message: "This package card is currently inactive",
     });
   }
 
-  if (Number(platformExists.availableLeads || 0) < requestedQuantity) {
+  if (Number(packageExists.availableLeads || 0) < requestedQuantity) {
     return res.status(400).json({
       success: false,
-      message: "Not enough leads available",
-      availableLeads: platformExists.availableLeads,
+      message: "Not enough leads available in this package",
+      availableLeads: packageExists.availableLeads,
       requestedQuantity,
     });
   }
 
-  // =====================================================
-  // PRICE CALCULATION
-  // =====================================================
-  const pricePerLead = Number(platformExists.pricePerLead || 0);
+  const pricePerLead = Number(packageExists.pricePerLead || 0);
   const totalAmount = requestedQuantity * pricePerLead;
+  const platformId = packageExists.platform._id;
 
   // =====================================================
-  // MONGODB TRANSACTION
+  // TRANSACTION
   // =====================================================
   const session = await mongoose.startSession();
 
@@ -78,9 +72,9 @@ const createOrder = asyncHandler(async (req, res) => {
     let purchasedLeadIds = [];
 
     await session.withTransaction(async () => {
-      // 1. GET AVAILABLE LEADS
+      // 1. Fetch available leads specifically belonging to this package
       const availableLeads = await Lead.find({
-        platform: platformExists._id,
+        package: packageExists._id,
         status: "AVAILABLE",
       })
         .sort({ createdAt: 1 })
@@ -94,12 +88,12 @@ const createOrder = asyncHandler(async (req, res) => {
 
       purchasedLeadIds = availableLeads.map((lead) => lead._id);
 
-      // 2. CREATE ORDER
+      // 2. Create Order
       const orderDocuments = await Order.create(
         [
           {
             user: userId,
-            platform: platformExists._id,
+            platform: platformId,
             quantity: requestedQuantity,
             pricePerLead,
             totalAmount,
@@ -112,7 +106,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
       createdOrder = orderDocuments[0];
 
-      // 3. MARK LEADS AS SOLD
+      // 3. Mark package leads as SOLD
       const leadUpdate = await Lead.updateMany(
         {
           _id: { $in: purchasedLeadIds },
@@ -134,10 +128,10 @@ const createOrder = asyncHandler(async (req, res) => {
         throw new Error("LEAD_ASSIGNMENT_FAILED");
       }
 
-      // 4. UPDATE PLATFORM COUNTERS
-      await Platform.updateOne(
+      // 4. Update Package Counters
+      await Package.updateOne(
         {
-          _id: platformExists._id,
+          _id: packageExists._id,
           availableLeads: { $gte: requestedQuantity },
         },
         {
@@ -149,27 +143,36 @@ const createOrder = asyncHandler(async (req, res) => {
         { session }
       );
 
-      // 5. CREATE DOWNLOAD ENTRY FOR USER (Directly in Transaction)
+      // 5. Update Platform Counters
+      await Platform.updateOne(
+        { _id: platformId },
+        {
+          $inc: {
+            availableLeads: -requestedQuantity,
+            soldLeads: requestedQuantity,
+          },
+        },
+        { session }
+      );
+
+      // 6. Create Download Entry for CSV export
       await Download.create(
         [
           {
             user: userId,
             order: createdOrder._id,
-            platform: platformExists._id,
+            platform: platformId,
             totalLeads: requestedQuantity,
-            fileName: `order-${createdOrder._id}.csv`,
+            fileName: `${packageExists.name.toLowerCase().replace(/\s+/g, "-")}-${createdOrder._id}.csv`,
           },
         ],
         { session }
       );
     });
 
-    // =====================================================
-    // NOTIFICATION
-    // =====================================================
     await createNotification({
-      title: "New Lead Purchase",
-      message: `A user purchased ${requestedQuantity} ${platformExists.name} leads.`,
+      title: "Package Purchase",
+      message: `Purchased ${requestedQuantity} leads from "${packageExists.name}".`,
       type: "Order",
     });
 
@@ -179,16 +182,20 @@ const createOrder = asyncHandler(async (req, res) => {
       order: createdOrder,
       purchasedLeads: purchasedLeadIds.length,
       totalAmount,
+      package: {
+        id: packageExists._id,
+        name: packageExists.name,
+      },
       platform: {
-        id: platformExists._id,
-        name: platformExists.name,
+        id: platformId,
+        name: packageExists.platform.name,
       },
     });
   } catch (error) {
     if (error.message === "NOT_ENOUGH_LEADS") {
       return res.status(400).json({
         success: false,
-        message: "Requested leads are no longer available",
+        message: "Requested leads are no longer available in this package",
       });
     }
 

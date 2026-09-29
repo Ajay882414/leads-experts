@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { uploadLeads } from "@/services/leadApi";
 import { getPlatforms } from "@/services/platformApi";
+import { getPackagesByPlatform } from "@/services/packageApi";
+import { Package } from "@/types/package";
 
 interface Platform {
   _id: string;
@@ -18,40 +19,24 @@ interface UploadResult {
   duplicates?: number;
   invalid?: number;
   totalRows?: number;
-  availableLeads?: number;
-  totalLeads?: number;
-  platform?: {
+  package?: {
     id: string;
     name: string;
+    platform: string;
   };
 }
 
 export default function UploadLeadForm() {
-  // ==========================================
-  // STATES
-  // ==========================================
-
-  const [platforms, setPlatforms] = useState<Platform[]>(
-    []
-  );
-
+  const [platforms, setPlatforms] = useState<Platform[]>([]);
   const [platform, setPlatform] = useState("");
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [packageId, setPackageId] = useState("");
 
-  const [file, setFile] = useState<File | null>(
-    null
-  );
-
+  const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-
-  const [platformLoading, setPlatformLoading] =
-    useState(true);
-
-  const [result, setResult] =
-    useState<UploadResult | null>(null);
-
-  // ==========================================
-  // FETCH PLATFORMS
-  // ==========================================
+  const [platformLoading, setPlatformLoading] = useState(true);
+  const [packagesLoading, setPackagesLoading] = useState(false);
+  const [result, setResult] = useState<UploadResult | null>(null);
 
   useEffect(() => {
     fetchPlatforms();
@@ -60,40 +45,41 @@ export default function UploadLeadForm() {
   const fetchPlatforms = async () => {
     try {
       setPlatformLoading(true);
-
       const response = await getPlatforms();
-
-      const activePlatforms = (
-        response?.platforms || []
-      ).filter(
+      const activePlatforms = (response?.platforms || []).filter(
         (item: Platform) =>
-          item.status === undefined ||
-          item.status === "ACTIVE"
+          item.status === undefined || item.status === "ACTIVE"
       );
-
       setPlatforms(activePlatforms);
     } catch (error) {
-      console.error(
-        "Failed to fetch platforms:",
-        error
-      );
-
+      console.error("Failed to fetch platforms:", error);
       setPlatforms([]);
     } finally {
       setPlatformLoading(false);
     }
   };
 
-  // ==========================================
-  // FILE SELECT
-  // ==========================================
+  // Jab bhi platform change ho, uske packages fetch karo
+  const handlePlatformChange = async (selectedId: string) => {
+    setPlatform(selectedId);
+    setPackageId("");
+    setPackages([]);
 
-  const handleFileChange = (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const selectedFile =
-      e.target.files?.[0] || null;
+    if (!selectedId) return;
 
+    try {
+      setPackagesLoading(true);
+      const res = await getPackagesByPlatform(selectedId);
+      setPackages(res.packages || []);
+    } catch {
+      setPackages([]);
+    } finally {
+      setPackagesLoading(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0] || null;
     setResult(null);
 
     if (!selectedFile) {
@@ -101,80 +87,40 @@ export default function UploadLeadForm() {
       return;
     }
 
-    // ========================================
-    // FILE TYPE CHECK
-    // ========================================
-
-    const allowedExtensions = [
-      ".csv",
-      ".xlsx",
-      ".xls",
-    ];
-
-    const fileName =
-      selectedFile.name.toLowerCase();
-
-    const isAllowed = allowedExtensions.some(
-      (extension) =>
-        fileName.endsWith(extension)
-    );
+    const allowedExtensions = [".csv", ".xlsx", ".xls"];
+    const fileName = selectedFile.name.toLowerCase();
+    const isAllowed = allowedExtensions.some((ext) => fileName.endsWith(ext));
 
     if (!isAllowed) {
-      alert(
-        "Please select a CSV or Excel file."
-      );
-
+      alert("Please select a CSV or Excel file.");
       e.target.value = "";
       setFile(null);
-
       return;
     }
 
-    // ========================================
-    // FILE SIZE CHECK
-    // Backend limit = 20 MB
-    // ========================================
-
-    const maxSize =
-      20 * 1024 * 1024;
-
-    if (selectedFile.size > maxSize) {
-      alert(
-        "File size must be less than 20 MB."
-      );
-
+    if (selectedFile.size > 20 * 1024 * 1024) {
+      alert("File size must be less than 20 MB.");
       e.target.value = "";
       setFile(null);
-
       return;
     }
 
     setFile(selectedFile);
   };
 
-  // ==========================================
-  // UPLOAD
-  // ==========================================
-
   const handleUpload = async () => {
-    // ========================================
-    // PLATFORM VALIDATION
-    // ========================================
-
     if (!platform) {
       alert("Please select a platform.");
       return;
     }
 
-    // ========================================
-    // FILE VALIDATION
-    // ========================================
+    if (!packageId) {
+      alert("Please select a specific package card for this CSV.");
+      return;
+    }
 
     if (!file) {
-      alert(
-        "Please select a CSV or Excel file."
-      );
-
+      alert("Please select a CSV or Excel file.");
       return;
     }
 
@@ -182,77 +128,27 @@ export default function UploadLeadForm() {
       setLoading(true);
       setResult(null);
 
-      // ======================================
-      // FORM DATA
-      // ======================================
-
       const formData = new FormData();
+      formData.append("packageId", packageId);
+      formData.append("file", file);
 
-      formData.append(
-        "platform",
-        platform
-      );
-
-      formData.append(
-        "file",
-        file
-      );
-
-      // ======================================
-      // API
-      // ======================================
-
-      const response =
-        await uploadLeads(formData);
-
-      // ======================================
-      // RESULT
-      // ======================================
-
+      const response = await uploadLeads(formData);
       setResult(response);
-
-      // ======================================
-      // SUCCESS MESSAGE
-      // ======================================
-
-      alert(
-        response?.message ||
-          "Leads uploaded successfully."
-      );
-
-      // ======================================
-      // RESET FILE
-      // ======================================
+      alert(response?.message || "Leads uploaded successfully to this card.");
 
       setFile(null);
-
-      const fileInput =
-        document.getElementById(
-          "lead-file"
-        ) as HTMLInputElement | null;
-
-      if (fileInput) {
-        fileInput.value = "";
-      }
+      const fileInput = document.getElementById(
+        "lead-file"
+      ) as HTMLInputElement | null;
+      if (fileInput) fileInput.value = "";
     } catch (error: any) {
-      console.error(
-        "Lead upload failed:",
-        error
+      alert(
+        error?.response?.data?.message || "Lead upload failed. Please try again."
       );
-
-      const message =
-        error?.response?.data?.message ||
-        "Lead upload failed. Please try again.";
-
-      alert(message);
     } finally {
       setLoading(false);
     }
   };
-
-  // ==========================================
-  // DOWNLOAD SAMPLE CSV
-  // ==========================================
 
   const downloadSample = () => {
     const csv = `Timestamp,Name,Phone,Age,Gender,Profession,Source
@@ -260,345 +156,148 @@ export default function UploadLeadForm() {
 2026-08-20 11:00:00,Rahul Sharma,9876543211,32,Male,Teacher,Facebook
 2026-08-20 11:30:00,Priya Sharma,9876543212,26,Female,Designer,Instagram`;
 
-    const blob = new Blob(
-      [csv],
-      {
-        type: "text/csv;charset=utf-8;",
-      }
-    );
-
-    const url =
-      window.URL.createObjectURL(
-        blob
-      );
-
-    const link =
-      document.createElement("a");
-
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
     link.href = url;
-    link.download =
-      "sample-leads.csv";
-
+    link.download = "sample-leads.csv";
     document.body.appendChild(link);
-
     link.click();
-
     document.body.removeChild(link);
-
     window.URL.revokeObjectURL(url);
   };
 
-  // ==========================================
-  // FORMAT FILE SIZE
-  // ==========================================
-
-  const formatFileSize = (
-    bytes: number
-  ) => {
-    if (bytes < 1024) {
-      return `${bytes} Bytes`;
-    }
-
-    if (bytes < 1024 * 1024) {
-      return `${(
-        bytes / 1024
-      ).toFixed(1)} KB`;
-    }
-
-    return `${(
-      bytes /
-      (1024 * 1024)
-    ).toFixed(1)} MB`;
-  };
-
-  // ==========================================
-  // UI
-  // ==========================================
-
   return (
-    <div className="bg-white rounded-2xl shadow p-8">
-
-      <div className="space-y-7">
-
-        {/* =====================================
-            PLATFORM
-        ===================================== */}
-
+    <div className="bg-white rounded-2xl shadow p-8 space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {/* Step 1: Select Platform */}
         <div>
-          <label
-            htmlFor="lead-platform"
-            className="font-semibold block mb-2"
-          >
-            Select Platform
+          <label className="font-semibold block mb-2 text-sm text-gray-700">
+            1. Select Platform *
           </label>
-
           <select
-            id="lead-platform"
             value={platform}
-            onChange={(e) =>
-              setPlatform(
-                e.target.value
-              )
-            }
-            disabled={
-              platformLoading ||
-              loading
-            }
-            className="w-full border border-gray-300 rounded-xl p-3 outline-none focus:border-blue-600 disabled:bg-gray-100"
+            onChange={(e) => handlePlatformChange(e.target.value)}
+            disabled={platformLoading || loading}
+            className="w-full border border-gray-300 rounded-xl p-3 text-sm outline-none focus:border-blue-600 disabled:bg-gray-100"
           >
             <option value="">
-              {platformLoading
-                ? "Loading platforms..."
-                : "Select Platform"}
+              {platformLoading ? "Loading platforms..." : "Select Platform"}
             </option>
-
-            {platforms.map(
-              (item) => (
-                <option
-                  key={item._id}
-                  value={item._id}
-                >
-                  {item.name}
-                </option>
-              )
-            )}
+            {platforms.map((item) => (
+              <option key={item._id} value={item._id}>
+                {item.name}
+              </option>
+            ))}
           </select>
-
-          {!platformLoading &&
-            platforms.length === 0 && (
-              <p className="text-sm text-red-500 mt-2">
-                No active platforms found.
-                Please create/activate a
-                platform first.
-              </p>
-            )}
         </div>
 
-        {/* =====================================
-            FILE
-        ===================================== */}
-
+        {/* Step 2: Select Package Card */}
         <div>
-          <label
-            htmlFor="lead-file"
-            className="font-semibold block mb-2"
-          >
-            Upload CSV / Excel File
+          <label className="font-semibold block mb-2 text-sm text-gray-700">
+            2. Select Package Card / Sub-Platform *
           </label>
-
-          <input
-            id="lead-file"
-            type="file"
-            accept=".csv,.xlsx,.xls"
-            onChange={
-              handleFileChange
-            }
-            disabled={loading}
-            className="w-full border border-gray-300 rounded-xl p-3 cursor-pointer disabled:bg-gray-100"
-          />
-
-          <p className="text-sm text-gray-500 mt-2">
-            Supported formats: CSV,
-            XLS, XLSX. Maximum file size:
-            20 MB.
-          </p>
-        </div>
-
-        {/* =====================================
-            SELECTED FILE
-        ===================================== */}
-
-        {file && (
-          <div className="border border-blue-200 bg-blue-50 rounded-xl p-4">
-
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-
-              <div>
-                <p className="font-semibold text-blue-900">
-                  Selected File
-                </p>
-
-                <p className="text-sm text-blue-700 mt-1 break-all">
-                  {file.name}
-                </p>
-              </div>
-
-              <p className="text-sm text-blue-700">
-                {formatFileSize(
-                  file.size
-                )}
-              </p>
-
-            </div>
-
-          </div>
-        )}
-
-        {/* =====================================
-            CSV FORMAT INFORMATION
-        ===================================== */}
-
-        <div className="border border-gray-200 rounded-xl p-5 bg-gray-50">
-
-          <h3 className="font-bold text-lg mb-3">
-            Required CSV Columns
-          </h3>
-
-          <div className="flex flex-wrap gap-2">
-
-            {[
-              "Timestamp",
-              "Name",
-              "Phone",
-              "Age",
-              "Gender",
-              "Profession",
-              "Source",
-            ].map(
-              (column) => (
-                <span
-                  key={column}
-                  className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
-                >
-                  {column}
-                </span>
-              )
-            )}
-
-          </div>
-
-          <p className="text-sm text-gray-500 mt-4">
-            Name, Phone and Age are required.
-            Duplicate phone numbers for the
-            same platform will not be imported.
-          </p>
-
-        </div>
-
-        {/* =====================================
-            SAMPLE CSV
-        ===================================== */}
-
-        <div className="flex flex-col sm:flex-row gap-4">
-
-          <button
-            type="button"
-            onClick={downloadSample}
-            disabled={loading}
-            className="border border-gray-300 hover:bg-gray-100 text-gray-800 px-5 py-3 rounded-xl font-semibold disabled:opacity-50"
+          <select
+            value={packageId}
+            onChange={(e) => setPackageId(e.target.value)}
+            disabled={packagesLoading || !platform || loading}
+            className="w-full border border-gray-300 rounded-xl p-3 text-sm outline-none focus:border-blue-600 disabled:bg-gray-100"
           >
-            Download Sample CSV
-          </button>
-
+            <option value="">
+              {packagesLoading
+                ? "Loading package cards..."
+                : !platform
+                ? "Select a platform first"
+                : packages.length === 0
+                ? "No package cards found. Create one in Platforms!"
+                : "Select Package Card"}
+            </option>
+            {packages.map((pkg) => (
+              <option key={pkg._id} value={pkg._id}>
+                {pkg.name} ({pkg.category}) — ₹{pkg.pricePerLead}/lead
+              </option>
+            ))}
+          </select>
         </div>
+      </div>
 
-        {/* =====================================
-            UPLOAD BUTTON
-        ===================================== */}
+      {/* Step 3: File Input */}
+      <div>
+        <label className="font-semibold block mb-2 text-sm text-gray-700">
+          3. Upload CSV File *
+        </label>
+        <input
+          id="lead-file"
+          type="file"
+          accept=".csv,.xlsx,.xls"
+          onChange={handleFileChange}
+          disabled={loading}
+          className="w-full border border-gray-300 rounded-xl p-3 text-sm cursor-pointer disabled:bg-gray-100"
+        />
+        <p className="text-xs text-gray-500 mt-2">
+          Leads inside this CSV will be strictly assigned to the selected Package Card.
+        </p>
+      </div>
 
+      {file && (
+        <div className="border border-blue-200 bg-blue-50 rounded-xl p-3 text-xs text-blue-900 font-semibold">
+          Selected: {file.name}
+        </div>
+      )}
+
+      <div className="flex gap-4">
         <button
           type="button"
-          onClick={handleUpload}
-          disabled={
-            loading ||
-            platformLoading ||
-            !platform ||
-            !file
-          }
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={downloadSample}
+          disabled={loading}
+          className="border border-gray-300 hover:bg-gray-100 text-gray-800 px-4 py-2.5 rounded-xl text-xs font-semibold"
         >
-          {loading
-            ? "Uploading Leads..."
-            : "Upload Leads"}
+          Download Sample CSV
         </button>
-
-        {/* =====================================
-            UPLOAD RESULT
-        ===================================== */}
-
-        {result && (
-          <div className="rounded-2xl border border-green-300 bg-green-50 p-6">
-
-            <h3 className="font-bold text-xl text-green-800 mb-5">
-              Upload Report
-            </h3>
-
-            {/* PLATFORM */}
-
-            {result.platform?.name && (
-              <div className="mb-4">
-                <p className="text-sm text-gray-600">
-                  Platform
-                </p>
-
-                <p className="font-semibold">
-                  {result.platform.name}
-                </p>
-              </div>
-            )}
-
-            {/* STATS */}
-
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-
-              <div className="bg-white rounded-xl p-4 border">
-                <p className="text-sm text-gray-500">
-                  Total Rows
-                </p>
-
-                <p className="text-2xl font-bold mt-1">
-                  {result.totalRows ??
-                    0}
-                </p>
-              </div>
-
-              <div className="bg-white rounded-xl p-4 border">
-                <p className="text-sm text-gray-500">
-                  Inserted
-                </p>
-
-                <p className="text-2xl font-bold text-green-600 mt-1">
-                  {result.inserted ??
-                    0}
-                </p>
-              </div>
-
-              <div className="bg-white rounded-xl p-4 border">
-                <p className="text-sm text-gray-500">
-                  Duplicates
-                </p>
-
-                <p className="text-2xl font-bold text-orange-600 mt-1">
-                  {result.duplicates ??
-                    0}
-                </p>
-              </div>
-
-              <div className="bg-white rounded-xl p-4 border">
-                <p className="text-sm text-gray-500">
-                  Invalid
-                </p>
-
-                <p className="text-2xl font-bold text-red-600 mt-1">
-                  {result.invalid ??
-                    0}
-                </p>
-              </div>
-
-            </div>
-
-            {/* MESSAGE */}
-
-            {result.message && (
-              <p className="text-green-700 mt-5">
-                {result.message}
-              </p>
-            )}
-
-          </div>
-        )}
-
       </div>
+
+      {/* Upload CTA */}
+      <button
+        type="button"
+        onClick={handleUpload}
+        disabled={loading || !platform || !packageId || !file}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3.5 rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+      >
+        {loading ? "Uploading Leads to Package..." : "Upload Leads"}
+      </button>
+
+      {/* Results Box */}
+      {result && (
+        <div className="rounded-2xl border border-green-300 bg-green-50 p-6 space-y-3">
+          <h4 className="font-bold text-green-900 text-base">
+            Upload Report: {result.package?.name} ({result.package?.platform})
+          </h4>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div className="bg-white p-3 rounded-xl border">
+              <span className="text-xs text-gray-500">Total Rows</span>
+              <p className="text-lg font-bold">{result.totalRows ?? 0}</p>
+            </div>
+            <div className="bg-white p-3 rounded-xl border">
+              <span className="text-xs text-gray-500">Inserted</span>
+              <p className="text-lg font-bold text-green-600">
+                {result.inserted ?? 0}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-xl border">
+              <span className="text-xs text-gray-500">Duplicates</span>
+              <p className="text-lg font-bold text-amber-600">
+                {result.duplicates ?? 0}
+              </p>
+            </div>
+            <div className="bg-white p-3 rounded-xl border">
+              <span className="text-xs text-gray-500">Invalid</span>
+              <p className="text-lg font-bold text-red-600">
+                {result.invalid ?? 0}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

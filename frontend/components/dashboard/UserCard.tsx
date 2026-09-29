@@ -41,12 +41,12 @@ export default function UserCard({ user }: UserCardProps) {
           </Link>
 
           {/* Add Funds Button */}
-          <Link
+          {/* <Link
             href="/wallet"
             className="inline-flex items-center justify-center rounded-xl bg-[#1e2e28] hover:bg-[#283d35] px-5 py-2.5 text-xs sm:text-sm font-bold text-white transition-all duration-150 active:scale-95 border border-emerald-800/40 shadow-sm"
           >
             Add Funds
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

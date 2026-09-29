@@ -11,6 +11,7 @@ export interface BrowsePlatform {
   pricePerLead: number;
   minimumPurchase: number;
   status: PlatformStatus;
+  categories?: string[]; // <-- Yeh line TypeScript error khatam kar degi
   totalLeads: number;
   availableLeads: number;
   soldLeads: number;
@@ -18,9 +19,39 @@ export interface BrowsePlatform {
   updatedAt?: string;
 }
 
+export interface LeadPackageItem {
+  id: string;
+  category: string;
+  title: string;
+  platformId: string;
+  platformName: string;
+  pricePerLead: number;
+  minimumPurchase: number;
+  availableLeads: number;
+  deliveryTime?: string;
+  badges?: string[];
+}
+
+export interface PlatformPackagesResponse {
+  success: boolean;
+  platform: {
+    _id: string;
+    name: string;
+    slug: string;
+    description: string;
+    icon: string;
+    color: string;
+    pricePerLead: number;
+    categories: string[];
+  };
+  packages: LeadPackageItem[];
+}
+
 export interface CreateOrderPayload {
-  platform: string;
+  platform?: string;
+  packageId?: string;
   quantity: number;
+  category?: string;
 }
 
 export interface PlatformsResponse {
@@ -37,6 +68,7 @@ export interface PlatformResponse {
 export interface OrderResponse {
   success: boolean;
   message: string;
+  category?: string;
   order: {
     _id: string;
     user: string;
