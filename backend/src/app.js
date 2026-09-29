@@ -30,14 +30,33 @@ const notFound = require("./middlewares/notFound.middleware");
 
 const app = express();
 
+const allowedOrigins = [
+  "https://leadsvero.com",
+  "https://www.leadsvero.com",
+  "https://leads-experts-xqew.vercel.app",
+  "http://localhost:3000",
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: function (origin, callback) {
+      // Mobile apps, Postman ya direct server calls me origin null hota hai
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error("CORS policy: This origin is not allowed"));
+      }
+    },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",
+      "X-Requested-With",
+      "Accept",
     ],
   })
 );
