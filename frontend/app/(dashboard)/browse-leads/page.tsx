@@ -1,39 +1,32 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { AlertCircle, RefreshCw, Sparkles } from "lucide-react";
+import { AlertCircle, RefreshCw } from "lucide-react";
 
 import BrowseLeadsHeader from "@/components/user/browse-leads/BrowseLeadsHeader";
 import PlatformGrid from "@/components/user/browse-leads/PlatformGrid";
 import EmptyLeads from "@/components/user/browse-leads/EmptyLeads";
 import BrowseLeadsLoading from "@/components/user/browse-leads/BrowseLeadsLoading";
-import PurchaseLeadModal from "@/components/user/browse-leads/PurchaseLeadModal";
 
-import { getBrowsePlatforms, purchaseLeads } from "@/services/browseLeadsApi";
+import { getBrowsePlatforms } from "@/services/browseLeadsApi";
 import type { BrowsePlatform } from "@/types/browseLead";
 
 export default function BrowseLeadsPage() {
-  const router = useRouter();
-
   const [platforms, setPlatforms] = useState<BrowsePlatform[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
-
-  const [selectedPlatform, setSelectedPlatform] = useState<BrowsePlatform | null>(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [purchaseLoading, setPurchaseLoading] = useState(false);
 
   const loadPlatforms = useCallback(async () => {
     try {
       setLoading(true);
       setError("");
       const data = await getBrowsePlatforms();
-      setPlatforms(data.filter((p) => p.status === "ACTIVE"));
+      setPlatforms(data.filter((p: BrowsePlatform) => p.status === "ACTIVE"));
     } catch (err: any) {
       setError(
-        err?.response?.data?.message || "Failed to load platforms. Please try again."
+        err?.response?.data?.message ||
+          "Failed to load platforms. Please try again."
       );
     } finally {
       setLoading(false);
@@ -43,35 +36,6 @@ export default function BrowseLeadsPage() {
   useEffect(() => {
     loadPlatforms();
   }, [loadPlatforms]);
-
-  const handleQuickBuy = (platform: BrowsePlatform) => {
-    setSelectedPlatform(platform);
-    setModalOpen(true);
-  };
-
-  const handlePurchase = async (quantity: number) => {
-    if (!selectedPlatform) return;
-    try {
-      setPurchaseLoading(true);
-      setError("");
-
-      const response = await purchaseLeads({
-        platform: selectedPlatform._id,
-        quantity,
-      });
-
-      if (!response.success) {
-        throw new Error(response.message || "Purchase failed");
-      }
-
-      setModalOpen(false);
-      router.push("/downloads");
-    } catch (err: any) {
-      setError(err?.response?.data?.message || err?.message || "Failed to complete purchase.");
-    } finally {
-      setPurchaseLoading(false);
-    }
-  };
 
   const filteredPlatforms = platforms.filter((p) =>
     p.name.toLowerCase().includes(search.trim().toLowerCase())
@@ -107,24 +71,21 @@ export default function BrowseLeadsPage() {
       <section className="space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200/60 pb-4">
           <div>
-            <h2 className="text-lg sm:text-xl font-black font-medium text-slate-900 tracking-tight flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
               <span>Choose a Platform</span>
-              <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-[#eef7ee] text-[#0c4731] text-[11px] font-black border border-[#d6ecd6]">
+              <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-full bg-[#eef7ee] text-[#0c4731] text-[11px] font-bold border border-[#d6ecd6]">
                 {filteredPlatforms.length} Active
               </span>
             </h2>
             <p className="mt-0.5 text-xs text-slate-500 font-medium">
-              Select a channel to purchase your dedicated verified leads.
+              Select a channel to explore category-filtered lead packages.
             </p>
           </div>
         </div>
 
         {/* Dynamic Grid / Empty States */}
         {filteredPlatforms.length > 0 ? (
-          <PlatformGrid
-            platforms={filteredPlatforms}
-            onQuickBuy={handleQuickBuy}
-          />
+          <PlatformGrid platforms={filteredPlatforms} />
         ) : (
           <EmptyLeads
             title="No Platforms Found"
@@ -137,15 +98,6 @@ export default function BrowseLeadsPage() {
           />
         )}
       </section>
-
-      {/* Purchase Modal */}
-      <PurchaseLeadModal
-        open={modalOpen}
-        platform={selectedPlatform}
-        onClose={() => setModalOpen(false)}
-        onPurchase={handlePurchase}
-        loading={purchaseLoading}
-      />
     </div>
   );
 }
