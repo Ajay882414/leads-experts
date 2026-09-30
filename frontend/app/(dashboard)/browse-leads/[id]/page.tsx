@@ -3,10 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Users, AlertCircle, RefreshCw } from "lucide-react";
+import { ArrowLeft, Users, AlertCircle } from "lucide-react";
 
 import { getPackagesByPlatform } from "@/services/packageApi";
-import { purchaseLeads } from "@/services/browseLeadsApi";
 import { Package } from "@/types/package";
 import PackageCard from "@/components/user/browse-leads/PackageCard";
 import PurchaseLeadModal from "@/components/user/browse-leads/PurchaseLeadModal";
@@ -26,7 +25,6 @@ export default function PlatformDetailPage() {
 
   const [selectedPkg, setSelectedPkg] = useState<Package | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [purchasing, setPurchasing] = useState(false);
 
   const fetchPlatformData = async () => {
     if (!platformId) return;
@@ -53,31 +51,6 @@ export default function PlatformDetailPage() {
   const handleOpenBuy = (pkg: Package) => {
     setSelectedPkg(pkg);
     setModalOpen(true);
-  };
-
-  const handlePurchase = async (quantity: number) => {
-    if (!selectedPkg) return;
-
-    try {
-      setPurchasing(true);
-      setError("");
-
-      const response = await purchaseLeads({
-        packageId: selectedPkg._id,
-        quantity,
-      } as any);
-
-      if (!response.success) {
-        throw new Error(response.message || "Purchase failed");
-      }
-
-      setModalOpen(false);
-      router.push("/downloads");
-    } catch (err: any) {
-      alert(err?.response?.data?.message || err?.message || "Unable to complete purchase.");
-    } finally {
-      setPurchasing(false);
-    }
   };
 
   if (loading) {
@@ -204,13 +177,15 @@ export default function PlatformDetailPage() {
         </div>
       )}
 
-      {/* Package Purchase Modal */}
+      {/* Package Purchase Modal with Correct Props */}
       <PurchaseLeadModal
         open={modalOpen}
         pkg={selectedPkg}
         onClose={() => setModalOpen(false)}
-        onPurchase={handlePurchase}
-        loading={purchasing}
+        onSuccess={() => {
+          setModalOpen(false);
+          fetchPlatformData();
+        }}
       />
     </div>
   );

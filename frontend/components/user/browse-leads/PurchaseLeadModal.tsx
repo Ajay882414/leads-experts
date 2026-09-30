@@ -1,30 +1,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { X, Sparkles, ShoppingCart, AlertCircle } from "lucide-react";
 import PurchaseSummary from "./PurchaseSummary";
 import { Package } from "@/types/package";
+import { loadRazorpayScript } from "@/utils/loadRazorpay";
+import {
+  createPaymentOrder,
+  verifyPaymentSignature,
+} from "@/services/paymentApi";
 
 interface PurchaseLeadModalProps {
   open: boolean;
   pkg: Package | null;
   onClose: () => void;
-  onPurchase: (quantity: number) => Promise<void> | void;
-  loading?: boolean;
+  onSuccess?: () => void;
 }
 
 export default function PurchaseLeadModal({
   open,
   pkg,
   onClose,
-  onPurchase,
-  loading = false,
+  onSuccess,
 }: PurchaseLeadModalProps) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     if (pkg) {
       setQuantity(Math.max(1, pkg.minimumPurchase || 1));
+      setErrorMessage("");
     }
   }, [pkg]);
 
@@ -38,6 +46,89 @@ export default function PurchaseLeadModal({
     if (!Number.isFinite(parsed)) return;
     const safeValue = Math.min(maximum, Math.max(minimum, Math.floor(parsed)));
     setQuantity(safeValue);
+  };
+
+  const handlePayNow = async () => {
+    try {
+      setLoading(true);
+      setErrorMessage("");
+
+      // 1. Razorpay SDK Load Karein
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        throw new Error(
+          "Razorpay SDK load nahi ho paya. Internet connection check karein."
+        );
+      }
+
+      // 2. Backend se Razorpay Order ID Create Karein
+      const orderData = await createPaymentOrder({
+        packageId: pkg._id,
+        quantity,
+      });
+
+      // 3. Razorpay Checkout Modal Open Karein
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        name: "Leadsvero",
+        description: `${pkg.name} — ${quantity} Leads`,
+        order_id: orderData.orderId,
+        handler: async function (response: any) {
+          try {
+            setLoading(true);
+
+            // 4. Payment Signatures Backend ko Bhejkar Verify Karein
+            const verifyRes = await verifyPaymentSignature({
+              razorpayOrderId: response.razorpay_order_id,
+              razorpayPaymentId: response.razorpay_payment_id,
+              razorpaySignature: response.razorpay_signature,
+            });
+
+            if (verifyRes.success) {
+              onClose();
+              if (onSuccess) onSuccess();
+              router.push("/downloads");
+            }
+          } catch (err: any) {
+            setErrorMessage(
+              err?.response?.data?.message ||
+                "Payment verification fail ho gaya. Kripya support se sampark karein."
+            );
+          } finally {
+            setLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+          },
+        },
+        theme: {
+          color: "#0c4731",
+        },
+      };
+
+      const razorpayInstance = new (window as any).Razorpay(options);
+
+      razorpayInstance.on("payment.failed", function (response: any) {
+        setErrorMessage(
+          response.error?.description ||
+            "Payment fail ho gaya. Kripya dobara koshish karein."
+        );
+        setLoading(false);
+      });
+
+      razorpayInstance.open();
+    } catch (err: any) {
+      setErrorMessage(
+        err?.response?.data?.message ||
+          err.message ||
+          "Payment initiate karne me samasya aayi."
+      );
+      setLoading(false);
+    }
   };
 
   return (
@@ -77,6 +168,14 @@ export default function PurchaseLeadModal({
 
         {/* Modal Body */}
         <div className="space-y-4 sm:space-y-5 p-5 sm:p-7 overflow-y-auto">
+          {/* Error Alert Box */}
+          {errorMessage && (
+            <div className="flex items-start gap-2.5 rounded-2xl bg-red-50 border border-red-200 p-3 text-xs text-red-700 font-medium">
+              <AlertCircle size={15} className="shrink-0 mt-0.5 text-red-600" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           {/* Quantity Field */}
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -104,8 +203,17 @@ export default function PurchaseLeadModal({
             </div>
 
             <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 font-normal">
-              <span>Minimum order: <b className="font-semibold text-slate-800">{minimum}</b></span>
-              <span>Rate: <b className="font-semibold text-slate-800">₹{pkg.pricePerLead}</b> / lead</span>
+              <span>
+                Minimum order:{" "}
+                <b className="font-semibold text-slate-800">{minimum}</b>
+              </span>
+              <span>
+                Rate:{" "}
+                <b className="font-semibold text-slate-800">
+                  ₹{pkg.pricePerLead}
+                </b>{" "}
+                / lead
+              </span>
             </div>
           </div>
 
@@ -119,9 +227,14 @@ export default function PurchaseLeadModal({
 
           {/* Notice Banner */}
           <div className="flex items-start gap-2.5 rounded-2xl bg-[#eef7ee] border border-[#d6ecd6] p-3.5 text-xs text-[#0c4731]">
-            <AlertCircle size={16} className="mt-0.5 shrink-0 text-[#0c4731]" />
+            <AlertCircle
+              size={16}
+              className="mt-0.5 shrink-0 text-[#0c4731]"
+            />
             <p className="font-normal leading-relaxed">
-              Instant delivery active. Once confirmed, your assigned leads will appear inside your <span className="font-bold">Downloads</span> tab in CSV format.
+              Instant delivery active. Payment confirm hote hi aapki leads turant{" "}
+              <span className="font-bold">Downloads</span> tab me CSV format me
+              mil jayengi.
             </p>
           </div>
 
@@ -143,11 +256,15 @@ export default function PurchaseLeadModal({
                 quantity < minimum ||
                 quantity > (pkg.availableLeads || 0)
               }
-              onClick={() => onPurchase(quantity)}
+              onClick={handlePayNow}
               className="flex-[1.5] inline-flex items-center justify-center gap-2 rounded-2xl bg-[#0c4731] hover:bg-[#083021] py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-white active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all shadow-md shadow-emerald-950/20 cursor-pointer"
             >
               <ShoppingCart size={16} className="text-[#a3e635]" />
-              <span>{loading ? "Processing..." : `Confirm & Pay ₹${(quantity * pkg.pricePerLead).toLocaleString("en-IN")}`}</span>
+              <span>
+                {loading
+                  ? "Processing..."
+                  : `Pay ₹${(quantity * pkg.pricePerLead).toLocaleString("en-IN")}`}
+              </span>
             </button>
           </div>
         </div>

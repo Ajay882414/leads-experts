@@ -1,22 +1,19 @@
 const express = require("express");
+const router = express.Router();
+const {
+  createPaymentOrder,
+  verifyPayment,
+  getAllPayments,
+} = require("../controllers/payment/payment.controller");
 
-const router =
-  express.Router();
+const protect = require("../middlewares/auth.middleware");
+const admin = require("../middlewares/admin.middleware");
 
-const protect =
-  require("../middlewares/auth.middleware");
+// User routes (Order creation & Signature verification)
+router.post("/create-order", protect, createPaymentOrder);
+router.post("/verify-payment", protect, verifyPayment);
 
-const admin =
-  require("../middlewares/admin.middleware");
-
-const getPayments =
-  require("../controllers/payment/getPayments.controller");
-
-router.get(
-  "/",
-  protect,
-  admin,
-  getPayments
-);
+// Admin route
+router.get("/all", protect, admin, getAllPayments);
 
 module.exports = router;

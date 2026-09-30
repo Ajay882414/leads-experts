@@ -42,24 +42,21 @@ const login = asyncHandler(async (req, res) => {
   // Generate JWT
   const token = generateToken(user._id);
 
-  // Send Cookie
-  // res.cookie("token", token, {
-  //   httpOnly: true,
-  //   secure: false, // Production => true
-  //   sameSite: "lax",
-  //   maxAge: 7 * 24 * 60 * 60 * 1000,
-  // });
+  // Dynamic Cookie: Production par secure aur localhost par lax/http
+  const isProduction = process.env.NODE_ENV === "production";
 
   res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,
-  sameSite: "none",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
 
+  // Token JSON response me bhi bhejein
   res.status(200).json({
     success: true,
     message: "Login Successful",
+    token,
     user: {
       id: user._id,
       fullName: user.fullName,
