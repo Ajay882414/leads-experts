@@ -91,7 +91,8 @@ export default function PlatformCard({ platform }: PlatformCardProps) {
                 <CheckCircle2 size={15} className="text-emerald-600 shrink-0" />
               </div>
               <p className="text-xs font-semibold text-emerald-700 tracking-tight mt-0.5">
-                {(platform.availableLeads || 0).toLocaleString("en-IN")} leads available
+                {/* {(platform.availableLeads || 0).toLocaleString("en-IN")} */}
+                 Unlimited Leads Available
               </p>
             </div>
           </div>

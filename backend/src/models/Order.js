@@ -33,6 +33,15 @@ const orderSchema =
         index: true,
       },
 
+      // package reference for the order, can be null if the order is not for a package
+
+      package: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Package",
+      required: false,
+      index: true,
+    },
+
       // ==========================================
       // QUANTITY
       // ==========================================
@@ -86,6 +95,8 @@ const orderSchema =
 
         index: true,
       },
+
+      
 
       // ==========================================
       // PURCHASED LEADS

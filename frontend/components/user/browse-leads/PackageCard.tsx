@@ -47,12 +47,12 @@ export default function PackageCard({ pkg, onBuy }: PackageCardProps) {
         </div>
 
         {/* Stock info */}
-        <div className="mt-4 text-xs font-semibold text-slate-500">
+        {/* <div className="mt-4 text-xs font-semibold text-slate-500">
           Available:{" "}
           <span className="text-slate-900 font-bold">
             {(pkg.availableLeads || 0).toLocaleString("en-IN")} leads
           </span>
-        </div>
+        </div> */}
       </div>
 
       {/* Pricing & Buy Button */}

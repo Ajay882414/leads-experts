@@ -143,6 +143,7 @@ const verifyPayment = asyncHandler(async (req, res) => {
   const newOrder = await Order.create({
     user: userId,
     platform: payment.platform,
+    package: payment.package, // <-- Package ID link
     quantity: payment.quantity,
     pricePerLead: pricePerLead,
     totalAmount: payment.amount,

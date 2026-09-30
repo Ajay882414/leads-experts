@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Download, Eye, Calendar, Layers, CheckCircle2, Clock, XCircle } from "lucide-react";
+import { Download, Eye, Calendar, CheckCircle2, Clock, XCircle } from "lucide-react";
 import { UserOrder } from "@/types/order";
 import { downloadOrderCSVDirect } from "@/services/orderApi";
 
@@ -19,7 +19,8 @@ export default function OrderTable({
   const handleDownload = async (order: UserOrder) => {
     try {
       setDownloadingId(order._id);
-      await downloadOrderCSVDirect(order._id, order.platform?.name || "leads");
+      const downloadName = order.package?.name || order.platform?.name || "leads";
+      await downloadOrderCSVDirect(order._id, downloadName);
     } catch (err) {
       alert("Failed to download CSV");
     } finally {
@@ -61,7 +62,7 @@ export default function OrderTable({
             <thead className="bg-[#f8fafc] text-[11px] font-normal uppercase tracking-wider text-slate-500 border-b border-slate-100">
               <tr>
                 <th className="px-6 py-4">Order ID</th>
-                <th className="px-6 py-4">Platform</th>
+                <th className="px-6 py-4">Package / Platform</th>
                 <th className="px-6 py-4">Volume</th>
                 <th className="px-6 py-4">Amount</th>
                 <th className="px-6 py-4">Status</th>
@@ -77,6 +78,8 @@ export default function OrderTable({
                   year: "numeric",
                 });
 
+                const displayTitle = order.package?.name || order.platform?.name || "N/A";
+
                 return (
                   <tr key={order._id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-6 py-4 font-mono font-normal text-slate-900">
@@ -84,10 +87,19 @@ export default function OrderTable({
                     </td>
                     <td className="px-6 py-4 font-normal text-slate-900">
                       <div className="flex items-center gap-2.5">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eef7ee] text-[#0c4731] font-normal text-xs border border-[#d6ecd6]">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eef7ee] text-[#0c4731] font-bold text-xs border border-[#d6ecd6] shrink-0">
                           {order.platform?.name?.slice(0, 1) || "L"}
                         </div>
-                        <span className="font-normal text-slate-800">{order.platform?.name || "N/A"}</span>
+                        <div className="flex flex-col">
+                          <span className="font-semibold text-slate-900 leading-tight">
+                            {displayTitle}
+                          </span>
+                          {order.package?.category && (
+                            <span className="text-[11px] text-slate-400">
+                              {order.package.category}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 font-normal text-slate-600">
@@ -143,20 +155,22 @@ export default function OrderTable({
             year: "numeric",
           });
 
+          const displayTitle = order.package?.name || order.platform?.name || "Package";
+
           return (
             <div
               key={order._id}
               className="rounded-[22px] border border-slate-200/80 bg-white p-4 shadow-[0_4px_16px_rgba(0,0,0,0.02)] space-y-3.5"
             >
-              {/* Top Row: Platform & Status */}
+              {/* Top Row: Package Name & Status */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#eef7ee] text-[#0c4731] font-normal text-xs border border-[#d6ecd6]">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#eef7ee] text-[#0c4731] font-bold text-xs border border-[#d6ecd6]">
                     {order.platform?.name?.slice(0, 1) || "L"}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs font-normal text-slate-900 truncate">
-                      {order.platform?.name || "Platform"}
+                    <p className="text-xs font-semibold text-slate-900 truncate">
+                      {displayTitle}
                     </p>
                     <p className="font-mono text-[11px] text-slate-400 font-normal">
                       #{order._id.slice(-6).toUpperCase()}

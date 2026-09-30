@@ -119,6 +119,7 @@ export interface UserOrder {
   _id: string;
   user: string;
   platform: UserOrderPlatform;
+  package?: UserOrderPackage;
   quantity: number;
   pricePerLead: number;
   totalAmount: number;
@@ -141,5 +142,12 @@ export interface DownloadLeadsResponse {
   leads: PurchasedLeadItem[];
 }
 
+
+export interface UserOrderPackage {
+  _id: string;
+  name: string;
+  category?: string;
+  pricePerLead?: number;
+}
 
 
