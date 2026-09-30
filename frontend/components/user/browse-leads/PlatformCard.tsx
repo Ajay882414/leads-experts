@@ -45,7 +45,7 @@ export default function PlatformCard({ platform }: PlatformCardProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
 
           {/* Stock Status Badge */}
-          <div className="absolute right-3 top-3">
+          {/* <div className="absolute right-3 top-3">
             <span
               className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider backdrop-blur-md shadow-sm ${
                 isAvailable
@@ -59,10 +59,12 @@ export default function PlatformCard({ platform }: PlatformCardProps) {
                   In Stock
                 </>
               ) : (
-                "Sold Out"
+                // "Sold Out"
+                ""
+
               )}
             </span>
-          </div>
+          </div> */}
         </div>
 
         {/* Platform Details */}
