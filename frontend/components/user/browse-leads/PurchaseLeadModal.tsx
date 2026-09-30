@@ -25,21 +25,22 @@ export default function PurchaseLeadModal({
   onSuccess,
 }: PurchaseLeadModalProps) {
   const router = useRouter();
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(20);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  // Minimum rule 20 leads
+  const minimum = Math.max(20, pkg?.minimumPurchase || 20);
+  const maximum = pkg?.availableLeads || 20;
+
   useEffect(() => {
     if (pkg) {
-      setQuantity(Math.max(1, pkg.minimumPurchase || 1));
+      setQuantity(minimum);
       setErrorMessage("");
     }
-  }, [pkg]);
+  }, [pkg, minimum]);
 
   if (!open || !pkg) return null;
-
-  const minimum = Math.max(1, pkg.minimumPurchase || 1);
-  const maximum = pkg.availableLeads || 1;
 
   const handleQuantityChange = (value: string) => {
     const parsed = Number(value);
@@ -50,10 +51,14 @@ export default function PurchaseLeadModal({
 
   const handlePayNow = async () => {
     try {
+      if (quantity < minimum) {
+        setErrorMessage(`Kam se kam ${minimum} leads purchase karna zaroori hai.`);
+        return;
+      }
+
       setLoading(true);
       setErrorMessage("");
 
-      // 1. Razorpay SDK Load Karein
       const isLoaded = await loadRazorpayScript();
       if (!isLoaded) {
         throw new Error(
@@ -61,13 +66,11 @@ export default function PurchaseLeadModal({
         );
       }
 
-      // 2. Backend se Razorpay Order ID Create Karein
       const orderData = await createPaymentOrder({
         packageId: pkg._id,
         quantity,
       });
 
-      // 3. Razorpay Checkout Modal Open Karein
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || orderData.keyId,
         amount: orderData.amount,
@@ -78,8 +81,6 @@ export default function PurchaseLeadModal({
         handler: async function (response: any) {
           try {
             setLoading(true);
-
-            // 4. Payment Signatures Backend ko Bhejkar Verify Karein
             const verifyRes = await verifyPaymentSignature({
               razorpayOrderId: response.razorpay_order_id,
               razorpayPaymentId: response.razorpay_payment_id,
@@ -168,7 +169,6 @@ export default function PurchaseLeadModal({
 
         {/* Modal Body */}
         <div className="space-y-4 sm:space-y-5 p-5 sm:p-7 overflow-y-auto">
-          {/* Error Alert Box */}
           {errorMessage && (
             <div className="flex items-start gap-2.5 rounded-2xl bg-red-50 border border-red-200 p-3 text-xs text-red-700 font-medium">
               <AlertCircle size={15} className="shrink-0 mt-0.5 text-red-600" />
@@ -217,7 +217,6 @@ export default function PurchaseLeadModal({
             </div>
           </div>
 
-          {/* Pricing Summary Component */}
           <div className="rounded-2xl border border-slate-100 bg-[#fbfdfb] p-3.5 sm:p-4">
             <PurchaseSummary
               quantity={quantity}
@@ -225,7 +224,6 @@ export default function PurchaseLeadModal({
             />
           </div>
 
-          {/* Notice Banner */}
           <div className="flex items-start gap-2.5 rounded-2xl bg-[#eef7ee] border border-[#d6ecd6] p-3.5 text-xs text-[#0c4731]">
             <AlertCircle
               size={16}
@@ -238,7 +236,6 @@ export default function PurchaseLeadModal({
             </p>
           </div>
 
-          {/* Actions Button Group */}
           <div className="flex items-center gap-3 pt-2">
             <button
               type="button"

@@ -13,6 +13,15 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
   const { packageId, quantity } = req.body;
   const userId = req.user._id;
 
+
+  const minRequired = Math.max(20, pkg.minimumPurchase || 20);
+  if (quantity < minRequired) {
+    return res.status(400).json({
+      success: false,
+      message: `Minimum order ${minRequired} leads ka hona chahiye`,
+    });
+  }
+
   if (!packageId || !quantity || quantity < 1) {
     return res.status(400).json({
       success: false,
@@ -88,6 +97,9 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
     },
   });
 });
+
+
+
 
 // 2. VERIFY PAYMENT SIGNATURE & ALLOCATE LEADS
 const verifyPayment = asyncHandler(async (req, res) => {
