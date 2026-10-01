@@ -11,6 +11,14 @@ import BrowseLeadsLoading from "@/components/user/browse-leads/BrowseLeadsLoadin
 import { getBrowsePlatforms } from "@/services/browseLeadsApi";
 import type { BrowsePlatform } from "@/types/browseLead";
 
+// Custom sequence order mapping: Instagram -> Snapchat -> Facebook -> Practice
+const PLATFORM_ORDER: Record<string, number> = {
+  instagram: 1,
+  snapchat: 2,
+  facebook: 3,
+  practice: 4,
+};
+
 export default function BrowseLeadsPage() {
   const [platforms, setPlatforms] = useState<BrowsePlatform[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +30,16 @@ export default function BrowseLeadsPage() {
       setLoading(true);
       setError("");
       const data = await getBrowsePlatforms();
-      setPlatforms(data.filter((p: BrowsePlatform) => p.status === "ACTIVE"));
+      const activePlatforms = data.filter((p: BrowsePlatform) => p.status === "ACTIVE");
+
+      // Sort platforms in specified order
+      const sortedPlatforms = activePlatforms.sort((a: BrowsePlatform, b: BrowsePlatform) => {
+        const orderA = PLATFORM_ORDER[a.name.toLowerCase().trim()] ?? 99;
+        const orderB = PLATFORM_ORDER[b.name.toLowerCase().trim()] ?? 99;
+        return orderA - orderB;
+      });
+
+      setPlatforms(sortedPlatforms);
     } catch (err: any) {
       setError(
         err?.response?.data?.message ||

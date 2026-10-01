@@ -106,7 +106,7 @@ export default function WhyUsHero() {
         </div>
       </div>
 
-      {/* Verified Lead Badge (Bottom Right) */}
+      {/* Fresh Lead Badge (Bottom Right) */}
       <div className="hidden sm:flex absolute right-[5%] md:right-[8%] bottom-28 z-10 pointer-events-none">
         <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-emerald-500 shadow-lg flex items-center justify-center text-white text-lg">
           ⚡

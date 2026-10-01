@@ -54,7 +54,7 @@ export default function WhyUsSection() {
                   50k+
                 </h3>
                 <p className="text-xs sm:text-sm text-slate-600 font-medium mt-1.5">
-                  Verified Leads Dispatched
+                  Fresh Leads Dispatched
                 </p>
               </div>
 

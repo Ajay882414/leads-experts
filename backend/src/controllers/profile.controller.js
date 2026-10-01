@@ -18,6 +18,7 @@ const updateProfile = asyncHandler(async (req, res) => {
     mobileNumber,
     platform,
     state,
+    avatar, // <-- avatar add kar diya hai
   } = req.body;
 
   const user = await User.findById(req.user._id);
@@ -34,6 +35,10 @@ const updateProfile = asyncHandler(async (req, res) => {
   user.platform = platform || user.platform;
   user.state = state || user.state;
 
+  if (avatar !== undefined) {
+    user.avatar = avatar; // <-- avatar save karega
+  }
+
   await user.save();
 
   res.status(200).json({
@@ -47,3 +52,13 @@ module.exports = {
   getProfile,
   updateProfile,
 };
+
+
+
+
+
+
+
+
+
+

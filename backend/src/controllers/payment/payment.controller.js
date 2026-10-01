@@ -8,19 +8,10 @@ const Order = require("../../models/Order");
 const Download = require("../../models/Download");
 const asyncHandler = require("../../utils/asyncHandler");
 
-// 1. CREATE RAZORPAY ORDER
+// 1. CREATE RAZORPAY ORDER (Stock check removed - allows on-demand preorder)
 const createPaymentOrder = asyncHandler(async (req, res) => {
   const { packageId, quantity } = req.body;
   const userId = req.user._id;
-
-
-  const minRequired = Math.max(20, pkg.minimumPurchase || 20);
-  if (quantity < minRequired) {
-    return res.status(400).json({
-      success: false,
-      message: `Minimum order ${minRequired} leads ka hona chahiye`,
-    });
-  }
 
   if (!packageId || !quantity || quantity < 1) {
     return res.status(400).json({
@@ -34,16 +25,11 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: "Package not found" });
   }
 
-  // Stock check
-  const availableStock = await Lead.countDocuments({
-    package: new mongoose.Types.ObjectId(packageId),
-    status: "AVAILABLE",
-  });
-
-  if (availableStock < quantity) {
+  const minRequired = Math.max(20, pkg.minimumPurchase || 20);
+  if (quantity < minRequired) {
     return res.status(400).json({
       success: false,
-      message: `Sirf ${availableStock} leads bachi hain is package me.`,
+      message: `Minimum order ${minRequired} leads ka hona chahiye`,
     });
   }
 
@@ -98,10 +84,7 @@ const createPaymentOrder = asyncHandler(async (req, res) => {
   });
 });
 
-
-
-
-// 2. VERIFY PAYMENT SIGNATURE & ALLOCATE LEADS
+// 2. VERIFY PAYMENT SIGNATURE & AUTO ALLOCATE OR SET PENDING
 const verifyPayment = asyncHandler(async (req, res) => {
   const { razorpayOrderId, razorpayPaymentId, razorpaySignature } = req.body;
   const userId = req.user._id;
@@ -135,73 +118,70 @@ const verifyPayment = asyncHandler(async (req, res) => {
     return res.status(404).json({ success: false, message: "Payment order nahi mila" });
   }
 
-  // 1. Available Leads fetch karein
-  const leadsToAssign = await Lead.find({
+  const pricePerLead = payment.amount / payment.quantity;
+
+  // Check currently available leads for this package
+  const availableLeads = await Lead.find({
     package: payment.package,
     status: "AVAILABLE",
   }).limit(payment.quantity);
 
-  if (leadsToAssign.length < payment.quantity) {
-    return res.status(400).json({
-      success: false,
-      message: "Leads stock khatam ho chuka hai.",
-    });
-  }
+  const hasFullStock = availableLeads.length >= payment.quantity;
+  const initialStatus = hasFullStock ? "Completed" : "Pending";
+  const leadIds = hasFullStock ? availableLeads.map((l) => l._id) : [];
 
-  const leadIds = leadsToAssign.map((lead) => lead._id);
-  const pricePerLead = payment.amount / payment.quantity;
-
-  // 2. New Order create karein with exact Enum "Completed"
+  // Create Order with appropriate status (Pending agar stock kam hai)
   const newOrder = await Order.create({
     user: userId,
     platform: payment.platform,
-    package: payment.package, // <-- Package ID link
+    package: payment.package,
     quantity: payment.quantity,
     pricePerLead: pricePerLead,
     totalAmount: payment.amount,
-    status: "Completed",
+    status: initialStatus,
     purchasedLeads: leadIds,
   });
 
-  // 3. Leads ko update karein (Lead model ke fields: status SOLD, soldTo, soldAt, order)
-  await Lead.updateMany(
-    { _id: { $in: leadIds } },
-    {
-      $set: {
-        status: "SOLD",
-        soldTo: userId,
-        soldAt: new Date(),
-        order: newOrder._id,
-        soldPrice: pricePerLead,
-      },
-    }
-  );
+  if (hasFullStock) {
+    // Leads ko mark sold karein
+    await Lead.updateMany(
+      { _id: { $in: leadIds } },
+      {
+        $set: {
+          status: "SOLD",
+          soldTo: userId,
+          soldAt: new Date(),
+          order: newOrder._id,
+          soldPrice: pricePerLead,
+        },
+      }
+    );
 
-  // 4. Download record create karein (totalLeads required field added)
-  try {
-    await Download.create({
-      user: userId,
-      platform: payment.platform,
-      order: newOrder._id,
-      totalLeads: payment.quantity,
-      fileName: `order-${newOrder._id}.csv`,
+    // CSV Download entry ready karein
+    try {
+      await Download.create({
+        user: userId,
+        platform: payment.platform,
+        order: newOrder._id,
+        totalLeads: payment.quantity,
+        fileName: `order-${newOrder._id}.csv`,
+      });
+    } catch (dlErr) {
+      console.warn("Download record insert note:", dlErr.message);
+    }
+
+    const remainingStock = await Lead.countDocuments({
+      package: payment.package,
+      status: "AVAILABLE",
     });
-  } catch (dlErr) {
-    console.warn("Download record insert note:", dlErr.message);
+
+    await Package.findByIdAndUpdate(payment.package, {
+      availableLeads: remainingStock,
+      $inc: { soldLeads: payment.quantity },
+    });
   }
 
-  // 5. Package stock count sync karein
-  const remainingStock = await Lead.countDocuments({
-    package: payment.package,
-    status: "AVAILABLE",
-  });
-
-  await Package.findByIdAndUpdate(payment.package, {
-    availableLeads: remainingStock,
-    $inc: { soldLeads: payment.quantity },
-  });
-
-  // 6. Payment status SUCCESS update karein
+  // Payment Record mark success
   payment.status = "SUCCESS";
   payment.razorpayPaymentId = razorpayPaymentId;
   payment.razorpaySignature = razorpaySignature;
@@ -210,8 +190,11 @@ const verifyPayment = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    message: "Payment verify ho gaya aur leads assign ho gayi!",
+    message: hasFullStock
+      ? "Payment verify ho gaya aur leads assign ho gayi!"
+      : "Payment successful! Aapki leads 12-24 ghante ke andar assign ho jayengi.",
     orderId: newOrder._id,
+    orderStatus: initialStatus,
   });
 });
 

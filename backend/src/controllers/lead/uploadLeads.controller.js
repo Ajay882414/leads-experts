@@ -1,14 +1,85 @@
 const Lead = require("../../models/Lead");
 const Platform = require("../../models/Platform");
 const Package = require("../../models/Package");
+const Order = require("../../models/Order");
+const Download = require("../../models/Download");
 const asyncHandler = require("../../utils/asyncHandler");
 const parseFile = require("../../utils/csvParser");
 const createNotification = require("../../utils/createNotification");
 
+// Helper: Auto-assign newly uploaded leads to FIFO pending orders
+async function autoAssignPendingOrders(packageId, platformId) {
+  try {
+    // Sabse puraane pending orders pehle fetch karein (FIFO)
+    const pendingOrders = await Order.find({
+      package: packageId,
+      status: "Pending",
+    }).sort({ createdAt: 1 });
+
+    for (const order of pendingOrders) {
+      const neededCount = order.quantity;
+
+      const availableLeads = await Lead.find({
+        package: packageId,
+        status: "AVAILABLE",
+      }).limit(neededCount);
+
+      // Agar is order ke barabar leads available hain
+      if (availableLeads.length >= neededCount) {
+        const leadIds = availableLeads.map((l) => l._id);
+
+        // 1. Leads status mark sold
+        await Lead.updateMany(
+          { _id: { $in: leadIds } },
+          {
+            $set: {
+              status: "SOLD",
+              soldTo: order.user,
+              soldAt: new Date(),
+              order: order._id,
+              soldPrice: order.pricePerLead,
+            },
+          }
+        );
+
+        // 2. Order status Completed
+        order.status = "Completed";
+        order.purchasedLeads = leadIds;
+        await order.save();
+
+        // 3. Download record create
+        await Download.findOneAndUpdate(
+          { order: order._id },
+          {
+            user: order.user,
+            platform: platformId,
+            order: order._id,
+            totalLeads: order.quantity,
+            fileName: `order-${order._id}.csv`,
+          },
+          { upsert: true, new: true }
+        );
+
+        // 4. Update Package sold count
+        await Package.findByIdAndUpdate(packageId, {
+          $inc: { soldLeads: order.quantity },
+        });
+
+        // 5. User Notification
+        await createNotification({
+          user: order.user,
+          title: "Leads Assigned!",
+          message: `Aapke order #${String(order._id).slice(-6).toUpperCase()} ki ${order.quantity} leads ready hain. Downloads tab se CSV download karein.`,
+          type: "Order",
+        });
+      }
+    }
+  } catch (err) {
+    console.error("Auto assign pending orders error:", err);
+  }
+}
+
 const uploadLeads = asyncHandler(async (req, res) => {
-  // =========================================
-  // 1. CHECK FILE
-  // =========================================
   if (!req.file) {
     return res.status(400).json({
       success: false,
@@ -16,11 +87,7 @@ const uploadLeads = asyncHandler(async (req, res) => {
     });
   }
 
-  // =========================================
-  // 2. PACKAGE CHECK
-  // =========================================
   const { packageId } = req.body;
-
   if (!packageId) {
     return res.status(400).json({
       success: false,
@@ -44,10 +111,6 @@ const uploadLeads = asyncHandler(async (req, res) => {
   }
 
   const platformId = packageExists.platform._id;
-
-  // =========================================
-  // 3. PARSE CSV
-  // =========================================
   const rows = parseFile(req.file.buffer);
 
   if (!rows.length) {
@@ -57,9 +120,6 @@ const uploadLeads = asyncHandler(async (req, res) => {
     });
   }
 
-  // =========================================
-  // 4. REQUIRED CSV HEADERS
-  // =========================================
   const firstRow = rows[0];
   const requiredHeaders = ["Name", "Phone", "Age"];
   const missingHeaders = requiredHeaders.filter(
@@ -83,14 +143,10 @@ const uploadLeads = asyncHandler(async (req, res) => {
     });
   }
 
-  // =========================================
-  // 5. PREPARE PHONE NUMBERS FOR DUPLICATE CHECK
-  // =========================================
   const phoneNumbers = rows
     .map((row) => String(row.Phone || "").trim())
     .filter(Boolean);
 
-  // Leads duplicate check inside this specific package card
   const existingLeads = await Lead.find({
     package: packageExists._id,
     phone: { $in: phoneNumbers },
@@ -103,9 +159,6 @@ const uploadLeads = asyncHandler(async (req, res) => {
   let duplicateCount = 0;
   let invalidCount = 0;
 
-  // =========================================
-  // 6. PROCESS EVERY ROW
-  // =========================================
   for (const row of rows) {
     const fullName = String(row.Name || "").trim();
     const phone = String(row.Phone || "").trim();
@@ -125,7 +178,6 @@ const uploadLeads = asyncHandler(async (req, res) => {
       continue;
     }
 
-    // Check duplicate inside this package
     if (existingPhones.has(phone) || csvPhones.has(phone)) {
       duplicateCount++;
       continue;
@@ -170,9 +222,6 @@ const uploadLeads = asyncHandler(async (req, res) => {
     });
   }
 
-  // =========================================
-  // 7. BULK INSERT
-  // =========================================
   let insertedLeads = [];
   try {
     insertedLeads = await Lead.insertMany(leadsToInsert, { ordered: false });
@@ -186,34 +235,41 @@ const uploadLeads = asyncHandler(async (req, res) => {
 
   const insertedCount = insertedLeads.length;
 
-  // =========================================
-  // 8. UPDATE PACKAGE & PLATFORM COUNTERS
-  // =========================================
   if (insertedCount > 0) {
+    // 1. Pending orders ko turant assign karein
+    await autoAssignPendingOrders(packageExists._id, platformId);
+
+    // 2. Real-time available stock count sync karein
+    const remainingAvailable = await Lead.countDocuments({
+      package: packageExists._id,
+      status: "AVAILABLE",
+    });
+
     await Package.findByIdAndUpdate(packageExists._id, {
-      $inc: {
-        totalLeads: insertedCount,
-        availableLeads: insertedCount,
-      },
+      availableLeads: remainingAvailable,
+      $inc: { totalLeads: insertedCount },
+    });
+
+    const platformAvailable = await Lead.countDocuments({
+      platform: platformId,
+      status: "AVAILABLE",
     });
 
     await Platform.findByIdAndUpdate(platformId, {
-      $inc: {
-        totalLeads: insertedCount,
-        availableLeads: insertedCount,
-      },
+      availableLeads: platformAvailable,
+      $inc: { totalLeads: insertedCount },
     });
 
     await createNotification({
       title: "Package Leads Uploaded",
-      message: `${insertedCount} leads added to package "${packageExists.name}".`,
+      message: `${insertedCount} leads processed for package "${packageExists.name}".`,
       type: "Lead",
     });
   }
 
   res.status(201).json({
     success: true,
-    message: "Leads uploaded to package successfully",
+    message: "Leads uploaded and pending orders processed successfully",
     package: {
       id: packageExists._id,
       name: packageExists.name,

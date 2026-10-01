@@ -71,7 +71,7 @@ export default function ContactFormConsole() {
               <div className="relative p-6 rounded-2xl bg-white/[0.04] border border-white/10 backdrop-blur-sm space-y-3">
                 <Quote size={28} className="text-[#a3e635]/70" />
                 <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed italic">
-                  &ldquo;Businesses don&apos;t fail due to bad products; they fail because of a lack of targeted, high-intent buyers. LeadsVero is built to eliminate cold outreach friction and give entrepreneurs, creators, and sales professionals instant access to genuine, verified leads.&rdquo;
+                  &ldquo;Businesses don&apos;t fail due to bad products; they fail because of a lack of targeted, high-intent buyers. LeadsVero is built to eliminate cold outreach friction and give entrepreneurs, creators, and sales professionals instant access to genuine, Fresh Leads.&rdquo;
                 </p>
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between">
                   <div>

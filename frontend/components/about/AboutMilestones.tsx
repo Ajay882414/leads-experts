@@ -5,7 +5,7 @@ import { TrendingUp } from "lucide-react";
 
 export default function AboutMilestones() {
   const milestones = [
-    { value: "50,000+", label: "Verified Leads Dispatched", sub: "Across India Tier-1 & Tier-2" },
+    { value: "50,000+", label: "Fresh Leads Dispatched", sub: "Across India Tier-1 & Tier-2" },
     { value: "10,000+", label: "Active Marketers & Agencies", sub: "Relying on our data engine" },
     { value: "99.4%", label: "Average Call Connect Rate", sub: "Far superior to scraped web data" },
     { value: "120+", label: "Targeted Audience Niches", sub: "From Real Estate to Gen-Z Learners" },

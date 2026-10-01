@@ -67,7 +67,7 @@ export default function PlatformRadarSection() {
           {/* Top Pill (The Future is AI / Lead Generation) */}
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#0c4731] text-white shadow-xl shadow-emerald-900/10 mb-4 transition-transform hover:scale-105">
             <span className="text-sm sm:text-base font-extrabold tracking-wide">
-              Verified Lead Ecosystem
+              Fresh Lead Ecosystem
             </span>
             <span className="text-[#a3e635] text-base">✦</span>
           </div>

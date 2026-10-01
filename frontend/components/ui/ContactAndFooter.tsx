@@ -53,7 +53,7 @@ export default function ContactAndFooter() {
 
               {/* Quote Body */}
               <p className="mt-3 text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed font-normal">
-                Businesses don&apos;t fail due to bad products; they fail because of a lack of targeted, high-intent buyers. Leadsvero is built to eliminate cold outreach friction and give entrepreneurs, creators, and sales professionals instant access to genuine, verified leads.
+                Businesses don&apos;t fail due to bad products; they fail because of a lack of targeted, high-intent buyers. Leadsvero is built to eliminate cold outreach friction and give entrepreneurs, creators, and sales professionals instant access to genuine, Fresh Leads.
               </p>
 
               <p className="mt-4 text-xs sm:text-sm text-[#a3e635] font-medium">

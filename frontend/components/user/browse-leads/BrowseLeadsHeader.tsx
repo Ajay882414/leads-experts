@@ -20,7 +20,7 @@ export default function BrowseLeadsHeader({
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#eef7ee] border border-[#d6ecd6] text-[#0c4731] mb-3">
           <Sparkles className="w-3.5 h-3.5 text-[#0c4731]" />
           <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-            Verified Lead Marketplace
+            Fresh Lead Marketplace
           </span>
         </div>
 

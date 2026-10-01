@@ -14,7 +14,7 @@ export default function Hero() {
 
       {/* ================= FLOATING STAT CARDS ================= */}
 
-      {/* 1. Left Card: 50k+ Verified Leads */}
+      {/* 1. Left Card: 50k+ Fresh Leads */}
       <div className="hidden lg:block absolute left-4 xl:left-12 2xl:left-24 top-1/2 -translate-y-8 z-10 anim-float-1 pointer-events-none">
         <div className="w-36 h-36 bg-[#161c24] text-white p-4 rounded-2xl shadow-2xl border border-slate-800 flex flex-col justify-between relative overflow-hidden backdrop-blur-sm">
           <div className="flex gap-1.5">
@@ -126,7 +126,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* 8. Verified Lead Badge (Bottom Right) */}
+      {/* 8. Fresh Lead Badge (Bottom Right) */}
       <div className="hidden sm:flex absolute right-[5%] md:right-[8%] bottom-28 z-10 anim-float-2 pointer-events-none">
         <div className="w-10 h-10 lg:w-12 lg:h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-emerald-500 app-icon-shadow flex items-center justify-center text-white text-lg">
           ⚡

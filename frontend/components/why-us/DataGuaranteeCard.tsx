@@ -129,7 +129,7 @@ export default function DataGuaranteeCard() {
                 Worried about bad leads? We&apos;ve got your back.
               </h4>
               <p className="text-xs sm:text-sm text-emerald-100/80 font-normal leading-relaxed">
-                Her verified lead package me direct replacement support aur dedicated account assistance include rehti hai. No questions asked replacement within 24 hours.
+                Her Fresh Lead package me direct replacement support aur dedicated account assistance include rehti hai. No questions asked replacement within 24 hours.
               </p>
             </div>
 

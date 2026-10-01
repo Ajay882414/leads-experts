@@ -101,7 +101,7 @@ export default function PlatformCard({ platform }: PlatformCardProps) {
 
           <p className="mt-3.5 line-clamp-2 text-xs leading-relaxed text-slate-500 font-normal">
             {platform.description ||
-              `Exclusive verified leads captured organically across ${platform.name}.`}
+              `Exclusive Fresh Leads captured organically across ${platform.name}.`}
           </p>
 
           {/* Dynamic Sub-Categories Chips */}

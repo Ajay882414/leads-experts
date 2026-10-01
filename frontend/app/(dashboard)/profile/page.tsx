@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   User,
   Mail,
@@ -13,8 +13,8 @@ import {
   Save,
   Loader2,
   Sparkles,
-  Calendar,
   Lock,
+  Camera,
 } from "lucide-react";
 import { getProfile, updateProfile } from "@/services/authApi";
 
@@ -22,6 +22,7 @@ interface UserProfile {
   _id?: string;
   fullName: string;
   email: string;
+  avatar?: string;
   mobileNumber: string;
   platform?: string;
   state?: string;
@@ -35,6 +36,9 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [previewAvatar, setPreviewAvatar] = useState<string>("");
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const fetchUserProfile = useCallback(async () => {
     try {
@@ -42,6 +46,9 @@ export default function ProfilePage() {
       setErrorMsg("");
       const res = await getProfile();
       setUser(res.user);
+      if (res.user?.avatar) {
+        setPreviewAvatar(res.user.avatar);
+      }
     } catch (err: any) {
       setErrorMsg(
         err?.response?.data?.message || "Failed to load profile details."
@@ -54,6 +61,26 @@ export default function ProfilePage() {
   useEffect(() => {
     fetchUserProfile();
   }, [fetchUserProfile]);
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 2 * 1024 * 1024) {
+      setErrorMsg("Image size 2MB se kam honi chahiye.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      setPreviewAvatar(base64String);
+      if (user) {
+        setUser({ ...user, avatar: base64String });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -134,14 +161,40 @@ export default function ProfilePage() {
         <form onSubmit={handleUpdate} className="space-y-6">
           {/* ================= TOP HERO BANNER & AVATAR ================= */}
           <div className="relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white p-6 sm:p-8 shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-            {/* Ambient Upper Glow Inside Banner */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-r from-[#0c2e22] via-[#092219] to-[#061711] opacity-95" />
 
             <div className="relative z-10 flex flex-col sm:flex-row items-center sm:items-end gap-5 pt-8">
-              {/* Profile Avatar Badge */}
-              <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#38ef7d] to-[#a3e635] text-slate-950 text-3xl font-normal shadow-lg ring-4 ring-white">
-                {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
-                <span className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-emerald-500 border-2 border-white" />
+              {/* Profile Avatar Badge with Upload Button */}
+              <div className="relative group">
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleAvatarChange}
+                  accept="image/png, image/jpeg, image/webp"
+                  className="hidden"
+                />
+
+                <div className="relative flex h-20 w-20 sm:h-24 sm:w-24 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#38ef7d] to-[#a3e635] text-slate-950 text-3xl font-bold shadow-lg ring-4 ring-white overflow-hidden">
+                  {previewAvatar ? (
+                    <img
+                      src={previewAvatar}
+                      alt={user.fullName || "User Avatar"}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span>{user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}</span>
+                  )}
+                </div>
+
+                {/* Camera Overlay Icon */}
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-[#0c4731] hover:bg-[#093625] text-white border-2 border-white shadow-md transition-transform hover:scale-105 cursor-pointer"
+                  title="Upload profile picture"
+                >
+                  <Camera size={14} />
+                </button>
               </div>
 
               {/* Identity Info */}
@@ -161,7 +214,7 @@ export default function ProfilePage() {
                 </p>
               </div>
 
-              {/* Save Button on Desktop (Quick Access) */}
+              {/* Save Button */}
               <div className="hidden sm:block">
                 <button
                   type="submit"
@@ -186,8 +239,7 @@ export default function ProfilePage() {
 
           {/* ================= MAIN SPLIT GRID ================= */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-            
-            {/* Left Column: Account Summary Snapshot */}
+            {/* Left Column */}
             <div className="rounded-[26px] border border-slate-200/80 bg-white p-5 sm:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] space-y-4">
               <div>
                 <h3 className="text-sm font-normal text-slate-900 uppercase tracking-wider">
@@ -369,7 +421,6 @@ export default function ProfilePage() {
                 </button>
               </div>
             </div>
-
           </div>
         </form>
       )}

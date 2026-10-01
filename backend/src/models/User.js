@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema(
       },
     },
 
+    avatar: {
+      type: String,
+      default: "",
+    },
+
     mobileNumber: {
       type: String,
       required: [true, "Mobile number is required"],
@@ -65,22 +70,18 @@ const userSchema = new mongoose.Schema(
     },
 
     status: {
-  type: String,
-  enum: [
-    "ACTIVE",
-    "BLOCKED",
-  ],
-  default: "ACTIVE",
-},
+      type: String,
+      enum: ["ACTIVE", "BLOCKED"],
+      default: "ACTIVE",
+    },
 
+    resetOtp: {
+      type: String,
+    },
 
-resetOtp: {
-  type: String,
-},
-
-resetOtpExpire: {
-  type: Date,
-},
+    resetOtpExpire: {
+      type: Date,
+    },
 
     isVerified: {
       type: Boolean,
@@ -96,35 +97,16 @@ resetOtpExpire: {
   }
 );
 
-
 userSchema.pre("save", async function () {
-
-  console.log("Before Hash:", this.password);
-
   if (!this.isModified("password")) {
     return;
   }
-
   const salt = await bcrypt.genSalt(12);
-
   this.password = await bcrypt.hash(this.password, salt);
-
-  console.log("After Hash:", this.password);
 });
 
-
-userSchema.methods.comparePassword = async function (
-  enteredPassword
-) {
-  return await bcrypt.compare(
-    enteredPassword,
-    this.password
-  );
+userSchema.methods.comparePassword = async function (enteredPassword) {
+  return await bcrypt.compare(enteredPassword, this.password);
 };
 
-
-
-module.exports = mongoose.model(
-  "User",
-  userSchema
-);
+module.exports = mongoose.model("User", userSchema);

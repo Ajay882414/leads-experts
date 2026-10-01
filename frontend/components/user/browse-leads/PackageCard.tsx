@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, ShieldCheck, Heart } from "lucide-react";
+import { Clock, ShieldCheck, Heart, ShoppingBag } from "lucide-react";
 import { Package } from "@/types/package";
 
 interface PackageCardProps {
@@ -9,8 +9,6 @@ interface PackageCardProps {
 }
 
 export default function PackageCard({ pkg, onBuy }: PackageCardProps) {
-  const isOutOfStock = (pkg.availableLeads || 0) < (pkg.minimumPurchase || 1);
-
   return (
     <div className="flex flex-col justify-between rounded-3xl border border-slate-200/90 bg-white p-6 shadow-sm transition hover:shadow-md hover:border-slate-300">
       <div>
@@ -21,7 +19,7 @@ export default function PackageCard({ pkg, onBuy }: PackageCardProps) {
           </h3>
           <button
             type="button"
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:text-red-500 transition border border-slate-100 shrink-0"
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-50 text-slate-400 hover:text-red-500 transition border border-slate-100 shrink-0 cursor-pointer"
           >
             <Heart size={15} />
           </button>
@@ -30,7 +28,7 @@ export default function PackageCard({ pkg, onBuy }: PackageCardProps) {
         {/* Delivery Time */}
         <div className="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
           <Clock size={13} className="text-slate-400" />
-          <span>{pkg.deliveryTime || "24 hours"}</span>
+          <span>{pkg.deliveryTime || "12 - 24 hours delivery"}</span>
         </div>
 
         {/* Badges */}
@@ -45,17 +43,9 @@ export default function PackageCard({ pkg, onBuy }: PackageCardProps) {
             {pkg.category}
           </span>
         </div>
-
-        {/* Stock info */}
-        {/* <div className="mt-4 text-xs font-semibold text-slate-500">
-          Available:{" "}
-          <span className="text-slate-900 font-bold">
-            {(pkg.availableLeads || 0).toLocaleString("en-IN")} leads
-          </span>
-        </div> */}
       </div>
 
-      {/* Pricing & Buy Button */}
+      {/* Pricing & Always Active Buy Button */}
       <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
         <div>
           <span className="text-[10px] font-medium text-slate-400 block uppercase">
@@ -69,11 +59,11 @@ export default function PackageCard({ pkg, onBuy }: PackageCardProps) {
 
         <button
           type="button"
-          disabled={isOutOfStock}
           onClick={() => onBuy(pkg)}
-          className="rounded-xl bg-[#265345] hover:bg-[#1b3d32] text-white px-5 py-2 text-xs font-bold transition shadow-sm disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed cursor-pointer"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-[#0c4731] hover:bg-[#083021] active:scale-95 text-white px-5 py-2.5 text-xs font-bold transition shadow-sm cursor-pointer"
         >
-          {isOutOfStock ? "Out of Stock" : "Buy Now"}
+          <ShoppingBag size={14} className="text-[#a3e635]" />
+          <span>Buy Now</span>
         </button>
       </div>
     </div>

@@ -31,7 +31,7 @@ export default function ContactPageFooter() {
               <span className="text-base font-normal tracking-tight text-white">LeadsVero</span>
             </div>
             <p className="text-xs text-slate-400 font-normal leading-relaxed">
-              India&apos;s verified lead sourcing engine. Direct channel acquisition with single-buyer protection.
+              India&apos;s Fresh Lead sourcing engine. Direct channel acquisition with single-buyer protection.
             </p>
           </div>
 

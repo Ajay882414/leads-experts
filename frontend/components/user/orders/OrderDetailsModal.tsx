@@ -71,7 +71,7 @@ export default function OrderDetailsModal({
                   Order #{order._id.slice(-8).toUpperCase()}
                 </h2>
                 <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-[#eef7ee] text-[#0c4731] border border-[#d6ecd6] text-[10px] font-normal px-2 py-0.5 uppercase tracking-wider">
-                  <Sparkles size={10} /> Verified Leads
+                  <Sparkles size={10} /> Fresh Leads
                 </span>
               </div>
               <p className="mt-1 text-xs text-slate-500 font-normal">

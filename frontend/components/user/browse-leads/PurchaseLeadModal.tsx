@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { X, Sparkles, ShoppingCart, AlertCircle } from "lucide-react";
+import { X, Sparkles, ShoppingCart, AlertCircle, Clock } from "lucide-react";
 import PurchaseSummary from "./PurchaseSummary";
 import { Package } from "@/types/package";
 import { loadRazorpayScript } from "@/utils/loadRazorpay";
@@ -29,24 +29,26 @@ export default function PurchaseLeadModal({
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  // Minimum rule 20 leads
-  const minimum = Math.max(20, pkg?.minimumPurchase || 20);
-  const maximum = pkg?.availableLeads || 20;
+  const minimum = 20;
 
   useEffect(() => {
     if (pkg) {
-      setQuantity(minimum);
+      setQuantity(20);
       setErrorMessage("");
     }
-  }, [pkg, minimum]);
+  }, [pkg]);
 
   if (!open || !pkg) return null;
 
   const handleQuantityChange = (value: string) => {
-    const parsed = Number(value);
-    if (!Number.isFinite(parsed)) return;
-    const safeValue = Math.min(maximum, Math.max(minimum, Math.floor(parsed)));
-    setQuantity(safeValue);
+    if (value === "") {
+      setQuantity(0);
+      return;
+    }
+    const parsed = parseInt(value, 10);
+    if (!Number.isNaN(parsed)) {
+      setQuantity(parsed);
+    }
   };
 
   const handlePayNow = async () => {
@@ -90,12 +92,12 @@ export default function PurchaseLeadModal({
             if (verifyRes.success) {
               onClose();
               if (onSuccess) onSuccess();
-              router.push("/downloads");
+              router.push("/orders");
             }
           } catch (err: any) {
             setErrorMessage(
               err?.response?.data?.message ||
-                "Payment verification fail ho gaya. Kripya support se sampark karein."
+                "Payment verification fail ho gaya. Support se sampark karein."
             );
           } finally {
             setLoading(false);
@@ -148,7 +150,7 @@ export default function PurchaseLeadModal({
                 Purchase Package Leads
               </h2>
               <span className="inline-flex items-center gap-1 rounded-full bg-[#eef7ee] text-[#0c4731] border border-[#d6ecd6] text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider">
-                <Sparkles size={10} /> Instant
+                <Sparkles size={10} /> Verified
               </span>
             </div>
             <p className="mt-1 text-xs text-slate-500 font-medium">
@@ -182,8 +184,8 @@ export default function PurchaseLeadModal({
               <label className="text-xs sm:text-sm font-semibold text-slate-800">
                 Number of Leads
               </label>
-              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-100">
-                Available: {(pkg.availableLeads || 0).toLocaleString("en-IN")}
+              <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-100">
+                Instant / Pre-order
               </span>
             </div>
 
@@ -191,10 +193,12 @@ export default function PurchaseLeadModal({
               <input
                 type="number"
                 min={minimum}
-                max={maximum}
-                value={quantity}
+                value={quantity === 0 ? "" : quantity}
                 disabled={loading}
                 onChange={(e) => handleQuantityChange(e.target.value)}
+                onBlur={() => {
+                  if (quantity < minimum) setQuantity(minimum);
+                }}
                 className="h-12 sm:h-13 w-full rounded-2xl border border-slate-200/90 bg-[#f8fafc] px-4 font-bold text-slate-900 text-sm sm:text-base outline-none transition-all focus:border-[#0c4731] focus:bg-white focus:ring-4 focus:ring-emerald-900/5"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
@@ -204,38 +208,30 @@ export default function PurchaseLeadModal({
 
             <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 font-normal">
               <span>
-                Minimum order:{" "}
-                <b className="font-semibold text-slate-800">{minimum}</b>
+                Minimum order: <b className="font-semibold text-slate-800">{minimum}</b>
               </span>
               <span>
-                Rate:{" "}
-                <b className="font-semibold text-slate-800">
-                  ₹{pkg.pricePerLead}
-                </b>{" "}
-                / lead
+                Rate: <b className="font-semibold text-slate-800">₹{pkg.pricePerLead}</b> / lead
               </span>
             </div>
           </div>
 
           <div className="rounded-2xl border border-slate-100 bg-[#fbfdfb] p-3.5 sm:p-4">
             <PurchaseSummary
-              quantity={quantity}
+              quantity={quantity < minimum ? minimum : quantity}
               pricePerLead={pkg.pricePerLead}
             />
           </div>
 
+          {/* Delivery Note */}
           <div className="flex items-start gap-2.5 rounded-2xl bg-[#eef7ee] border border-[#d6ecd6] p-3.5 text-xs text-[#0c4731]">
-            <AlertCircle
-              size={16}
-              className="mt-0.5 shrink-0 text-[#0c4731]"
-            />
+            <Clock size={16} className="mt-0.5 shrink-0 text-[#0c4731]" />
             <p className="font-normal leading-relaxed">
-              Instant delivery active. Payment confirm hote hi aapki leads turant{" "}
-              <span className="font-bold">Downloads</span> tab me CSV format me
-              mil jayengi.
+              Order place hote hi leads <b>12 se 24 hours</b> ke andar assign hokar <b>My Orders</b> me CSV download ke liye ready ho jayengi.
             </p>
           </div>
 
+          {/* Action Buttons */}
           <div className="flex items-center gap-3 pt-2">
             <button
               type="button"
@@ -248,11 +244,7 @@ export default function PurchaseLeadModal({
 
             <button
               type="button"
-              disabled={
-                loading ||
-                quantity < minimum ||
-                quantity > (pkg.availableLeads || 0)
-              }
+              disabled={loading || quantity < minimum}
               onClick={handlePayNow}
               className="flex-[1.5] inline-flex items-center justify-center gap-2 rounded-2xl bg-[#0c4731] hover:bg-[#083021] py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-white active:scale-95 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all shadow-md shadow-emerald-950/20 cursor-pointer"
             >
@@ -260,7 +252,7 @@ export default function PurchaseLeadModal({
               <span>
                 {loading
                   ? "Processing..."
-                  : `Pay ₹${(quantity * pkg.pricePerLead).toLocaleString("en-IN")}`}
+                  : `Pay ₹${((quantity < minimum ? minimum : quantity) * pkg.pricePerLead).toLocaleString("en-IN")}`}
               </span>
             </button>
           </div>

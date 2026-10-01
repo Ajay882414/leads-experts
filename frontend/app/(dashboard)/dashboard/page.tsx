@@ -133,7 +133,7 @@ export default function UserDashboardPage() {
           <div className="space-y-3">
             <QuickAction
               title="Browse Lead Markets"
-              description="Purchase fresh verified leads"
+              description="Purchase fresh Fresh Leads"
               href="/browse-leads"
               icon={Sparkles}
               badge="Hot"

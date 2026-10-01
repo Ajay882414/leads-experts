@@ -104,7 +104,7 @@ export default function DownloadsPage() {
           <p className="mx-auto mt-1.5 max-w-md text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
             {search
               ? "Try adjusting your search query to find your download files."
-              : "You haven't purchased any leads yet. Browse available platforms to buy your verified leads."}
+              : "You haven't purchased any leads yet. Browse available platforms to buy your Fresh Leads."}
           </p>
           <Link
             href="/browse-leads"

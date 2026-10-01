@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { AlertCircle, ShoppingBag, ArrowRight, RefreshCw, Sparkles } from "lucide-react";
+import { AlertCircle, ShoppingBag, ArrowRight, RefreshCw, Clock } from "lucide-react";
 
 import OrderHeader from "@/components/user/orders/OrderHeader";
 import OrderTable from "@/components/user/orders/OrderTable";
@@ -40,12 +40,19 @@ export default function OrdersPage() {
 
   const filteredOrders = orders.filter((order) => {
     const platformName = order.platform?.name?.toLowerCase() || "";
+    const packageName = (order as any).package?.name?.toLowerCase() || "";
     const orderId = order._id.toLowerCase();
-    const matchesSearch =
-      platformName.includes(search.trim().toLowerCase()) ||
-      orderId.includes(search.trim().toLowerCase());
+    const query = search.trim().toLowerCase();
 
-    const matchesStatus = statusFilter ? order.status === statusFilter : true;
+    const matchesSearch =
+      platformName.includes(query) ||
+      packageName.includes(query) ||
+      orderId.includes(query);
+
+    const matchesStatus = statusFilter
+      ? order.status.toLowerCase() === statusFilter.toLowerCase()
+      : true;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -103,7 +110,6 @@ export default function OrdersPage() {
       {/* Empty State Card */}
       {!loading && filteredOrders.length === 0 && !error && (
         <div className="relative overflow-hidden rounded-[28px] border border-slate-200/80 bg-white px-6 py-16 text-center shadow-[0_4px_20px_rgba(0,0,0,0.02)]">
-          {/* Subtle Ambient background in empty card */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-slate-50/80 to-transparent" />
           
           <div className="relative z-10">

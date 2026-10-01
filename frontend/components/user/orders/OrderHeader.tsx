@@ -31,7 +31,7 @@ export default function OrderHeader({
         </h1>
 
         <p className="text-slate-500 mt-1 max-w-xl text-xs sm:text-sm font-normal leading-relaxed">
-          Track verified lead acquisitions, inspect customer contact records, and download active CSV batches.
+          Track Fresh Lead acquisitions, inspect customer contact records, and download active CSV batches.
         </p>
       </div>
 

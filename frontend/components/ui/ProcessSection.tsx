@@ -93,7 +93,7 @@ export default function ProcessSection() {
             Choose. Buy. Download. Earn.
           </h2>
           <p className="mt-3 text-sm sm:text-base md:text-lg text-slate-600 max-w-2xl font-normal leading-relaxed">
-            Select your platform, purchase verified leads, download CSV, and start converting.
+            Select your platform, purchase Fresh Leads, download CSV, and start converting.
           </p>
         </div>
 
