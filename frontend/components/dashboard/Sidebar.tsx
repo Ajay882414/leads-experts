@@ -61,14 +61,13 @@ export default function Sidebar() {
       <div className="flex flex-col flex-1 min-h-0">
         
         {/* Fixed Brand Header */}
+        <Link href="/" className="cursor-pointer">
         <div className="flex items-center gap-3 px-2 py-3 mb-2 flex-shrink-0">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#38ef7d] to-[#a3e635] flex items-center justify-center font-black text-white text-xl shadow-md">
-            L
+          <div className="cursor-pointer">
+            <img src="/image 17.png" className="w-[200]" alt="" />
           </div>
-          <span className="text-xl font-black tracking-wider text-white">
-            Leadsvero
-          </span>
         </div>
+        </Link>
 
         {/* Menu Navigation Links */}
         <nav className="space-y-1 mt-1 overflow-y-auto pr-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
