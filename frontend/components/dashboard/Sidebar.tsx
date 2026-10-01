@@ -18,6 +18,7 @@ import {
   Settings,
   User,
   LifeBuoy,
+  GraduationCap,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -30,6 +31,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { title: "Dashboard", href: "/dashboard", icon: PieChart },
   { title: "Browse Leads", href: "/browse-leads", icon: Compass },
+  { title: "Practice", href: "/practice", icon: GraduationCap },
   { title: "My Orders", href: "/orders", icon: ShoppingBag },
   { title: "Downloads", href: "/downloads", icon: Download },
   { title: "Profile", href: "/profile", icon: User },
