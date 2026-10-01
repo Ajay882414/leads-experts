@@ -10,7 +10,7 @@ export default function Header() {
   return (
     <header className="fixed top-0 left-0 lg:left-64 xl:left-72 right-0 z-30 h-16 sm:h-20 bg-white/90 backdrop-blur-md border-b border-gray-200/80 px-4 sm:px-8 flex items-center justify-between transition-all duration-200">
       
-      {/* Left: Title & Subtitle (Mobile menu button space handled via pl-12) */}
+      {/* Left: Title & Subtitle */}
       <div className="pl-12 lg:pl-0">
         <h1 className="text-lg sm:text-2xl font-medium text-slate-800 tracking-tight leading-none">
           Dashboard
@@ -23,15 +23,6 @@ export default function Header() {
       {/* Right Controls: Wallet, Alerts, Settings, User */}
       <div className="flex items-center gap-2 sm:gap-4">
         
-        {/* Wallet Balance Badge */}
-        {/* <Link
-          href="/wallet"
-          className="flex items-center gap-1.5 sm:gap-2 bg-[#0c2419] text-white px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:bg-[#081a12] transition-colors border border-emerald-900/60 flex-shrink-0"
-        >
-          <Wallet size={15} className="text-[#a3e635]" />
-          <span className="whitespace-nowrap">₹ 12,450</span>
-        </Link> */}
-
         {/* Notifications Link Button */}
         <Link
           href="/notifications"
@@ -41,7 +32,6 @@ export default function Header() {
           <Bell size={18} className="sm:w-5 sm:h-5" />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white" />
         </Link>
-        
 
         {/* Settings Icon Button */}
         <Link
@@ -54,8 +44,16 @@ export default function Header() {
 
         {/* User Identity Pill */}
         <div className="flex items-center gap-2 sm:gap-2.5 pl-1 sm:pl-2 sm:border-l sm:border-gray-200">
-          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-[#38ef7d] to-[#a3e635] text-slate-950 flex items-center justify-center font-black text-xs sm:text-sm shadow-sm flex-shrink-0">
-            {user?.fullName?.charAt(0).toUpperCase() || "A"}
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-tr from-[#38ef7d] to-[#a3e635] text-slate-950 flex items-center justify-center font-black text-xs sm:text-sm shadow-sm flex-shrink-0 overflow-hidden ring-2 ring-white">
+            {(user as any)?.avatar ? (
+              <img
+                src={(user as any).avatar}
+                alt={user?.fullName || "User Avatar"}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span>{user?.fullName?.charAt(0).toUpperCase() || "A"}</span>
+            )}
           </div>
 
           <div className="hidden md:flex flex-col text-left leading-tight">

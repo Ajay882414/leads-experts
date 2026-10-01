@@ -9,6 +9,7 @@ import {
   Settings,
   Bell,
   Download,
+  LifeBuoy,
 } from "lucide-react";
 
 export const sidebarLinks = [
@@ -56,6 +57,11 @@ export const sidebarLinks = [
     title: "Reports",
     href: "/admin/reports",
     icon: BarChart3,
+  },
+{
+    title: "Support Tickets",
+    href: "/admin/support",
+  icon: LifeBuoy, // from lucide-react
   },
   {
     title: "Settings",

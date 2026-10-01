@@ -15,6 +15,7 @@ const leadRoutes = require("./routes/lead.routes");
 const userRoutes = require("./routes/user.routes");
 const orderRoutes = require("./routes/order.routes");
 const packageRoutes = require("./routes/package.routes");
+const supportRoutes = require("./routes/support.routes");
 const paymentRoutes =
 require("./routes/payment.routes");
 const notificationRoutes =
@@ -103,6 +104,9 @@ app.use(
   "/api/users",
   userRoutes
 );
+
+// Baki routes ke sath line add karein:
+app.use("/api/support", supportRoutes);
 
 app.use(
   "/api/orders",

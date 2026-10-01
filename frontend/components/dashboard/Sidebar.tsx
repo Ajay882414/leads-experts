@@ -17,6 +17,7 @@ import {
   X,
   Settings,
   User,
+  LifeBuoy,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -32,6 +33,7 @@ const navItems: NavItem[] = [
   { title: "My Orders", href: "/orders", icon: ShoppingBag },
   { title: "Downloads", href: "/downloads", icon: Download },
   { title: "Profile", href: "/profile", icon: User },
+  { title: "Help & Support", href: "/support", icon: LifeBuoy },
   { title: "Settings", href: "/settings", icon: Settings },
   // { title: "Favorites", href: "/favorites", icon: Heart },
   // { title: "Wallet", href: "/wallet", icon: Wallet },

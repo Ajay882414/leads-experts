@@ -17,6 +17,7 @@ export interface User {
   id?: string;
   fullName: string;
   email: string;
+  avatar?: string; // <-- yeh line add kar dein
   mobileNumber: string;
   platform: string;
   state: string;
