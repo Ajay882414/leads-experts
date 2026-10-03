@@ -8,10 +8,6 @@ import {
   Compass,
   ShoppingBag,
   Download,
-  Heart,
-  // Wallet,
-  // Headphones,
-  Smartphone,
   LogOut,
   Menu,
   X,
@@ -37,9 +33,6 @@ const navItems: NavItem[] = [
   { title: "Profile", href: "/profile", icon: User },
   { title: "Help & Support", href: "/support", icon: LifeBuoy },
   { title: "Settings", href: "/settings", icon: Settings },
-  // { title: "Favorites", href: "/favorites", icon: Heart },
-  // { title: "Wallet", href: "/wallet", icon: Wallet },
-  // { title: "Support", href: "/support", icon: Headphones },
 ];
 
 export default function Sidebar() {
@@ -56,19 +49,23 @@ export default function Sidebar() {
     }
   };
 
+  // User avatar image extraction
+  const avatarUrl =
+    (user as any)?.profilePicture ||
+    (user as any)?.avatar ||
+    (user as any)?.image;
+
   const SidebarContent = () => (
     <div className="flex flex-col h-full justify-between select-none">
-      
-      {/* Top Header + Navigation Items (Scrollable internally if screen height is small) */}
+      {/* Top Header + Navigation Items */}
       <div className="flex flex-col flex-1 min-h-0">
-        
         {/* Fixed Brand Header */}
         <Link href="/" className="cursor-pointer">
-        <div className="flex items-center gap-3 px-2 py-3 mb-2 flex-shrink-0">
-          <div className="cursor-pointer">
-            <img src="/image 17.png" className="w-[200]" alt="" />
+          <div className="flex items-center gap-3 px-2 py-3 mb-2 shrink-0">
+            <div className="cursor-pointer">
+              <img src="/image 17.png" className="w-[200px]" alt="LeadsVero" />
+            </div>
           </div>
-        </div>
         </Link>
 
         {/* Menu Navigation Links */}
@@ -99,40 +96,25 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Bottom Fixed Area: App Card + User Details + Logout */}
-      <div className="flex flex-col gap-3 pt-3 flex-shrink-0 border-t border-slate-800/60 mt-2">
-        
-        {/* Mobile App Promo Card
-        <div className="bg-[#a3e635] text-slate-950 p-3.5 rounded-[22px] shadow-lg flex flex-col justify-between">
-          <div className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-slate-900 mb-0.5">
-            <Smartphone size={14} className="stroke-[2.5]" />
-            <span>MOBILE APP</span>
-          </div>
-
-          <p className="text-[11.5px] font-semibold text-slate-900 leading-snug mb-2.5">
-            Download the Leadsvero app for instant lead access on the go.
-          </p>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl bg-[#0b1120] text-white text-[11px] font-bold shadow hover:bg-black transition-colors cursor-pointer">
-              <span>🍎</span>
-              <span>iOS</span>
-            </button>
-
-            <button className="flex items-center justify-center gap-1 py-1.5 px-2 rounded-xl bg-[#0b1120] text-white text-[11px] font-bold shadow hover:bg-black transition-colors cursor-pointer">
-              <span>▶</span>
-              <span>Android</span>
-            </button>
-          </div>
-        </div> */}
-
-        {/* User Card + Logout */}
+      {/* Bottom Fixed Area: User Details + Logout */}
+      <div className="flex flex-col gap-3 pt-3 shrink-0 border-t border-slate-800/60 mt-2">
         <div className="bg-[#121a2d] border border-slate-800/80 rounded-[22px] p-3 flex flex-col gap-2.5">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-[#38ef7d] to-[#a3e635] text-slate-950 flex items-center justify-center font-black text-sm shadow-sm flex-shrink-0">
-              {user?.fullName?.charAt(0).toUpperCase() || "A"}
+            {/* User Avatar with Image Support */}
+            <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center border border-slate-700 bg-gradient-to-tr from-[#38ef7d] to-[#a3e635]">
+              {avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={user?.fullName || "User Avatar"}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <span className="font-black text-sm text-slate-950">
+                  {user?.fullName?.charAt(0).toUpperCase() || "A"}
+                </span>
+              )}
             </div>
-            
+
             <div className="flex flex-col min-w-0 flex-1 leading-tight">
               <span className="text-xs sm:text-sm font-bold text-white truncate">
                 {user?.fullName || "Ajay Sharma"}
@@ -144,6 +126,7 @@ export default function Sidebar() {
           </div>
 
           <button
+            type="button"
             onClick={handleLogout}
             className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-[#1d273d] hover:bg-[#25324d] text-slate-200 text-xs font-bold transition-all duration-150 cursor-pointer shadow-sm active:scale-98"
           >
@@ -151,9 +134,7 @@ export default function Sidebar() {
             <span>Logout</span>
           </button>
         </div>
-
       </div>
-
     </div>
   );
 
@@ -161,6 +142,7 @@ export default function Sidebar() {
     <>
       {/* Mobile Toggle Trigger */}
       <button
+        type="button"
         onClick={() => setOpen(true)}
         className="fixed top-4 left-4 lg:hidden z-50 p-2 rounded-xl bg-[#0b1120] text-white shadow-xl border border-slate-800 cursor-pointer"
         aria-label="Open Sidebar"
@@ -168,7 +150,7 @@ export default function Sidebar() {
         <Menu size={20} />
       </button>
 
-      {/* Desktop Fixed Sidebar (Never scrolls with main page) */}
+      {/* Desktop Fixed Sidebar */}
       <aside className="hidden lg:flex w-64 xl:w-72 bg-[#0b1120] text-white h-screen fixed top-0 left-0 flex-col p-4 border-r border-slate-800/70 z-40">
         <SidebarContent />
       </aside>
@@ -182,6 +164,7 @@ export default function Sidebar() {
           />
           <div className="relative w-72 bg-[#0b1120] text-white h-full p-4 flex flex-col z-50 shadow-2xl border-r border-slate-800">
             <button
+              type="button"
               onClick={() => setOpen(false)}
               className="absolute top-4 right-4 p-1.5 rounded-lg text-slate-400 hover:text-white cursor-pointer"
             >
