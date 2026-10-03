@@ -36,9 +36,9 @@ export default function PackageCard({ pkg, onBuy }: PackageCardProps) {
           <span className="rounded-full bg-rose-50 px-2.5 py-0.5 text-[10px] font-bold text-rose-700 border border-rose-100">
             Hot
           </span>
-          <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-100 flex items-center gap-1">
+          {/* <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 border border-emerald-100 flex items-center gap-1">
             <ShieldCheck size={11} /> Verified
-          </span>
+          </span> */}
           <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-semibold text-slate-700">
             {pkg.category}
           </span>
