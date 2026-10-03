@@ -11,8 +11,6 @@ const createNotification = require("../../utils/createNotification");
 
 const createOrder = asyncHandler(async (req, res) => {
   const userId = req.user._id;
-
-  // Ab request body me package ID aayegi
   const { packageId, quantity } = req.body;
   const requestedQuantity = Number(quantity);
 
@@ -49,22 +47,10 @@ const createOrder = asyncHandler(async (req, res) => {
     });
   }
 
-  if (Number(packageExists.availableLeads || 0) < requestedQuantity) {
-    return res.status(400).json({
-      success: false,
-      message: "Not enough leads available in this package",
-      availableLeads: packageExists.availableLeads,
-      requestedQuantity,
-    });
-  }
-
   const pricePerLead = Number(packageExists.pricePerLead || 0);
   const totalAmount = requestedQuantity * pricePerLead;
   const platformId = packageExists.platform._id;
 
-  // =====================================================
-  // TRANSACTION
-  // =====================================================
   const session = await mongoose.startSession();
 
   try {
@@ -72,7 +58,7 @@ const createOrder = asyncHandler(async (req, res) => {
     let purchasedLeadIds = [];
 
     await session.withTransaction(async () => {
-      // 1. Fetch available leads specifically belonging to this package
+      // 1. Check if leads exist right now
       const availableLeads = await Lead.find({
         package: packageExists._id,
         status: "AVAILABLE",
@@ -82,22 +68,23 @@ const createOrder = asyncHandler(async (req, res) => {
         .select("_id")
         .session(session);
 
-      if (availableLeads.length < requestedQuantity) {
-        throw new Error("NOT_ENOUGH_LEADS");
+      const hasSufficientStock = availableLeads.length >= requestedQuantity;
+
+      if (hasSufficientStock) {
+        purchasedLeadIds = availableLeads.map((lead) => lead._id);
       }
 
-      purchasedLeadIds = availableLeads.map((lead) => lead._id);
-
-      // 2. Create Order
+      // 2. Create Order with PACKAGE link
       const orderDocuments = await Order.create(
         [
           {
             user: userId,
             platform: platformId,
+            package: packageExists._id, // <-- Exact card title & category link
             quantity: requestedQuantity,
             pricePerLead,
             totalAmount,
-            status: "Completed",
+            status: hasSufficientStock ? "Completed" : "Pending",
             purchasedLeads: purchasedLeadIds,
           },
         ],
@@ -106,68 +93,63 @@ const createOrder = asyncHandler(async (req, res) => {
 
       createdOrder = orderDocuments[0];
 
-      // 3. Mark package leads as SOLD
-      const leadUpdate = await Lead.updateMany(
-        {
-          _id: { $in: purchasedLeadIds },
-          status: "AVAILABLE",
-        },
-        {
-          $set: {
-            status: "SOLD",
-            soldTo: userId,
-            soldAt: new Date(),
-            order: createdOrder._id,
-            soldPrice: pricePerLead,
-          },
-        },
-        { session }
-      );
-
-      if (leadUpdate.modifiedCount !== requestedQuantity) {
-        throw new Error("LEAD_ASSIGNMENT_FAILED");
-      }
-
-      // 4. Update Package Counters
-      await Package.updateOne(
-        {
-          _id: packageExists._id,
-          availableLeads: { $gte: requestedQuantity },
-        },
-        {
-          $inc: {
-            availableLeads: -requestedQuantity,
-            soldLeads: requestedQuantity,
-          },
-        },
-        { session }
-      );
-
-      // 5. Update Platform Counters
-      await Platform.updateOne(
-        { _id: platformId },
-        {
-          $inc: {
-            availableLeads: -requestedQuantity,
-            soldLeads: requestedQuantity,
-          },
-        },
-        { session }
-      );
-
-      // 6. Create Download Entry for CSV export
-      await Download.create(
-        [
+      // 3. If stock was available, assign leads and create download file
+      if (hasSufficientStock) {
+        await Lead.updateMany(
           {
-            user: userId,
-            order: createdOrder._id,
-            platform: platformId,
-            totalLeads: requestedQuantity,
-            fileName: `${packageExists.name.toLowerCase().replace(/\s+/g, "-")}-${createdOrder._id}.csv`,
+            _id: { $in: purchasedLeadIds },
+            status: "AVAILABLE",
           },
-        ],
-        { session }
-      );
+          {
+            $set: {
+              status: "SOLD",
+              soldTo: userId,
+              soldAt: new Date(),
+              order: createdOrder._id,
+              soldPrice: pricePerLead,
+            },
+          },
+          { session }
+        );
+
+        await Package.updateOne(
+          {
+            _id: packageExists._id,
+            availableLeads: { $gte: requestedQuantity },
+          },
+          {
+            $inc: {
+              availableLeads: -requestedQuantity,
+              soldLeads: requestedQuantity,
+            },
+          },
+          { session }
+        );
+
+        await Platform.updateOne(
+          { _id: platformId },
+          {
+            $inc: {
+              availableLeads: -requestedQuantity,
+              soldLeads: requestedQuantity,
+            },
+          },
+          { session }
+        );
+
+        await Download.create(
+          [
+            {
+              user: userId,
+              order: createdOrder._id,
+              platform: platformId,
+              totalLeads: requestedQuantity,
+              fileName: `${packageExists.name.toLowerCase().replace(/\s+/g, "-")}-${createdOrder._id}.csv`,
+            },
+          ],
+          { session }
+        );
+      }
     });
 
     await createNotification({
@@ -178,7 +160,7 @@ const createOrder = asyncHandler(async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Leads purchased successfully",
+      message: "Order placed successfully",
       order: createdOrder,
       purchasedLeads: purchasedLeadIds.length,
       totalAmount,
@@ -191,22 +173,6 @@ const createOrder = asyncHandler(async (req, res) => {
         name: packageExists.platform.name,
       },
     });
-  } catch (error) {
-    if (error.message === "NOT_ENOUGH_LEADS") {
-      return res.status(400).json({
-        success: false,
-        message: "Requested leads are no longer available in this package",
-      });
-    }
-
-    if (error.message === "LEAD_ASSIGNMENT_FAILED") {
-      return res.status(409).json({
-        success: false,
-        message: "Some leads were already purchased. Please try again.",
-      });
-    }
-
-    throw error;
   } finally {
     await session.endSession();
   }

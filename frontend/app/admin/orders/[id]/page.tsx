@@ -26,7 +26,7 @@ interface Order {
     name?: string;
     title?: string;
     category?: string;
-    price?: number;
+    pricePerLead?: number;
   };
 
   quantity: number;
@@ -134,6 +134,15 @@ export default function OrderDetailsPage() {
   const orderDate = order.createdAt
     ? new Date(order.createdAt).toLocaleString("en-IN")
     : "-";
+
+  // Exact Package Card Title & Category
+  const cardTitle =
+    order.package?.name ||
+    order.package?.title ||
+    `${order.platform?.name || "Platform"} Lead Package`;
+
+  const audienceCategory =
+    order.package?.category || "Standard Category";
 
   return (
     <div className="space-y-6 p-4 max-w-7xl mx-auto">
@@ -245,14 +254,14 @@ export default function OrderDetailsPage() {
               </p>
             </div>
 
-            {/* PACKAGE CARD & AUDIENCE CATEGORY */}
+            {/* FULL CARD TITLE & CATEGORY */}
             <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-4 space-y-3">
               <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Target Lead Package
+                  Target Lead Package Title
                 </p>
                 <p className="font-bold text-base text-slate-900 mt-0.5">
-                  {order.package?.title || order.package?.name || "Standard Platform Leads"}
+                  {cardTitle}
                 </p>
               </div>
 
@@ -262,7 +271,7 @@ export default function OrderDetailsPage() {
                 </p>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#0c4731] text-white text-xs font-bold">
                   <Tag size={12} className="text-[#a3e635]" />
-                  {order.package?.category || "Direct / Mixed Leads"}
+                  {audienceCategory}
                 </span>
               </div>
             </div>
