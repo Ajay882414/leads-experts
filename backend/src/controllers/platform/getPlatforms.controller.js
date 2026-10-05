@@ -1,28 +1,56 @@
 const Platform = require("../../models/Platform");
 const Package = require("../../models/Package");
+const Lead = require("../../models/Lead");
 const asyncHandler = require("../../utils/asyncHandler");
 
 const getPlatforms = asyncHandler(async (req, res) => {
-  // Sabhi platforms fetch karo
+  // 1. Sabhi platforms fetch karo
   const platforms = await Platform.find()
     .sort({ createdAt: -1 })
     .lean();
 
-  // Har platform ke andar ke active packages ki categories attach karo
-  const platformsWithCategories = await Promise.all(
+  // 2. Har platform ke actual package cards aur unki real leads calculate karo
+  const platformsWithCalculatedStats = await Promise.all(
     platforms.map(async (platform) => {
-      const activePackages = await Package.find({
+      // Platform ke sabhi existing packages nikalo
+      const packages = await Package.find({
         platform: platform._id,
-        status: "ACTIVE",
-      }).select("category");
+      }).select("_id category status");
 
-      // Unique categories list nikalo
+      const packageIds = packages.map((pkg) => pkg._id);
+
+      // Active packages ki unique categories list
+      const activePackages = packages.filter((pkg) => pkg.status === "ACTIVE");
       const categories = [
         ...new Set(activePackages.map((pkg) => pkg.category).filter(Boolean)),
       ];
 
+      // Agar is platform ke andar koi package card hi nahi hai
+      if (packageIds.length === 0) {
+        return {
+          ...platform,
+          totalLeads: 0,
+          availableLeads: 0,
+          soldLeads: 0,
+          categories: categories.length
+            ? categories
+            : ["Housewife", "Students", "Working Pro"],
+        };
+      }
+
+      // Sirf active/existing packages se linked leads hi count karo
+      // Taaki purane deleted cards ki stale leads count na ho
+      const [totalLeads, availableLeads, soldLeads] = await Promise.all([
+        Lead.countDocuments({ package: { $in: packageIds } }),
+        Lead.countDocuments({ package: { $in: packageIds }, status: "AVAILABLE" }),
+        Lead.countDocuments({ package: { $in: packageIds }, status: "SOLD" }),
+      ]);
+
       return {
         ...platform,
+        totalLeads,
+        availableLeads,
+        soldLeads,
         categories: categories.length
           ? categories
           : ["Housewife", "Students", "Working Pro"],
@@ -32,8 +60,8 @@ const getPlatforms = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     success: true,
-    count: platformsWithCategories.length,
-    platforms: platformsWithCategories,
+    count: platformsWithCalculatedStats.length,
+    platforms: platformsWithCalculatedStats,
   });
 });
 

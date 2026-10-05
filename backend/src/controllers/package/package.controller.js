@@ -4,6 +4,39 @@ const Lead = require("../../models/Lead");
 const asyncHandler = require("../../utils/asyncHandler");
 
 // =====================================================
+// HELPER: Platform Counters Recalculate & Sync
+// =====================================================
+const syncPlatformLeadCounters = async (platformId) => {
+  try {
+    const existingPackages = await Package.find({ platform: platformId }).select("_id");
+    const packageIds = existingPackages.map((p) => p._id);
+
+    if (packageIds.length === 0) {
+      await Platform.findByIdAndUpdate(platformId, {
+        totalLeads: 0,
+        availableLeads: 0,
+        soldLeads: 0,
+      });
+      return;
+    }
+
+    const [totalLeads, availableLeads, soldLeads] = await Promise.all([
+      Lead.countDocuments({ package: { $in: packageIds } }),
+      Lead.countDocuments({ package: { $in: packageIds }, status: "AVAILABLE" }),
+      Lead.countDocuments({ package: { $in: packageIds }, status: "SOLD" }),
+    ]);
+
+    await Platform.findByIdAndUpdate(platformId, {
+      totalLeads,
+      availableLeads,
+      soldLeads,
+    });
+  } catch (error) {
+    console.error("Error syncing platform lead counters:", error);
+  }
+};
+
+// =====================================================
 // 1. CREATE PACKAGE CARD (Admin)
 // =====================================================
 const createPackage = asyncHandler(async (req, res) => {
@@ -42,6 +75,9 @@ const createPackage = asyncHandler(async (req, res) => {
     minimumPurchase: Number(minimumPurchase) || 1,
   });
 
+  // Sync platform stats
+  await syncPlatformLeadCounters(platform);
+
   res.status(201).json({
     success: true,
     message: "Package card created successfully",
@@ -68,6 +104,20 @@ const getPackagesByPlatform = asyncHandler(async (req, res) => {
     status: "ACTIVE",
   }).sort({ createdAt: -1 });
 
+  // Attach live lead stock count to each package card
+  const packagesWithStock = await Promise.all(
+    packages.map(async (pkg) => {
+      const availableStock = await Lead.countDocuments({
+        package: pkg._id,
+        status: "AVAILABLE",
+      });
+      return {
+        ...pkg.toObject(),
+        stock: availableStock,
+      };
+    })
+  );
+
   // Unique categories list for tab filters
   const categories = [
     "All",
@@ -86,7 +136,7 @@ const getPackagesByPlatform = asyncHandler(async (req, res) => {
       pricePerLead: platform.pricePerLead,
     },
     categories,
-    packages,
+    packages: packagesWithStock,
   });
 });
 
@@ -102,9 +152,23 @@ const getAllPackages = asyncHandler(async (req, res) => {
     .populate("platform", "name slug color")
     .sort({ createdAt: -1 });
 
+  // Attach live stock counts for Admin Modal
+  const packagesWithStock = await Promise.all(
+    packages.map(async (pkg) => {
+      const availableStock = await Lead.countDocuments({
+        package: pkg._id,
+        status: "AVAILABLE",
+      });
+      return {
+        ...pkg.toObject(),
+        stock: availableStock,
+      };
+    })
+  );
+
   res.status(200).json({
     success: true,
-    packages,
+    packages: packagesWithStock,
   });
 });
 
@@ -125,6 +189,9 @@ const updatePackage = asyncHandler(async (req, res) => {
       message: "Package not found",
     });
   }
+
+  // Sync counters in case platform was reassigned or modified
+  await syncPlatformLeadCounters(updatedPackage.platform);
 
   res.status(200).json({
     success: true,
@@ -147,13 +214,20 @@ const deletePackage = asyncHandler(async (req, res) => {
     });
   }
 
-  // Delete all leads associated with this package
+  const platformId = pkg.platform;
+
+  // 1. Is card se linked saari leads database se completely delete karo
   await Lead.deleteMany({ package: id });
+
+  // 2. Package document delete karo
   await pkg.deleteOne();
+
+  // 3. Platform counters ko real-time re-sync karo
+  await syncPlatformLeadCounters(platformId);
 
   res.status(200).json({
     success: true,
-    message: "Package and its leads deleted successfully",
+    message: "Package and all its associated leads deleted successfully",
   });
 });
 
