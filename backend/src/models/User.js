@@ -75,6 +75,27 @@ const userSchema = new mongoose.Schema(
       default: "ACTIVE",
     },
 
+    // ==========================================
+    // REFERRAL SYSTEM FIELDS
+    // ==========================================
+
+    // Client ka apna unique code (e.g., AD-FARHAN ya auto-generated)
+    referralCode: {
+      type: String,
+      trim: true,
+      uppercase: true,
+      sparse: true, // IMPORTANT: Allows multiple null/undefined values without unique constraint errors
+      index: true,
+    },
+
+    // Kis client ke link se user ne signup kiya (Direct user ke case me null rahega)
+    referredBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+      index: true,
+    },
+
     resetOtp: {
       type: String,
     },

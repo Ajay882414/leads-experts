@@ -85,7 +85,4 @@ const platformSchema = new mongoose.Schema(
   }
 );
 
-platformSchema.index({ slug: 1 });
-platformSchema.index({ status: 1 });
-
 module.exports = mongoose.model("Platform", platformSchema);

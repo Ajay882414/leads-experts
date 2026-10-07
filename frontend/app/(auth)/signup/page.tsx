@@ -1,13 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signup } = useAuth();
+
+  // URL query parameter se ?ref=CODE read karega
+  const refCode = searchParams.get("ref") || "";
 
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +38,13 @@ export default function SignupPage() {
 
     try {
       setLoading(true);
-      await signup(formData);
+
+      // Backend ko referral code ke sath form data bhejega
+      await signup({
+        ...formData,
+        ...(refCode ? { ref: refCode } : {}),
+      });
+
       alert("Account Created Successfully");
       router.push("/login");
     } catch (error: any) {
@@ -48,13 +58,11 @@ export default function SignupPage() {
     <div className="relative min-h-screen w-full bg-[#111c24] flex items-center justify-center p-4 py-12 overflow-hidden selection:bg-[#48d597] selection:text-black">
       
       {/* ================= BACKGROUND ACCENT RIBBONS ================= */}
-      {/* Left Bottom Ribbon */}
       <div className="absolute -left-12 bottom-12 sm:bottom-20 z-0 pointer-events-none">
         <div className="w-56 sm:w-80 h-10 sm:h-14 bg-[#1f6b5b] transform -rotate-12 rounded-r-md opacity-90 shadow-2xl" />
         <div className="w-64 sm:w-96 h-10 sm:h-14 bg-[#48d597] transform -rotate-12 rounded-r-md -mt-4 shadow-2xl" />
       </div>
 
-      {/* Right Top Ribbon */}
       <div className="absolute -right-12 top-12 sm:top-20 z-0 pointer-events-none">
         <div className="w-64 sm:w-96 h-10 sm:h-14 bg-[#1f6b5b] transform -rotate-12 rounded-l-md opacity-90 shadow-2xl" />
         <div className="w-56 sm:w-80 h-10 sm:h-14 bg-[#48d597] transform -rotate-12 rounded-l-md -mt-4 shadow-2xl" />
@@ -72,6 +80,11 @@ export default function SignupPage() {
                 Leadsvero
               </span>
             </h1>
+            {refCode && (
+              <span className="inline-block mt-2 text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                Referral Link Applied: {refCode}
+              </span>
+            )}
           </div>
 
           <div className="text-right flex flex-col items-end">
@@ -243,5 +256,13 @@ export default function SignupPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#111c24]" />}>
+      <SignupForm />
+    </Suspense>
   );
 }

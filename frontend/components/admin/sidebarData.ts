@@ -10,6 +10,7 @@ import {
   Bell,
   Download,
   LifeBuoy,
+  UserCheck,
 } from "lucide-react";
 
 export const sidebarLinks = [
@@ -58,6 +59,11 @@ export const sidebarLinks = [
     href: "/admin/reports",
     icon: BarChart3,
   },
+  {
+  title: "Client Referrals",
+  href: "/admin/referrals",
+  icon: UserCheck, // ya Users icon
+},
 {
     title: "Support Tickets",
     href: "/admin/support",

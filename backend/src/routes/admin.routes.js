@@ -4,13 +4,19 @@ const router = express.Router();
 
 const protect = require("../middlewares/auth.middleware");
 const admin = require("../middlewares/admin.middleware");
-const getRecentUsers = require("../controllers/admin/getRecentUsers.controller");
 
+const getRecentUsers = require("../controllers/admin/getRecentUsers.controller");
 const getRecentLeads = require("../controllers/admin/getRecentLeads.controller");
 const getDashboardStats = require("../controllers/admin/getDashboardStats.controller");
 const getLeadChart = require("../controllers/admin/getLeadChart.controller");
 const getPlatformChart = require("../controllers/admin/getPlatformChart.controller");
+const {
+  getAllReferralClients,
+  getClientDetailedReport,
+} = require("../controllers/admin/getClientReport.controller");
+
 // const getRevenue = require("../controllers/admin/getRevenue.controller");
+
 router.get(
   "/dashboard",
   protect,
@@ -18,6 +24,22 @@ router.get(
   getDashboardStats
 );
 
+// ==========================================
+// REFERRAL CLIENTS & TEAM REPORTS
+// ==========================================
+router.get(
+  "/referral-clients",
+  protect,
+  admin,
+  getAllReferralClients
+);
+
+router.get(
+  "/referral-report/:clientId",
+  protect,
+  admin,
+  getClientDetailedReport
+);
 
 router.get(
   "/recent-users",
@@ -46,9 +68,6 @@ router.get(
   admin,
   getPlatformChart
 );
-
-
-
 
 // router.get(
 //   "/revenue",
