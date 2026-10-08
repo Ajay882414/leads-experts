@@ -13,7 +13,12 @@ const forgotPassword = asyncHandler(async (req, res) => {
     });
   }
 
-  const user = await User.findOne({ email });
+  const cleanEmail = email.toLowerCase().trim();
+
+  // Sirf required fields fetch karein
+  const user = await User.findOne({ email: cleanEmail })
+    .select("_id email fullName")
+    .lean();
 
   if (!user) {
     return res.status(404).json({
@@ -24,23 +29,20 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
   // Generate OTP
   const otp = generateOtp();
+  const resetOtpExpire = new Date(Date.now() + 10 * 60 * 1000);
 
-  // Save OTP
-  user.resetOtp = otp;
-  user.resetOtpExpire = Date.now() + 10 * 60 * 1000;
-
-  await user.save({
-    validateBeforeSave: false,
-  });
-
-  // Send Email
-  await sendOtpEmail(
-    user.email,
-    user.fullName,
-    otp
+  // Fast direct update bina poora document re-save kiye
+  await User.updateOne(
+    { _id: user._id },
+    { $set: { resetOtp: otp, resetOtpExpire } }
   );
 
-  res.status(200).json({
+  // Email background me trigger karein taaki user ko turant response mile
+  sendOtpEmail(user.email, user.fullName, otp).catch((err) =>
+    console.error("Forgot Password OTP Email Error:", err)
+  );
+
+  return res.status(200).json({
     success: true,
     message: "OTP sent successfully",
     email: user.email,

@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      index: true, // Fast index query
       validate(value) {
         if (!validator.isEmail(value)) {
           throw new Error("Invalid email");
@@ -78,17 +79,14 @@ const userSchema = new mongoose.Schema(
     // ==========================================
     // REFERRAL SYSTEM FIELDS
     // ==========================================
-
-    // Client ka apna unique code (e.g., AD-FARHAN ya auto-generated)
     referralCode: {
       type: String,
       trim: true,
       uppercase: true,
-      sparse: true, // IMPORTANT: Allows multiple null/undefined values without unique constraint errors
+      sparse: true,
       index: true,
     },
 
-    // Kis client ke link se user ne signup kiya (Direct user ke case me null rahega)
     referredBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -122,7 +120,7 @@ userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
     return;
   }
-  const salt = await bcrypt.genSalt(12);
+  const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
 });
 

@@ -11,7 +11,7 @@ const signup = asyncHandler(async (req, res) => {
     platform,
     state,
     password,
-    ref, // <-- Optional referral code from query/body (e.g. "FARHAN10")
+    ref,
   } = req.body;
 
   if (
@@ -28,9 +28,14 @@ const signup = asyncHandler(async (req, res) => {
     });
   }
 
+  const cleanEmail = email.toLowerCase().trim();
+
+  // 1. Fast existence check (Sirf _id lookup)
   const existingUser = await User.findOne({
-    email: email.toLowerCase().trim(),
-  });
+    email: cleanEmail,
+  })
+    .select("_id")
+    .lean();
 
   if (existingUser) {
     return res.status(409).json({
@@ -39,56 +44,54 @@ const signup = asyncHandler(async (req, res) => {
     });
   }
 
-  // ==========================================
-  // SAFE REFERRAL LOOKUP (Zero impact on normal users)
-  // ==========================================
+  // 2. Safe Referral Lookup (Sirf _id fetch)
   let referredByUserId = null;
-
   if (ref && typeof ref === "string" && ref.trim().length > 0) {
     const cleanRef = ref.trim().toUpperCase();
     const referrer = await User.findOne({
       referralCode: cleanRef,
-    }).select("_id");
+    })
+      .select("_id")
+      .lean();
 
     if (referrer) {
       referredByUserId = referrer._id;
     }
   }
 
-  // ==========================================
-  // CREATE USER
-  // ==========================================
+  // 3. User Creation
   const user = await User.create({
-    fullName,
-    email,
-    mobileNumber,
+    fullName: fullName.trim(),
+    email: cleanEmail,
+    mobileNumber: mobileNumber.trim(),
     platform,
     state,
     password,
-    referredBy: referredByUserId, // Direct user ke liye automatically null rahega
+    referredBy: referredByUserId,
   });
 
-  // ==========================================
-  // NOTIFICATION
-  // ==========================================
-  await createNotification({
+  // 4. Background Notification (Non-blocking)
+  createNotification({
     title: "New User Registered",
     message: `${user.fullName} has registered successfully.`,
     type: "User",
-  });
+  }).catch((err) => console.error("Notification background error:", err));
 
+  // 5. Token & Cookie
   const token = generateToken(user._id);
+  const isProduction = process.env.NODE_ENV === "production";
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: true,
-    sameSite: "none",
+    secure: isProduction,
+    sameSite: isProduction ? "none" : "lax",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
   return res.status(201).json({
     success: true,
     message: "Account created successfully",
+    token,
     user: {
       id: user._id,
       fullName: user.fullName,

@@ -13,7 +13,11 @@ const resendOtp = asyncHandler(async (req, res) => {
     });
   }
 
-  const user = await User.findOne({ email });
+  const cleanEmail = email.toLowerCase().trim();
+
+  const user = await User.findOne({ email: cleanEmail })
+    .select("_id email fullName")
+    .lean();
 
   if (!user) {
     return res.status(404).json({
@@ -23,23 +27,19 @@ const resendOtp = asyncHandler(async (req, res) => {
   }
 
   const otp = generateOtp();
+  const resetOtpExpire = new Date(Date.now() + 10 * 60 * 1000);
 
-  user.resetOtp = otp;
-
-  user.resetOtpExpire =
-    Date.now() + 10 * 60 * 1000;
-
-  await user.save({
-    validateBeforeSave: false,
-  });
-
-  await sendOtpEmail(
-    user.email,
-    user.fullName,
-    otp
+  await User.updateOne(
+    { _id: user._id },
+    { $set: { resetOtp: otp, resetOtpExpire } }
   );
 
-  res.status(200).json({
+  // Background non-blocking execution
+  sendOtpEmail(user.email, user.fullName, otp).catch((err) =>
+    console.error("Resend OTP Email Error:", err)
+  );
+
+  return res.status(200).json({
     success: true,
     message: "OTP sent successfully",
   });

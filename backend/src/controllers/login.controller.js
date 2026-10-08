@@ -5,7 +5,7 @@ const generateToken = require("../utils/generateToken");
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
-  // Check required fields
+  // 1. Check required fields
   if (!email || !password) {
     return res.status(400).json({
       success: false,
@@ -13,9 +13,11 @@ const login = asyncHandler(async (req, res) => {
     });
   }
 
-  // Find user
+  const cleanEmail = email.toLowerCase().trim();
+
+  // 2. Find user (Fast index lookup)
   const user = await User.findOne({
-    email: email.toLowerCase(),
+    email: cleanEmail,
   }).select("+password");
 
   if (!user) {
@@ -25,7 +27,7 @@ const login = asyncHandler(async (req, res) => {
     });
   }
 
-  // Compare password
+  // 3. Compare password
   const isMatch = await user.comparePassword(password);
 
   if (!isMatch) {
@@ -35,14 +37,15 @@ const login = asyncHandler(async (req, res) => {
     });
   }
 
-  // Update last login
-  user.lastLogin = new Date();
-  await user.save();
+  // 4. Background Update lastLogin (User ko block kiye bina fast update)
+  User.updateOne({ _id: user._id }, { $set: { lastLogin: new Date() } }).catch(
+    (err) => console.error("LastLogin update error:", err)
+  );
 
-  // Generate JWT
+  // 5. Generate JWT Token
   const token = generateToken(user._id);
 
-  // Dynamic Cookie: Production par secure aur localhost par lax/http
+  // Dynamic Cookie configuration
   const isProduction = process.env.NODE_ENV === "production";
 
   res.cookie("token", token, {
@@ -52,8 +55,8 @@ const login = asyncHandler(async (req, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
-  // Token JSON response me bhi bhejein
-  res.status(200).json({
+  // 6. Instant Response
+  return res.status(200).json({
     success: true,
     message: "Login Successful",
     token,

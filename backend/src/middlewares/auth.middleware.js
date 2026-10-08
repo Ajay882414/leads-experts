@@ -5,7 +5,7 @@ const authMiddleware = async (req, res, next) => {
   try {
     let token = req.cookies?.token;
 
-    // 1. Agar cookie me token nahi mila, toh Authorization header check karo
+    // 1. Authorization header fallback
     if (
       !token &&
       req.headers.authorization &&
@@ -23,10 +23,12 @@ const authMiddleware = async (req, res, next) => {
 
     // 2. Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // 3. User dhoondho (id ya _id dono support)
     const userId = decoded.id || decoded._id;
-    const user = await User.findById(userId);
+
+    // 3. Fast Lean Query: Password exclude aur plain JS object fetch
+    const user = await User.findById(userId)
+      .select("-password -resetOtp -resetOtpExpire -__v")
+      .lean();
 
     if (!user) {
       return res.status(401).json({
