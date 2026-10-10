@@ -21,7 +21,6 @@ export default function Header() {
       </div>
 
       {/* Right Controls: Wallet, Alerts, Settings, User */}
-     
       <div className="flex items-center gap-2 sm:gap-4">
         
         {/* Notifications Link Button */}
@@ -70,7 +69,7 @@ export default function Header() {
         </div>
 
       </div>
-      
+
 
     </header>
   );
