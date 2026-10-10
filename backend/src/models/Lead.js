@@ -13,7 +13,6 @@ const leadSchema = new mongoose.Schema(
       index: true,
     },
 
-    // Direct reference to the specific package card
     package: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Package",
@@ -38,11 +37,12 @@ const leadSchema = new mongoose.Schema(
       index: true,
     },
 
+    // Single number (e.g. 21) ya Range (e.g. 18-27) dono accept karega
     age: {
-      type: Number,
+      type: String,
       required: [true, "Lead age is required"],
-      min: 0,
-      max: 120,
+      trim: true,
+      default: "18+",
     },
 
     gender: {
@@ -122,7 +122,6 @@ const leadSchema = new mongoose.Schema(
 leadSchema.index({ package: 1, status: 1 });
 leadSchema.index({ platform: 1, status: 1 });
 
-// Same phone number cannot exist twice in the same package card
 leadSchema.index(
   {
     package: 1,

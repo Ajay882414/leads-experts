@@ -10,7 +10,6 @@ const createNotification = require("../../utils/createNotification");
 // Helper: Auto-assign newly uploaded leads to FIFO pending orders
 async function autoAssignPendingOrders(packageId, platformId) {
   try {
-    // Sabse puraane pending orders pehle fetch karein (FIFO)
     const pendingOrders = await Order.find({
       package: packageId,
       status: "Pending",
@@ -24,7 +23,6 @@ async function autoAssignPendingOrders(packageId, platformId) {
         status: "AVAILABLE",
       }).limit(neededCount);
 
-      // Agar is order ke barabar leads available hain
       if (availableLeads.length >= neededCount) {
         const leadIds = availableLeads.map((l) => l._id);
 
@@ -143,13 +141,13 @@ const uploadLeads = asyncHandler(async (req, res) => {
     });
   }
 
-  const phoneNumbers = rows
-    .map((row) => String(row.Phone || "").trim())
+  const rawPhoneList = rows
+    .map((row) => String(row.Phone || "").replace(/[^0-9+]/g, "").trim())
     .filter(Boolean);
 
   const existingLeads = await Lead.find({
     package: packageExists._id,
-    phone: { $in: phoneNumbers },
+    phone: { $in: rawPhoneList },
   }).select("phone");
 
   const existingPhones = new Set(existingLeads.map((lead) => lead.phone));
@@ -161,19 +159,15 @@ const uploadLeads = asyncHandler(async (req, res) => {
 
   for (const row of rows) {
     const fullName = String(row.Name || "").trim();
-    const phone = String(row.Phone || "").trim();
+    // Phone numbers ke beech ke extra space/symbols clean karein (e.g. "63768 81458" -> "6376881458")
+    const phone = String(row.Phone || "").replace(/[^0-9+]/g, "").trim();
     const ageValue = String(row.Age || "").trim();
     const gender = String(row.Gender || "").trim();
     const profession = String(row.Profession || "").trim();
     const source = String(row.Source || "").trim();
 
+    // Basic validity check
     if (!fullName || !phone || !ageValue) {
-      invalidCount++;
-      continue;
-    }
-
-    const age = Number(ageValue);
-    if (Number.isNaN(age) || age < 0 || age > 120) {
       invalidCount++;
       continue;
     }
@@ -198,7 +192,7 @@ const uploadLeads = asyncHandler(async (req, res) => {
       package: packageExists._id,
       fullName,
       phone,
-      age,
+      age: ageValue, // Direct string save karega (18, 19, 18-27, 19-37 sab chalega)
       gender,
       profession,
       source,
@@ -236,7 +230,7 @@ const uploadLeads = asyncHandler(async (req, res) => {
   const insertedCount = insertedLeads.length;
 
   if (insertedCount > 0) {
-    // 1. Pending orders ko turant assign karein
+    // 1. Pending orders ko FIFO logic se turant assign karein
     await autoAssignPendingOrders(packageExists._id, platformId);
 
     // 2. Real-time available stock count sync karein
