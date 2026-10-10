@@ -21,6 +21,7 @@ export default function Header() {
       </div>
 
       {/* Right Controls: Wallet, Alerts, Settings, User */}
+      <Link href={"/profile"}>
       <div className="flex items-center gap-2 sm:gap-4">
         
         {/* Notifications Link Button */}
@@ -65,10 +66,11 @@ export default function Header() {
             </span>
           </div>
 
-          <ChevronDown size={14} className="text-gray-400 hidden sm:block" />
+          {/* <ChevronDown size={14} className="text-gray-400 hidden sm:block" /> */}
         </div>
 
       </div>
+      </Link>
 
     </header>
   );
