@@ -45,6 +45,14 @@ function SignupForm() {
         ...(refCode ? { ref: refCode } : {}),
       });
 
+      // Meta Pixel: CompleteRegistration Event Trigger
+      if (typeof window !== "undefined" && (window as any).fbq) {
+        (window as any).fbq("track", "CompleteRegistration", {
+          content_name: "Signup",
+          status: "completed",
+        });
+      }
+
       alert("Account Created Successfully");
       router.push("/login");
     } catch (error: any) {
@@ -56,7 +64,6 @@ function SignupForm() {
 
   return (
     <div className="relative min-h-screen w-full bg-[#111c24] flex items-center justify-center p-4 py-12 overflow-hidden selection:bg-[#48d597] selection:text-black">
-      
       {/* ================= BACKGROUND ACCENT RIBBONS ================= */}
       <div className="absolute -left-12 bottom-12 sm:bottom-20 z-0 pointer-events-none">
         <div className="w-56 sm:w-80 h-10 sm:h-14 bg-[#1f6b5b] transform -rotate-12 rounded-r-md opacity-90 shadow-2xl" />
@@ -70,7 +77,6 @@ function SignupForm() {
 
       {/* ================= MAIN SIGNUP CARD ================= */}
       <div className="relative z-10 w-full max-w-[580px] bg-white rounded-[32px] sm:rounded-[36px] p-7 sm:p-10 shadow-[0_25px_60px_rgba(0,0,0,0.35)] border border-slate-100">
-        
         {/* Card Header */}
         <div className="flex items-start justify-between gap-4 mb-7">
           <div>
@@ -102,7 +108,6 @@ function SignupForm() {
 
         {/* Signup Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          
           {/* Row 1: Full Name & Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -192,8 +197,18 @@ function SignupForm() {
                 <option value="Twitter">Twitter / X</option>
               </select>
               <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </div>
             </div>
@@ -221,13 +236,38 @@ function SignupForm() {
                 aria-label="Toggle password visibility"
               >
                 {showPassword ? (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                    />
                   </svg>
                 ) : (
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"
+                    />
                   </svg>
                 )}
               </button>
@@ -244,16 +284,19 @@ function SignupForm() {
               {loading ? "Creating Account..." : "Create Account"}
             </button>
           </div>
-
         </form>
 
         {/* Footer Text */}
         <p className="text-center text-xs text-slate-500 mt-5">
           By signing up, you agree to our{" "}
-          <Link href="/terms" className="text-[#1f6b5b] hover:underline">Terms</Link> &{" "}
-          <Link href="/privacy" className="text-[#1f6b5b] hover:underline">Privacy Policy</Link>
+          <Link href="/terms" className="text-[#1f6b5b] hover:underline">
+            Terms
+          </Link>{" "}
+          &{" "}
+          <Link href="/privacy" className="text-[#1f6b5b] hover:underline">
+            Privacy Policy
+          </Link>
         </p>
-
       </div>
     </div>
   );
