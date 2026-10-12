@@ -1,10 +1,4 @@
 const nodemailer = require("nodemailer");
-const dns = require("dns");
-
-// Node DNS ko force karein IPv4 result pehle dene ke liye
-if (dns.setDefaultResultOrder) {
-  dns.setDefaultResultOrder("ipv4first");
-}
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
@@ -16,16 +10,18 @@ const transporter = nodemailer.createTransport({
   },
   tls: {
     rejectUnauthorized: false,
-    ciphers: "SSLv3",
+    servername: "smtp.gmail.com",
   },
-  connectionTimeout: 20000,
+  family: 4, // Force IPv4
+  connectionTimeout: 15000,
   greetingTimeout: 15000,
-  socketTimeout: 20000,
+  socketTimeout: 15000,
 });
 
 const sendEmail = async ({ email, subject, html }) => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    throw new Error("EMAIL_USER ya EMAIL_PASS environment variables missing hain");
+    console.error("CRITICAL: EMAIL_USER ya EMAIL_PASS environment variables missing hain!");
+    throw new Error("Email configuration missing on server");
   }
 
   return await transporter.sendMail({
