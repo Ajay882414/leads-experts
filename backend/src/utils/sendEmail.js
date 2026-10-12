@@ -2,7 +2,6 @@ const nodemailer = require("nodemailer");
 
 const sendEmail = async ({ email, subject, html }) => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("CRITICAL: EMAIL_USER ya EMAIL_PASS environment variables missing hain!");
     throw new Error("Email configuration missing on server");
   }
 
@@ -14,10 +13,11 @@ const sendEmail = async ({ email, subject, html }) => {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS.replace(/\s+/g, ""),
     },
+    family: 4, // 👈 Force IPv4
     tls: {
       rejectUnauthorized: false,
     },
-    connectionTimeout: 10000,
+    connectionTimeout: 15000,
   });
 
   return await transporter.sendMail({

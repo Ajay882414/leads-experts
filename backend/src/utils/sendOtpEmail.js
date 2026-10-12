@@ -6,19 +6,20 @@ const sendOtpEmail = async (email, name, otp) => {
     throw new Error("Email configuration missing on server");
   }
 
-  // Cloud servers ke liye explicit host aur SSL Port 465 best rehta hai
+  // Force IPv4 (family: 4) taaki Render par ENETUNREACH IPv6 error na aaye
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
-    secure: true, // SSL ke liye true
+    secure: true,
     auth: {
       user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS.replace(/\s+/g, ""), // spaces remove karega
+      pass: process.env.EMAIL_PASS.replace(/\s+/g, ""),
     },
+    family: 4, // 👈 Sabse zaroori fix: Force IPv4 connection on Render
     tls: {
       rejectUnauthorized: false,
     },
-    connectionTimeout: 10000, // 10 seconds connection timeout
+    connectionTimeout: 15000,
   });
 
   const html = `
