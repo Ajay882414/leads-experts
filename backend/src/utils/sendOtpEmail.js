@@ -1,29 +1,8 @@
-const nodemailer = require("nodemailer");
+const sendEmail = require("./sendEmail");
 
 const sendOtpEmail = async (email, name, otp) => {
-  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    console.error("CRITICAL: EMAIL_USER ya EMAIL_PASS environment variables missing hain!");
-    throw new Error("Email configuration missing on server");
-  }
-
-  // Force IPv4 (family: 4) taaki Render par ENETUNREACH IPv6 error na aaye
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS.replace(/\s+/g, ""),
-    },
-    family: 4, // 👈 Sabse zaroori fix: Force IPv4 connection on Render
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 15000,
-  });
-
   const html = `
-  <div style="max-width: 520px; margin: 0 auto; padding: 30px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;">
+  <div style="max-width: 520px; margin: 0 auto; padding: 30px; font-family: Arial, sans-serif; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;">
     <h2 style="color: #0f172a; margin-top: 0; font-size: 22px;">Hello ${name || "User"},</h2>
     <p style="color: #475569; font-size: 15px; line-height: 1.5; margin-bottom: 24px;">
       Aapke account ka Password Reset request mila hai. Aapka verification OTP neeche diya gaya hai:
@@ -44,9 +23,8 @@ const sendOtpEmail = async (email, name, otp) => {
   </div>
   `;
 
-  return await transporter.sendMail({
-    from: `"LeadsVero" <${process.env.EMAIL_USER}>`,
-    to: email,
+  return await sendEmail({
+    email,
     subject: `Password Reset OTP - ${otp}`,
     html,
   });
