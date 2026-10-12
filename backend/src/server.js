@@ -1,3 +1,10 @@
+const dns = require("dns");
+
+// Render IPv6 bypass fix: Force Node.js to use IPv4 first
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder("ipv4first");
+}
+
 require("dotenv").config();
 
 const app = require("./app");
