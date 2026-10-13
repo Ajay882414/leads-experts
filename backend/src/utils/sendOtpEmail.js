@@ -5,7 +5,7 @@ const sendOtpEmail = async (email, name, otp) => {
   <div style="max-width: 520px; margin: 0 auto; padding: 30px; font-family: Arial, sans-serif; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 16px;">
     <h2 style="color: #0f172a; margin-top: 0; font-size: 22px;">Hello ${name || "User"},</h2>
     <p style="color: #475569; font-size: 15px; line-height: 1.5; margin-bottom: 24px;">
-      Aapke account ka Password Reset request mila hai. Aapka verification OTP neeche diya gaya hai:
+      Aapke account ka Password Reset request mila hai. Verification OTP neeche diya gaya hai:
     </p>
 
     <div style="background-color: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 12px; padding: 20px; text-align: center; margin: 24px 0;">
