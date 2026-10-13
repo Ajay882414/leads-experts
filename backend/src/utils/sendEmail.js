@@ -11,7 +11,7 @@ const sendEmail = async ({ email, subject, html }) => {
   const resend = new Resend(apiKey);
 
   const { data, error } = await resend.emails.send({
-    from: "LeadsVero <onboarding@resend.dev>",
+    from: "LeadsVero <noreply@leadsvero.com>", // 👈 Yeh update karna hai
     to: [email],
     subject,
     html,
