@@ -6,6 +6,7 @@ import useAuth from "@/hooks/useAuth";
 
 import Sidebar from "@/components/dashboard/Sidebar";
 import Header from "@/components/dashboard/Header";
+import WelcomeVideoModal from "@/components/dashboard/WelcomeVideoModal";
 
 export default function DashboardLayout({
   children,
@@ -33,12 +34,15 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-[#f8fafc] flex">
+      {/* Center Video Popup (Automatic close on end + manual close button) */}
+      <WelcomeVideoModal videoSrc="/videos/IMG_5024.mp4" />
+
       {/* 1. Left Fixed Sidebar */}
       <Sidebar />
 
-      {/* 2. Main Area: lg:ml-64 xl:ml-72 lagaya hai taaki Header aur Content Sidebar ki width ke baad shuru hon */}
+      {/* 2. Main Area */}
       <div className="flex-1 flex flex-col min-w-0 lg:ml-64 xl:ml-72 min-h-screen">
-        {/* Fixed Header jo sidebar ke upar nahi aayega */}
+        {/* Fixed Header */}
         <Header />
 
         {/* Dashboard Main Content */}
