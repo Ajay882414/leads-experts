@@ -2,21 +2,19 @@ const User = require("../../models/User");
 const nodemailer = require("nodemailer");
 const asyncHandler = require("../../utils/asyncHandler");
 
-// 1. Render Live-Safe Transporter (Forced Port 465 SSL)
-// Render Cloud Hosted Safe Transporter (Forced IPv4 + Port 465 SSL)
+// Brevo SMTP Transporter (Render Cloud Friendly - No IPv6 / Timeout Issues)
 const createTransporter = () => {
-  const user = (process.env.EMAIL_USER || "").trim();
-  const pass = (process.env.EMAIL_PASS || "").trim();
+  const user = (process.env.BREVO_USER || process.env.EMAIL_USER || "").trim();
+  const pass = (process.env.BREVO_PASS || process.env.EMAIL_PASS || "").trim();
 
   if (!user || !pass) {
-    throw new Error("EMAIL_USER ya EMAIL_PASS environment variables missing hain.");
+    throw new Error("BREVO_USER ya BREVO_PASS environment variables missing hain.");
   }
 
   return nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    family: 4, // 👈 SABSE IMPORTANT: Ye Render ko IPv6 (ENETUNREACH) bypass karke direct IPv4 par connect karega
+    host: "smtp-relay.brevo.com",
+    port: 587,
+    secure: false, // Port 587 par STARTTLS ke liye false rehta hai
     auth: {
       user: user,
       pass: pass,
@@ -24,9 +22,7 @@ const createTransporter = () => {
     tls: {
       rejectUnauthorized: false,
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000,
+    connectionTimeout: 15000,
   });
 };
 
@@ -42,7 +38,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
 
   let emailList = [];
 
-  // 2. Single User Filter
+  // Single User Filter
   if (sendMode === "single") {
     if (!singleEmail || !singleEmail.trim()) {
       return res.status(400).json({
@@ -52,7 +48,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
     }
     emailList = [singleEmail.trim().toLowerCase()];
   } else {
-    // 3. Bulk Users Filter
+    // Bulk Users Filter
     let query = { role: "user", status: "ACTIVE" };
     if (audience === "verified") {
       query.isVerified = true;
@@ -68,7 +64,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
     emailList = users.map((u) => u.email).filter(Boolean);
   }
 
-  // Professional HTML Template
+  // HTML Template
   const getHtmlContent = (bodyText) => `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1e293b; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;">
       <div style="border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 20px;">
@@ -85,9 +81,14 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
   `;
 
   const transporter = createTransporter();
-  const senderEmail = (process.env.EMAIL_USER || "").trim();
+  const senderEmail = (
+    process.env.BREVO_SENDER ||
+    process.env.BREVO_USER ||
+    process.env.EMAIL_USER ||
+    ""
+  ).trim();
 
-  // --- SINGLE EMAIL DISPATCH ---
+  // --- 1. SINGLE EMAIL DISPATCH ---
   if (sendMode === "single") {
     try {
       const info = await transporter.sendMail({
@@ -105,15 +106,15 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
         sentCount: 1,
       });
     } catch (err) {
-      console.error("❌ Live SMTP Send Error:", err.message);
+      console.error("❌ Brevo SMTP Error:", err.message);
       return res.status(500).json({
         success: false,
-        message: err.message || "Email connection timeout ho gaya.",
+        message: err.message || "Email dispatch failed.",
       });
     }
   }
 
-  // --- BULK EMAIL DISPATCH ---
+  // --- 2. BULK EMAIL DISPATCH ---
   let successfulSends = 0;
 
   for (const toEmail of emailList) {
