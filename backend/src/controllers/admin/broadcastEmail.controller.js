@@ -2,7 +2,7 @@ const User = require("../../models/User");
 const nodemailer = require("nodemailer");
 const asyncHandler = require("../../utils/asyncHandler");
 
-// Brevo SMTP Transporter (Render Cloud Friendly - No IPv6 / Timeout Issues)
+// Render Cloud Ke Liye Guaranteed Port 465 SSL Transporter
 const createTransporter = () => {
   const user = (process.env.BREVO_USER || process.env.EMAIL_USER || "").trim();
   const pass = (process.env.BREVO_PASS || process.env.EMAIL_PASS || "").trim();
@@ -13,8 +13,8 @@ const createTransporter = () => {
 
   return nodemailer.createTransport({
     host: "smtp-relay.brevo.com",
-    port: 587,
-    secure: false, // Port 587 par STARTTLS ke liye false rehta hai
+    port: 465, // 👈 Port 587 Render par block hota hai, Port 465 SSL hamesha chalta hai
+    secure: true, // Port 465 ke sath secure: true zaroori hai
     auth: {
       user: user,
       pass: pass,
@@ -22,7 +22,9 @@ const createTransporter = () => {
     tls: {
       rejectUnauthorized: false,
     },
-    connectionTimeout: 15000,
+    connectionTimeout: 5000, // 👈 15000 ki jagah 5000 (5 seconds me fail ho jayega agar connect na ho)
+  greetingTimeout: 5000,
+  socketTimeout: 10000,
   });
 };
 
@@ -64,7 +66,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
     emailList = users.map((u) => u.email).filter(Boolean);
   }
 
-  // HTML Template
+  // Professional HTML Layout
   const getHtmlContent = (bodyText) => `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1e293b; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;">
       <div style="border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 20px;">
@@ -88,7 +90,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
     ""
   ).trim();
 
-  // --- 1. SINGLE EMAIL DISPATCH ---
+  // 1. Single Email Dispatch
   if (sendMode === "single") {
     try {
       const info = await transporter.sendMail({
@@ -98,15 +100,15 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
         html: getHtmlContent(message),
       });
 
-      console.log("✅ Email Sent Successfully to:", emailList[0], "MessageID:", info.messageId);
+      console.log("✅ Live Brevo Email Sent:", info.messageId);
 
       return res.status(200).json({
         success: true,
-        message: `Email successfully ${emailList[0]} ko bhej diya gaya hai!`,
+        message: `Email successfully ${emailList[0]} ko send ho gaya!`,
         sentCount: 1,
       });
     } catch (err) {
-      console.error("❌ Brevo SMTP Error:", err.message);
+      console.error("❌ Live Brevo SMTP Error:", err.message);
       return res.status(500).json({
         success: false,
         message: err.message || "Email dispatch failed.",
@@ -114,9 +116,8 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
     }
   }
 
-  // --- 2. BULK EMAIL DISPATCH ---
+  // 2. Bulk Email Dispatch
   let successfulSends = 0;
-
   for (const toEmail of emailList) {
     try {
       await transporter.sendMail({
