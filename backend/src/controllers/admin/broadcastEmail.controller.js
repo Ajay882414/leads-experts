@@ -2,21 +2,29 @@ const User = require("../../models/User");
 const nodemailer = require("nodemailer");
 const asyncHandler = require("../../utils/asyncHandler");
 
-// 1. Gmail SMTP Transporter
+// 1. Render Live-Safe Transporter (Forced Port 465 SSL)
 const createTransporter = () => {
   const user = (process.env.EMAIL_USER || "").trim();
   const pass = (process.env.EMAIL_PASS || "").trim();
 
   if (!user || !pass) {
-    throw new Error("EMAIL_USER ya EMAIL_PASS .env file mein missing hai.");
+    throw new Error("EMAIL_USER ya EMAIL_PASS environment variables missing hain.");
   }
 
   return nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465, // Render standard port 587 ko block karta hai, isliye port 465 zaroori hai
+    secure: true, // Port 465 ke sath secure hamesha true rahega
     auth: {
       user: user,
-      pass: pass, // 16-character Google App Password
+      pass: pass, // Google App Password (16-digit bina space)
     },
+    tls: {
+      rejectUnauthorized: false, // Cloud server SSL handshake error fix
+    },
+    connectionTimeout: 10000, // 10 second timeout limit taaki infinite loop na bane
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
   });
 };
 
@@ -32,7 +40,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
 
   let emailList = [];
 
-  // Single User Filter
+  // 2. Single User Filter
   if (sendMode === "single") {
     if (!singleEmail || !singleEmail.trim()) {
       return res.status(400).json({
@@ -42,7 +50,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
     }
     emailList = [singleEmail.trim().toLowerCase()];
   } else {
-    // Bulk Users Filter
+    // 3. Bulk Users Filter
     let query = { role: "user", status: "ACTIVE" };
     if (audience === "verified") {
       query.isVerified = true;
@@ -77,7 +85,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
   const transporter = createTransporter();
   const senderEmail = (process.env.EMAIL_USER || "").trim();
 
-  // --- 1. SINGLE EMAIL DISPATCH ---
+  // --- SINGLE EMAIL DISPATCH ---
   if (sendMode === "single") {
     try {
       const info = await transporter.sendMail({
@@ -95,15 +103,15 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
         sentCount: 1,
       });
     } catch (err) {
-      console.error("❌ Gmail Send Error:", err.message);
+      console.error("❌ Live SMTP Send Error:", err.message);
       return res.status(500).json({
         success: false,
-        message: err.message || "Email send karne mein error aaya.",
+        message: err.message || "Email connection timeout ho gaya.",
       });
     }
   }
 
-  // --- 2. BULK EMAIL DISPATCH ---
+  // --- BULK EMAIL DISPATCH ---
   let successfulSends = 0;
 
   for (const toEmail of emailList) {
