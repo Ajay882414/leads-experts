@@ -15,13 +15,24 @@ const {
   getClientDetailedReport,
 } = require("../controllers/admin/getClientReport.controller");
 
-// const getRevenue = require("../controllers/admin/getRevenue.controller");
+// 📊 Isolated Daily Reports Controller
+const getDailyReports = require("../controllers/admin/dailyReport.controller");
 
 router.get(
   "/dashboard",
   protect,
   admin,
   getDashboardStats
+);
+
+// ==========================================
+// NEW DAILY & TIMELINE METRICS ROUTE
+// ==========================================
+router.get(
+  "/daily-reports",
+  protect,
+  admin,
+  getDailyReports
 );
 
 // ==========================================
@@ -68,12 +79,5 @@ router.get(
   admin,
   getPlatformChart
 );
-
-// router.get(
-//   "/revenue",
-//   protect,
-//   admin,
-//   getRevenue
-// );
 
 module.exports = router;
