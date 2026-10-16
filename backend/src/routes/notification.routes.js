@@ -1,32 +1,46 @@
 const express = require("express");
-
 const router = express.Router();
 
-const protect =
-  require("../middlewares/auth.middleware");
+const protect = require("../middlewares/auth.middleware");
+const admin = require("../middlewares/admin.middleware");
 
-const admin =
-  require("../middlewares/admin.middleware");
+const createNotification = require("../controllers/notification/createNotification.controller");
+const getNotifications = require("../controllers/notification/getNotifications.controller");
+const getNotification = require("../controllers/notification/getNotification.controller");
+const markAsRead = require("../controllers/notification/markAsRead.controller");
+const deleteNotification = require("../controllers/notification/deleteNotification.controller");
+const getNotificationStats = require("../controllers/notification/getNotificationStats.controller");
 
-const createNotification =
-  require("../controllers/notification/createNotification.controller");
+// ==========================================
+// USER & ADMIN NOTIFICATION ENDPOINTS
+// ==========================================
 
-const getNotifications =
-  require("../controllers/notification/getNotifications.controller");
+// 1. Get All Notifications (User aur Admin dono access kar sakte hain, controller role ke hisaab se filter karega)
+router.get(
+  "/",
+  protect,
+  getNotifications
+);
 
-const getNotification =
-  require("../controllers/notification/getNotification.controller");
+// 2. Mark Notification Read (User aur Admin dono apne alerts read mark kar sakte hain)
+router.patch(
+  "/:id/read",
+  protect,
+  markAsRead
+);
 
-const markAsRead =
-  require("../controllers/notification/markAsRead.controller");
+// 3. Get Single Notification
+router.get(
+  "/:id",
+  protect,
+  getNotification
+);
 
-const deleteNotification =
-  require("../controllers/notification/deleteNotification.controller");
+// ==========================================
+// ADMIN-ONLY ACTIONS
+// ==========================================
 
-const getNotificationStats =
-  require("../controllers/notification/getNotificationStats.controller");
-
-// Get Stats
+// Get Stats (Admin dashboard ke liye)
 router.get(
   "/stats",
   protect,
@@ -34,23 +48,7 @@ router.get(
   getNotificationStats
 );
 
-// Get All
-router.get(
-  "/",
-  protect,
-  admin,
-  getNotifications
-);
-
-// Get Single
-router.get(
-  "/:id",
-  protect,
-  admin,
-  getNotification
-);
-
-// Create
+// Create Notification Manually
 router.post(
   "/",
   protect,
@@ -58,15 +56,7 @@ router.post(
   createNotification
 );
 
-// Mark Read
-router.patch(
-  "/:id/read",
-  protect,
-  admin,
-  markAsRead
-);
-
-// Delete
+// Delete Notification
 router.delete(
   "/:id",
   protect,

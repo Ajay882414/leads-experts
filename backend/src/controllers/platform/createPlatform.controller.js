@@ -47,10 +47,12 @@ const createPlatform = asyncHandler(async (req, res) => {
     status: status || "ACTIVE",
   });
 
+ // Notification trigger for Platform Creation (Visible to All)
   await createNotification({
-    title: "Platform Created",
-    message: `${platform.name} platform created successfully.`,
+    title: "New Platform Added! 🚀",
+    message: `Fresh platform "${platform.name}" has been launched. Explore leads now!`,
     type: "Platform",
+    target: "all",
   });
 
   res.status(201).json({

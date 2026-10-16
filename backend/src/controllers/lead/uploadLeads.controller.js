@@ -254,10 +254,20 @@ const uploadLeads = asyncHandler(async (req, res) => {
       $inc: { totalLeads: insertedCount },
     });
 
+   // Admin notification
     await createNotification({
       title: "Package Leads Uploaded",
       message: `${insertedCount} leads processed for package "${packageExists.name}".`,
       type: "Lead",
+      target: "admin",
+    });
+
+    // Public / Users pool update alert
+    await createNotification({
+      title: "Inventory Restocked! 🔥",
+      message: `Fresh leads uploaded for "${packageExists.name}" under ${packageExists.platform.name}. Grab yours now!`,
+      type: "Lead",
+      target: "user",
     });
   }
 

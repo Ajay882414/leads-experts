@@ -1,26 +1,20 @@
-const Notification =
-  require("../../models/Notification");
+const Notification = require("../../models/Notification");
+const asyncHandler = require("../../utils/asyncHandler");
 
-const asyncHandler =
-  require("../../utils/asyncHandler");
+const getNotifications = asyncHandler(async (req, res) => {
+  // Saare notifications fetch karein newest first
+  const notifications = await Notification.find({})
+    .sort({ createdAt: -1 })
+    .limit(50);
 
-const getNotifications =
-  asyncHandler(async (req, res) => {
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
-    const notifications =
-      await Notification.find()
-        .sort({
-          createdAt: -1,
-        });
-
-    res.status(200).json({
-      success: true,
-      count:
-        notifications.length,
-      notifications,
-    });
-
+  res.status(200).json({
+    success: true,
+    count: notifications.length,
+    unreadCount,
+    notifications,
   });
+});
 
-module.exports =
-  getNotifications;
+module.exports = getNotifications;

@@ -1,6 +1,7 @@
 const Package = require("../../models/Package");
 const Platform = require("../../models/Platform");
 const Lead = require("../../models/Lead");
+const createNotification = require("../../utils/createNotification");
 const asyncHandler = require("../../utils/asyncHandler");
 
 // =====================================================
@@ -78,11 +79,23 @@ const createPackage = asyncHandler(async (req, res) => {
   // Sync platform stats
   await syncPlatformLeadCounters(platform);
 
+  // Sync platform stats
+  await syncPlatformLeadCounters(platform);
+
+  // Trigger Notification for new card/package
+  await createNotification({
+    title: "New Lead Package Available! 📦",
+    message: `New package "${newPackage.name}" is now live on ${platformExists.name} (${newPackage.category}).`,
+    type: "Package",
+    target: "all",
+  });
+
   res.status(201).json({
     success: true,
     message: "Package card created successfully",
     package: newPackage,
   });
+  
 });
 
 // =====================================================
