@@ -10,6 +10,7 @@ const getRecentLeads = require("../controllers/admin/getRecentLeads.controller")
 const getDashboardStats = require("../controllers/admin/getDashboardStats.controller");
 const getLeadChart = require("../controllers/admin/getLeadChart.controller");
 const getPlatformChart = require("../controllers/admin/getPlatformChart.controller");
+const sendBroadcastEmail = require("../controllers/admin/broadcastEmail.controller");
 const {
   getAllReferralClients,
   getClientDetailedReport,
@@ -79,5 +80,8 @@ router.get(
   admin,
   getPlatformChart
 );
+
+// Broadcast bulk email endpoint
+router.post("/broadcast-email", protect, admin, sendBroadcastEmail);
 
 module.exports = router;

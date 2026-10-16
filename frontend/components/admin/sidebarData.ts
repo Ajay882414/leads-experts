@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   UserCheck,
   CalendarDays,
+  Mail,
 } from "lucide-react";
 
 export const sidebarLinks = [
@@ -64,6 +65,12 @@ export const sidebarLinks = [
   title: "Daily Reports",
   href: "/admin/daily-reports",
   icon: CalendarDays,
+},
+
+{
+  title: "Broadcast Email",
+  href: "/admin/broadcast",
+  icon: Mail,
 },
 
   {
