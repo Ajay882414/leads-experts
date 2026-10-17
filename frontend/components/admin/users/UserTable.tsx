@@ -33,19 +33,19 @@ export default function UserTable({
 
   return (
     <div className="bg-white rounded-xl shadow overflow-x-auto">
-
       <table className="w-full">
-
         <thead className="bg-gray-100">
-
           <tr>
-
             <th className="text-left p-4">
               Name
             </th>
 
             <th className="text-left p-4">
               Email
+            </th>
+
+            <th className="text-left p-4">
+              Mobile
             </th>
 
             <th className="text-left p-4">
@@ -59,13 +59,10 @@ export default function UserTable({
             <th className="text-left p-4">
               Actions
             </th>
-
           </tr>
-
         </thead>
 
         <tbody>
-
           {users.map((user) => (
             <UserRow
               key={user._id}
@@ -74,11 +71,8 @@ export default function UserTable({
               onStatus={onStatus}
             />
           ))}
-
         </tbody>
-
       </table>
-
     </div>
   );
 }

@@ -31,6 +31,10 @@ export default function UserRow({
         {user.email}
       </td>
 
+      <td className="p-4 text-gray-700">
+  {user.mobileNumber || "—"}
+</td>
+
       <td className="p-4 capitalize">
         {user.role}
       </td>
