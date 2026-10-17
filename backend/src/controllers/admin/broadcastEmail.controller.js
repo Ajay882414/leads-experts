@@ -1,35 +1,20 @@
 const User = require("../../models/User");
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 const asyncHandler = require("../../utils/asyncHandler");
-
-// Render Cloud Ke Liye Guaranteed Port 465 SSL Transporter
-const createTransporter = () => {
-  const user = (process.env.BREVO_USER || process.env.EMAIL_USER || "").trim();
-  const pass = (process.env.BREVO_PASS || process.env.EMAIL_PASS || "").trim();
-
-  if (!user || !pass) {
-    throw new Error("BREVO_USER ya BREVO_PASS environment variables missing hain.");
-  }
-
-  return nodemailer.createTransport({
-    host: "smtp-relay.brevo.com",
-    port: 465, // 👈 Port 587 Render par block hota hai, Port 465 SSL hamesha chalta hai
-    secure: true, // Port 465 ke sath secure: true zaroori hai
-    auth: {
-      user: user,
-      pass: pass,
-    },
-    tls: {
-      rejectUnauthorized: false,
-    },
-    connectionTimeout: 5000, // 👈 15000 ki jagah 5000 (5 seconds me fail ho jayega agar connect na ho)
-  greetingTimeout: 5000,
-  socketTimeout: 10000,
-  });
-};
 
 const sendBroadcastEmail = asyncHandler(async (req, res) => {
   const { subject, message, sendMode = "bulk", singleEmail, audience = "all" } = req.body;
+
+  // Render environment se Brevo Key aur Sender uthana
+  const apiKey = (process.env.BREVO_PASS || process.env.BREVO_API_KEY || "").trim();
+  const senderEmail = (process.env.BREVO_SENDER || process.env.EMAIL_USER || "www.ajaysharma47@gmail.com").trim();
+
+  if (!apiKey) {
+    return res.status(500).json({
+      success: false,
+      message: "BREVO API key environment variables mein missing hai.",
+    });
+  }
 
   if (!subject || !message) {
     return res.status(400).json({
@@ -48,7 +33,7 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
         message: "Single user ke liye recipient email likhna zaroori hai.",
       });
     }
-    emailList = [singleEmail.trim().toLowerCase()];
+    emailList = [{ email: singleEmail.trim().toLowerCase() }];
   } else {
     // Bulk Users Filter
     let query = { role: "user", status: "ACTIVE" };
@@ -56,24 +41,24 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
       query.isVerified = true;
     }
 
-    const users = await User.find(query).select("email").lean();
+    const users = await User.find(query).select("email fullName").lean();
     if (!users || users.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Koi valid active user nahi mila.",
       });
     }
-    emailList = users.map((u) => u.email).filter(Boolean);
+    emailList = users.map((u) => ({ email: u.email, name: u.fullName || "User" }));
   }
 
-  // Professional HTML Layout
-  const getHtmlContent = (bodyText) => `
+  // HTML Template
+  const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; color: #1e293b; background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px;">
       <div style="border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 20px;">
         <h2 style="color: #0c4731; margin: 0; font-size: 22px;">LeadsVero</h2>
       </div>
       <div style="font-size: 15px; line-height: 1.7; color: #334155; white-space: pre-wrap;">
-        ${bodyText}
+        ${message}
       </div>
       <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 30px 0 15px;" />
       <p style="font-size: 12px; color: #94a3b8; text-align: center; margin: 0;">
@@ -82,61 +67,40 @@ const sendBroadcastEmail = asyncHandler(async (req, res) => {
     </div>
   `;
 
-  const transporter = createTransporter();
-  const senderEmail = (
-    process.env.BREVO_SENDER ||
-    process.env.BREVO_USER ||
-    process.env.EMAIL_USER ||
-    ""
-  ).trim();
-
-  // 1. Single Email Dispatch
-  if (sendMode === "single") {
-    try {
-      const info = await transporter.sendMail({
-        from: `"LeadsVero" <${senderEmail}>`,
-        to: emailList[0],
+  try {
+    // Brevo HTTPS API Request (Port 443 - Render par kabhi timeout nahi hota)
+    const response = await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: { name: "LeadsVero", email: senderEmail },
+        to: emailList,
         subject: subject,
-        html: getHtmlContent(message),
-      });
+        htmlContent: htmlContent,
+      },
+      {
+        headers: {
+          "api-key": apiKey,
+          "Content-Type": "application/json",
+          accept: "application/json",
+        },
+        timeout: 10000,
+      }
+    );
 
-      console.log("✅ Live Brevo Email Sent:", info.messageId);
+    console.log("✅ Brevo API Success:", response.data);
 
-      return res.status(200).json({
-        success: true,
-        message: `Email successfully ${emailList[0]} ko send ho gaya!`,
-        sentCount: 1,
-      });
-    } catch (err) {
-      console.error("❌ Live Brevo SMTP Error:", err.message);
-      return res.status(500).json({
-        success: false,
-        message: err.message || "Email dispatch failed.",
-      });
-    }
+    return res.status(200).json({
+      success: true,
+      message: `Email successfully ${emailList.length} recipient(s) ko send ho gaya!`,
+      sentCount: emailList.length,
+    });
+  } catch (error) {
+    console.error("❌ Brevo API Error:", error.response?.data || error.message);
+    return res.status(500).json({
+      success: false,
+      message: error.response?.data?.message || "Email send failed via Brevo API.",
+    });
   }
-
-  // 2. Bulk Email Dispatch
-  let successfulSends = 0;
-  for (const toEmail of emailList) {
-    try {
-      await transporter.sendMail({
-        from: `"LeadsVero" <${senderEmail}>`,
-        to: toEmail,
-        subject: subject,
-        html: getHtmlContent(message),
-      });
-      successfulSends++;
-    } catch (err) {
-      console.error(`Failed to send to ${toEmail}:`, err.message);
-    }
-  }
-
-  return res.status(200).json({
-    success: true,
-    message: `Broadcast successfully ${successfulSends} users ko bhej diya gaya.`,
-    sentCount: successfulSends,
-  });
 });
 
 module.exports = sendBroadcastEmail;
