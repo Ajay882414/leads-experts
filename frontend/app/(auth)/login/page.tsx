@@ -11,6 +11,7 @@ function LoginForm() {
   const { login } = useAuth();
 
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -18,6 +19,7 @@ function LoginForm() {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setErrorMessage("");
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -26,19 +28,18 @@ function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
 
     try {
       setLoading(true);
 
       const res: any = await login(formData);
 
-      // Agar context ya API se token milta hai toh use localStorage me backup save karein
       if (res?.token) {
         localStorage.setItem("token", res.token);
       }
 
-      alert("Login Successful");
-
+      // Bina alert popup ke smooth direct redirect
       const redirect = searchParams.get("redirect");
 
       if (redirect) {
@@ -52,7 +53,9 @@ function LoginForm() {
         router.replace("/dashboard");
       }
     } catch (error: any) {
-      alert(error?.response?.data?.message || "Login Failed");
+      setErrorMessage(
+        error?.response?.data?.message || "Invalid Email or Password"
+      );
     } finally {
       setLoading(false);
     }
@@ -60,7 +63,7 @@ function LoginForm() {
 
   return (
     <div className="relative min-h-screen w-full bg-[#111c24] flex items-center justify-center p-4 overflow-hidden selection:bg-[#48d597] selection:text-black">
-      {/* Background Ribbon */}
+      {/* Background Ribbons */}
       <div className="absolute -left-12 bottom-12 sm:bottom-20 z-0 pointer-events-none">
         <div className="w-56 sm:w-80 h-10 sm:h-14 bg-[#1f6b5b] transform -rotate-12 rounded-r-md opacity-90 shadow-2xl" />
         <div className="w-64 sm:w-96 h-10 sm:h-14 bg-[#48d597] transform -rotate-12 rounded-r-md -mt-4 shadow-2xl" />
@@ -94,6 +97,13 @@ function LoginForm() {
             </Link>
           </div>
         </div>
+
+        {/* Clean Error Message Box (No browser alert) */}
+        {errorMessage && (
+          <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-medium">
+            {errorMessage}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -151,7 +161,7 @@ function LoginForm() {
               disabled={loading}
               className="w-full bg-[#1f6b5b] hover:bg-[#175246] active:scale-[0.99] text-white py-3 sm:py-3.5 rounded-xl font-bold text-sm tracking-wide transition-all shadow-[0_8px_20px_rgba(31,107,91,0.28)] disabled:opacity-70 cursor-pointer"
             >
-              {loading ? "Please Wait..." : "Sign in"}
+              {loading ? "Signing in..." : "Sign in"}
             </button>
           </div>
         </form>

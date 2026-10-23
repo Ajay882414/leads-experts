@@ -10,10 +10,10 @@ function SignupForm() {
   const searchParams = useSearchParams();
   const { signup } = useAuth();
 
-  // URL query parameter se ?ref=CODE read karega
   const refCode = searchParams.get("ref") || "";
 
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -27,6 +27,7 @@ function SignupForm() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
+    setErrorMessage("");
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
@@ -35,17 +36,16 @@ function SignupForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
 
     try {
       setLoading(true);
 
-      // Backend ko referral code ke sath form data bhejega
       await signup({
         ...formData,
         ...(refCode ? { ref: refCode } : {}),
       });
 
-      // Meta Pixel: CompleteRegistration Event Trigger
       if (typeof window !== "undefined" && (window as any).fbq) {
         (window as any).fbq("track", "CompleteRegistration", {
           content_name: "Signup",
@@ -53,10 +53,12 @@ function SignupForm() {
         });
       }
 
-      alert("Account Created Successfully");
+      // Bina alert popup ke smooth direct redirect
       router.push("/login");
     } catch (error: any) {
-      alert(error?.response?.data?.message || "Signup Failed");
+      setErrorMessage(
+        error?.response?.data?.message || "Signup failed. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -64,7 +66,7 @@ function SignupForm() {
 
   return (
     <div className="relative min-h-screen w-full bg-[#111c24] flex items-center justify-center p-4 py-12 overflow-hidden selection:bg-[#48d597] selection:text-black">
-      {/* ================= BACKGROUND ACCENT RIBBONS ================= */}
+      {/* Background Ribbons */}
       <div className="absolute -left-12 bottom-12 sm:bottom-20 z-0 pointer-events-none">
         <div className="w-56 sm:w-80 h-10 sm:h-14 bg-[#1f6b5b] transform -rotate-12 rounded-r-md opacity-90 shadow-2xl" />
         <div className="w-64 sm:w-96 h-10 sm:h-14 bg-[#48d597] transform -rotate-12 rounded-r-md -mt-4 shadow-2xl" />
@@ -75,9 +77,8 @@ function SignupForm() {
         <div className="w-56 sm:w-80 h-10 sm:h-14 bg-[#48d597] transform -rotate-12 rounded-l-md -mt-4 shadow-2xl" />
       </div>
 
-      {/* ================= MAIN SIGNUP CARD ================= */}
+      {/* Main Signup Card */}
       <div className="relative z-10 w-full max-w-[580px] bg-white rounded-[32px] sm:rounded-[36px] p-7 sm:p-10 shadow-[0_25px_60px_rgba(0,0,0,0.35)] border border-slate-100">
-        {/* Card Header */}
         <div className="flex items-start justify-between gap-4 mb-7">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight">
@@ -106,9 +107,14 @@ function SignupForm() {
           </div>
         </div>
 
-        {/* Signup Form */}
+        {/* Clean Error Message Box (No browser alert) */}
+        {errorMessage && (
+          <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-medium">
+            {errorMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Row 1: Full Name & Email */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs sm:text-[13px] text-slate-700 font-medium mb-1.5">
@@ -141,7 +147,6 @@ function SignupForm() {
             </div>
           </div>
 
-          {/* Row 2: Mobile Number & State */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs sm:text-[13px] text-slate-700 font-medium mb-1.5">
@@ -174,7 +179,6 @@ function SignupForm() {
             </div>
           </div>
 
-          {/* Row 3: Platform Selection */}
           <div>
             <label className="block text-xs sm:text-[13px] text-slate-700 font-medium mb-1.5">
               Target Lead Platform
@@ -214,7 +218,6 @@ function SignupForm() {
             </div>
           </div>
 
-          {/* Row 4: Password Field */}
           <div>
             <label className="block text-xs sm:text-[13px] text-slate-700 font-medium mb-1.5">
               Create Password
@@ -235,46 +238,11 @@ function SignupForm() {
                 className="absolute right-3.5 text-slate-400 hover:text-slate-600 focus:outline-none p-1"
                 aria-label="Toggle password visibility"
               >
-                {showPassword ? (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    />
-                  </svg>
-                ) : (
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"
-                    />
-                  </svg>
-                )}
+                {showPassword ? "Hide" : "Show"}
               </button>
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="pt-2">
             <button
               type="submit"
@@ -286,7 +254,6 @@ function SignupForm() {
           </div>
         </form>
 
-        {/* Footer Text */}
         <p className="text-center text-xs text-slate-500 mt-5">
           By signing up, you agree to our{" "}
           <Link href="/terms" className="text-[#1f6b5b] hover:underline">

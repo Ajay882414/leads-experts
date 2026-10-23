@@ -9,21 +9,22 @@ export default function ForgotPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage("");
 
     try {
       setLoading(true);
-      const res = await forgotPassword(email);
+      const res = await forgotPassword(email.trim());
 
-      alert(res.message || "OTP Sent to your email");
-
-      sessionStorage.setItem("resetEmail", res.email || email);
+      sessionStorage.setItem("resetEmail", res.email || email.trim());
+      // No popup alert: seedha OTP verify page par smooth navigation
       router.push("/reset-password");
     } catch (error: any) {
-      alert(
-        error.response?.data?.message || "Something went wrong"
+      setErrorMessage(
+        error.response?.data?.message || "Failed to send OTP. Please check your email."
       );
     } finally {
       setLoading(false);
@@ -32,24 +33,19 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="relative min-h-screen w-full bg-[#111c24] flex items-center justify-center p-4 py-12 sm:py-16 overflow-hidden selection:bg-[#48d597] selection:text-black">
-      
-      {/* ================= BACKGROUND ACCENT RIBBONS ================= */}
-      {/* Left Bottom Ribbon */}
+      {/* Background Ribbons */}
       <div className="absolute -left-12 bottom-12 sm:bottom-20 z-0 pointer-events-none">
         <div className="w-56 sm:w-80 h-10 sm:h-14 bg-[#1f6b5b] transform -rotate-12 rounded-r-md opacity-90 shadow-2xl" />
         <div className="w-64 sm:w-96 h-10 sm:h-14 bg-[#48d597] transform -rotate-12 rounded-r-md -mt-4 shadow-2xl" />
       </div>
 
-      {/* Right Top Ribbon */}
       <div className="absolute -right-12 top-12 sm:top-20 z-0 pointer-events-none">
         <div className="w-64 sm:w-96 h-10 sm:h-14 bg-[#1f6b5b] transform -rotate-12 rounded-l-md opacity-90 shadow-2xl" />
         <div className="w-56 sm:w-80 h-10 sm:h-14 bg-[#48d597] transform -rotate-12 rounded-l-md -mt-4 shadow-2xl" />
       </div>
 
-      {/* ================= MAIN FORGOT PASSWORD CARD ================= */}
+      {/* Main Card */}
       <div className="relative z-10 w-full max-w-[460px] bg-white rounded-[32px] sm:rounded-[36px] p-7 sm:p-10 shadow-[0_25px_60px_rgba(0,0,0,0.35)] border border-slate-100">
-        
-        {/* Card Header */}
         <div className="flex items-start justify-between gap-4 mb-7">
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight">
@@ -76,9 +72,14 @@ export default function ForgotPasswordPage() {
           </div>
         </div>
 
-        {/* Forgot Password Form */}
+        {/* Clean Error Message Box */}
+        {errorMessage && (
+          <div className="mb-5 p-3.5 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs sm:text-sm font-medium">
+            {errorMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
-          
           <div>
             <label className="block text-xs sm:text-[13px] text-slate-700 font-medium mb-2">
               Enter registered email address
@@ -86,14 +87,16 @@ export default function ForgotPasswordPage() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setErrorMessage("");
+                setEmail(e.target.value);
+              }}
               placeholder="user@example.com"
               required
               className="w-full bg-[#f0f4f9] text-slate-900 px-4 py-3 sm:py-3.5 rounded-xl text-xs sm:text-sm border border-slate-200/80 outline-none focus:border-[#1f6b5b] focus:bg-white transition-all font-normal placeholder-slate-400"
             />
           </div>
 
-          {/* Submit CTA Button */}
           <div className="pt-2">
             <button
               type="submit"
@@ -103,10 +106,8 @@ export default function ForgotPasswordPage() {
               {loading ? "Sending OTP..." : "Send OTP"}
             </button>
           </div>
-
         </form>
 
-        {/* Back Link */}
         <div className="text-center mt-6">
           <Link
             href="/login"
@@ -118,9 +119,7 @@ export default function ForgotPasswordPage() {
             Back to Login
           </Link>
         </div>
-
       </div>
-
     </div>
   );
 }
