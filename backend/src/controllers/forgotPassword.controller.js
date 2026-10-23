@@ -24,21 +24,15 @@ const forgotPassword = asyncHandler(async (req, res) => {
   }
 
   // Generate 6-digit OTP
-  const otp =
-    typeof generateOtp === "function"
-      ? generateOtp()
-      : Math.floor(100000 + Math.random() * 900000).toString();
+  const otp = typeof generateOtp === "function" ? generateOtp() : Math.floor(100000 + Math.random() * 900000).toString();
 
-  // Fast direct update: Mongoose schema validation ko bypass karke direct set karein
-  await User.updateOne(
-    { _id: user._id },
-    {
-      $set: {
-        resetOtp: String(otp),
-        resetOtpExpire: new Date(Date.now() + 10 * 60 * 1000),
-      },
-    }
-  );
+  // Save OTP & 10 mins Expiry
+  user.resetOtp = String(otp);
+  user.resetOtpExpire = Date.now() + 10 * 60 * 1000;
+
+  await user.save({
+    validateBeforeSave: false,
+  });
 
   // Send Email with Error Catch
   try {
@@ -47,14 +41,13 @@ const forgotPassword = asyncHandler(async (req, res) => {
     console.error("Nodemailer Send Error on live server:", emailError);
     return res.status(500).json({
       success: false,
-      message:
-        "Failed to send OTP email. Please verify live server email configuration.",
+      message: "Failed to send OTP email. Please verify live server email configuration.",
     });
   }
 
   res.status(200).json({
     success: true,
-    message: "OTP sent successfully to your email",
+    message: "OTP sent successfully",
     email: user.email,
   });
 });
