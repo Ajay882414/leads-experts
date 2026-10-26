@@ -10,7 +10,7 @@ export default function PriorityChannelsStrip() {
       title: "Direct WhatsApp Line",
       badge: "Instant Active",
       actionText: "Chat on WhatsApp",
-      actionHref: "https://wa.me/918769546871?text=Hello%20LeadsVero,%20I%20need%20custom%20leads%20information",
+      actionHref: "https://wa.me/917258055245?text=Hello%20LeadsVero,%20I%20need%20custom%20leads%20information",
       value: "+91 87695.....",
       subtext: "Best for quick platform inquiries, payment proof, or instant custom quotas.",
       theme: "lime",

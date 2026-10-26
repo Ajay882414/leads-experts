@@ -170,7 +170,7 @@ export default function ContactHero() {
           </button>
 
           <a
-            href="https://wa.me/918769546871"
+            href="https://wa.me/917258055245"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-3.5 rounded-full bg-slate-100 hover:bg-slate-200/90 text-slate-800 font-normal text-xs sm:text-sm md:text-base transition-all duration-200 active:scale-95"

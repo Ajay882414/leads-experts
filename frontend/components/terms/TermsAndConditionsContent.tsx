@@ -206,11 +206,11 @@ export default function PrivacyPolicyPage() {
                     <ArrowRight size={12} />
                   </a>
                   <a
-                    href="tel:+918769546871"
+                    href="tel:+917258055245"
                     className="flex items-center gap-1.5 text-xs font-normal text-slate-300 hover:text-white"
                   >
                     <Phone size={12} className="text-[#a3e635]" />
-                    <span>+91 8769546871</span>
+                    <span>+91 7258055245</span>
                   </a>
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function PrivacyPolicyPage() {
                     <div>
                       <p className="text-xs font-normal text-slate-900 mb-1">A. Account &amp; Billing Data (Buyers):</p>
                       <p className="text-xs text-slate-600">
-                        When you register on LeadsVero, we collect your full name, work email address, WhatsApp/telephone contact number (+91 8769546871), company name, GSTIN (if applicable), and transactional history. Payment credentials (card/UPI details) are tokenized via PCI-DSS compliant payment gateways like Razorpay and are never stored on our servers.
+                        When you register on LeadsVero, we collect your full name, work email address, WhatsApp/telephone contact number (+91 7258055245), company name, GSTIN (if applicable), and transactional history. Payment credentials (card/UPI details) are tokenized via PCI-DSS compliant payment gateways like Razorpay and are never stored on our servers.
                       </p>
                     </div>
                     <div className="border-t border-slate-100 pt-3">
@@ -449,7 +449,7 @@ export default function PrivacyPolicyPage() {
                       </div>
                       <div className="flex items-center gap-1.5 text-[11px] text-slate-200 font-mono">
                         <Phone size={12} className="text-[#a3e635]" />
-                        <span>+91 8769546871</span>
+                        <span>+91 7258055245</span>
                       </div>
                     </div>
 

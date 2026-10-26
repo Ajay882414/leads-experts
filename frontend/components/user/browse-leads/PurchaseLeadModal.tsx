@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { X, Sparkles, ShoppingCart, AlertCircle, Clock } from "lucide-react";
+import { X, Sparkles, ShoppingCart, AlertCircle, Clock, Plus, Minus } from "lucide-react";
 import PurchaseSummary from "./PurchaseSummary";
 import { Package } from "@/types/package";
 import { loadRazorpayScript } from "@/utils/loadRazorpay";
@@ -30,6 +30,7 @@ export default function PurchaseLeadModal({
   const [errorMessage, setErrorMessage] = useState("");
 
   const minimum = 20;
+  const step = 5; // Har click par 5 leads increase ya decrease hongi
 
   useEffect(() => {
     if (pkg) {
@@ -49,6 +50,21 @@ export default function PurchaseLeadModal({
     if (!Number.isNaN(parsed)) {
       setQuantity(parsed);
     }
+  };
+
+  const handleIncrement = () => {
+    if (loading) return;
+    setQuantity((prev) => (prev < minimum ? minimum : prev + step));
+    setErrorMessage("");
+  };
+
+  const handleDecrement = () => {
+    if (loading) return;
+    setQuantity((prev) => {
+      const next = prev - step;
+      return next < minimum ? minimum : next;
+    });
+    setErrorMessage("");
   };
 
   const handlePayNow = async () => {
@@ -189,7 +205,20 @@ export default function PurchaseLeadModal({
               </span>
             </div>
 
-            <div className="relative">
+            {/* Stepper Input Container with - and + buttons */}
+            <div className="relative flex items-center rounded-2xl border border-slate-200/90 bg-[#f8fafc] p-1.5 focus-within:border-[#0c4731] focus-within:bg-white focus-within:ring-4 focus-within:ring-emerald-900/5 transition-all">
+              {/* Minus Button */}
+              <button
+                type="button"
+                onClick={handleDecrement}
+                disabled={loading || quantity <= minimum}
+                className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-slate-200/80 text-slate-700 hover:bg-slate-50 hover:text-slate-900 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition cursor-pointer"
+                aria-label="Decrease quantity"
+              >
+                <Minus size={15} />
+              </button>
+
+              {/* Number Input */}
               <input
                 type="number"
                 min={minimum}
@@ -199,11 +228,24 @@ export default function PurchaseLeadModal({
                 onBlur={() => {
                   if (quantity < minimum) setQuantity(minimum);
                 }}
-                className="h-12 sm:h-13 w-full rounded-2xl border border-slate-200/90 bg-[#f8fafc] px-4 font-bold text-slate-900 text-sm sm:text-base outline-none transition-all focus:border-[#0c4731] focus:bg-white focus:ring-4 focus:ring-emerald-900/5"
+                className="h-9 sm:h-10 w-full bg-transparent px-3 text-center font-bold text-slate-900 text-sm sm:text-base outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400">
+
+              {/* Units Label with proper right gap */}
+              <span className="text-xs font-semibold text-slate-400 select-none pr-3">
                 Units
               </span>
+
+              {/* Plus Button */}
+              <button
+                type="button"
+                onClick={handleIncrement}
+                disabled={loading}
+                className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white border border-slate-200/80 text-slate-700 hover:bg-slate-50 hover:text-slate-900 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition cursor-pointer"
+                aria-label="Increase quantity"
+              >
+                <Plus size={15} />
+              </button>
             </div>
 
             <div className="mt-2 flex items-center justify-between text-[11px] text-slate-500 font-normal">
