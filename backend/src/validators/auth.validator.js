@@ -46,13 +46,9 @@ const signupValidation = (req, res, next) => {
   }
 
   const allowedPlatforms = [
-    "Instagram",
-    "Facebook",
-    "Snapchat",
-    "YouTube",
-    "LinkedIn",
-    "TikTok",
-    "Twitter",
+    "Affiliate Marketing",
+    "Network Marketing",
+    "Direct Selling",
   ];
 
   if (!allowedPlatforms.includes(platform)) {

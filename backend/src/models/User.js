@@ -82,19 +82,9 @@ const userSchema = new mongoose.Schema(
 
       enum: [
 
-        "Instagram",
-
-        "Facebook",
-
-        "Snapchat",
-
-        "YouTube",
-
-        "LinkedIn",
-
-        "TikTok",
-
-        "Twitter",
+        "Affiliate Marketing",
+    "Network Marketing",
+    "Direct Selling",
 
       ],
 

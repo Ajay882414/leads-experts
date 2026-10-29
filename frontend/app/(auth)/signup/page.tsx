@@ -181,25 +181,21 @@ function SignupForm() {
 
           <div>
             <label className="block text-xs sm:text-[13px] text-slate-700 font-medium mb-1.5">
-              Target Lead Platform
+              Target Lead Industry
             </label>
             <div className="relative">
               <select
-                name="platform"
-                value={formData.platform}
-                onChange={handleChange}
-                required
-                className="w-full bg-[#f0f4f9] text-slate-900 px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm border border-slate-200/80 outline-none focus:border-[#1f6b5b] focus:bg-white transition-all font-normal appearance-none cursor-pointer"
-              >
-                <option value="">Select Platform</option>
-                <option value="Instagram">Instagram</option>
-                <option value="Facebook">Facebook</option>
-                <option value="LinkedIn">LinkedIn</option>
-                <option value="YouTube">YouTube</option>
-                <option value="Snapchat">Snapchat</option>
-                <option value="TikTok">TikTok</option>
-                <option value="Twitter">Twitter / X</option>
-              </select>
+  name="platform"
+  value={formData.platform}
+  onChange={handleChange}
+  required
+  className="w-full bg-[#f0f4f9] text-slate-900 px-4 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm border border-slate-200/80 outline-none focus:border-[#1f6b5b] focus:bg-white transition-all font-normal appearance-none cursor-pointer"
+>
+  <option value="">Select Industry</option>
+  <option value="Affiliate Marketing">Affiliate Marketing</option>
+  <option value="Network Marketing">Network Marketing</option>
+  <option value="Direct Selling">Direct Selling</option>
+</select>
               <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-500">
                 <svg
                   className="w-4 h-4"
