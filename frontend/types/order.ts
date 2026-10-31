@@ -15,6 +15,8 @@ export interface OrderPlatform {
   name: string;
 }
 
+
+
 export interface PurchasedLead {
   _id: string;
   fullName: string;
@@ -104,15 +106,24 @@ export interface UserOrderPlatform {
   pricePerLead?: number;
 }
 
+export type LeadCallStatus =
+  | "NEW"
+  | "CONTACTED"
+  | "INTERESTED"
+  | "FOLLOW_UP"
+  | "NOT_INTERESTED"
+  | "CLOSED";
+
 export interface PurchasedLeadItem {
   _id: string;
   fullName: string;
   phone: string;
-  age?: number;
+  age?: number | string;
   gender?: string;
   profession?: string;
   source?: string;
   status?: string;
+  callStatus?: LeadCallStatus;
 }
 
 export interface UserOrder {

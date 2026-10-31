@@ -71,13 +71,31 @@ const leadSchema = new mongoose.Schema(
     },
 
     // ========================================
-    // LEAD STATUS
+    // LEAD INVENTORY STATUS (System Flow)
     // ========================================
 
     status: {
       type: String,
       enum: ["AVAILABLE", "RESERVED", "SOLD"],
       default: "AVAILABLE",
+      index: true,
+    },
+
+    // ========================================
+    // MINI-CRM / CALLING STATUS (Buyer Side Tracker)
+    // ========================================
+
+    callStatus: {
+      type: String,
+      enum: [
+        "NEW",
+        "CONTACTED",
+        "INTERESTED",
+        "FOLLOW_UP",
+        "NOT_INTERESTED",
+        "CLOSED",
+      ],
+      default: "NEW",
       index: true,
     },
 
@@ -135,6 +153,12 @@ leadSchema.index(
 leadSchema.index({
   soldTo: 1,
   order: 1,
+});
+
+// Mini-CRM Index: Buyer ke leads aur unke call status ke fast retrieval ke liye
+leadSchema.index({
+  soldTo: 1,
+  callStatus: 1,
 });
 
 module.exports = mongoose.model("Lead", leadSchema);

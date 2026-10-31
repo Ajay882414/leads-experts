@@ -8,7 +8,7 @@ const getOrder = asyncHandler(async (req, res) => {
     .populate("package", "name title category price description")
     .populate(
       "purchasedLeads",
-      "fullName phone age gender profession source status"
+      "fullName phone age gender profession source status callStatus"
     )
     .lean();
 

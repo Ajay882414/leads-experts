@@ -48,6 +48,20 @@ export const getOrderStats =
     return response.data;
   };
 
+
+  /* =====================================================
+   USER — UPDATE LEAD CALL STATUS (MINI-CRM)
+===================================================== */
+export const updateLeadCallStatus = async (
+  leadId: string,
+  callStatus: string
+): Promise<{ success: boolean; lead: { id: string; callStatus: string } }> => {
+  const response = await api.put(`/leads/${leadId}/call-status`, {
+    callStatus,
+  });
+  return response.data;
+};
+
 // ========================================
 // UPDATE ORDER STATUS - ADMIN
 // ========================================

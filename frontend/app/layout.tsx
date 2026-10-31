@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import LiveActivityTicker from "@/components/common/LiveActivityTicker";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -81,6 +82,8 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-white text-slate-900 selection:bg-[#97df2c] selection:text-black">
         <AuthProvider>{children}</AuthProvider>
+        {/* Live Social Proof Ticker */}
+        <LiveActivityTicker />
       </body>
     </html>
   );

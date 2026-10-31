@@ -15,6 +15,20 @@ const deleteLead = require("../controllers/lead/deleteLead.controller");
 const getLeadStats = require("../controllers/lead/getLeadStats.controller");
 const uploadLeads = require("../controllers/lead/uploadLeads.controller");
 
+// Mini-CRM Controller (Buyer calling status)
+const updateCallStatus = require("../controllers/lead/updateCallStatus.controller");
+
+// ========================================
+// BUYER MINI-CRM: UPDATE CALL STATUS
+// PUT /api/leads/:id/call-status
+// (Note: Sirf protect middleware hai taaki normal user use kar sake)
+// ========================================
+router.put(
+  "/:id/call-status",
+  protect,
+  updateCallStatus
+);
+
 // ========================================
 // LEAD STATISTICS
 // GET /api/leads/stats
