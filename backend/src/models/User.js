@@ -75,20 +75,22 @@ const userSchema = new mongoose.Schema(
 
 
     platform: {
-
-      type: String,
-
-      required: true,
-
-      enum: [
-
-        "Affiliate Marketing",
+  type: String,
+  required: true,
+  enum: [
+    "Instagram",
+    "Facebook",
+    "Snapchat",
+    "YouTube",
+    "LinkedIn",
+    "TikTok",
+    "Twitter",
+    "Affiliate Marketing",
     "Network Marketing",
     "Direct Selling",
-
-      ],
-
-    },
+  ],
+  default: "Instagram",
+},
 
 
 

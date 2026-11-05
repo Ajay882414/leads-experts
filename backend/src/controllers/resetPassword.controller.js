@@ -115,8 +115,11 @@ const resetPassword = asyncHandler(async (req, res) => {
   user.resetOtpExpire = undefined;
 
 
+// Purani line:
+// await user.save();
 
-  await user.save();
+// Uski jagah yeh likhein:
+await user.save({ validateModifiedOnly: true });
 
 
 

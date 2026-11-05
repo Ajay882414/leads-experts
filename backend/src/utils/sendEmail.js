@@ -1,17 +1,17 @@
 const { Resend } = require("resend");
 
 const sendEmail = async ({ email, subject, html }) => {
-  const apiKey = process.env.RESEND_API_KEY;
+  const apiKey = (process.env.RESEND_API_KEY || "").trim();
 
   if (!apiKey) {
-    console.error("CRITICAL: RESEND_API_KEY environment variable missing hai!");
+    console.error("CRITICAL: RESEND_API_KEY missing");
     throw new Error("RESEND_API_KEY environment variable is not defined on server");
   }
 
   const resend = new Resend(apiKey);
 
   const { data, error } = await resend.emails.send({
-    from: "LeadsVero <noreply@leadsvero.com>", // 👈 Yeh update karna hai
+    from: "LeadsVero <onboarding@resend.dev>", // Verification hone tak yehi sender use hoga
     to: [email],
     subject,
     html,
@@ -22,10 +22,6 @@ const sendEmail = async ({ email, subject, html }) => {
     throw new Error(error.message);
   }
 
-
-
-
-  
   return data;
 };
 
