@@ -1,6 +1,9 @@
 const express = require("express");
+const path = require("path");
+const fs = require("fs");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
+
 const adminRoutes = require("./routes/admin.routes");
 const signupRoute = require("./routes/signup.route");
 const testRoute = require("./routes/test.route");
@@ -16,18 +19,14 @@ const userRoutes = require("./routes/user.routes");
 const orderRoutes = require("./routes/order.routes");
 const packageRoutes = require("./routes/package.routes");
 const supportRoutes = require("./routes/support.routes");
-const paymentRoutes =
-require("./routes/payment.routes");
-const notificationRoutes =
-  require("./routes/notification.routes");
-  const downloadRoutes = require("./routes/download.routes");
-  const reportRoutes =
-require("./routes/report.routes");
-const settingRoutes =
-require("./routes/setting.routes");
+const paymentRoutes = require("./routes/payment.routes");
+const notificationRoutes = require("./routes/notification.routes");
+const downloadRoutes = require("./routes/download.routes");
+const reportRoutes = require("./routes/report.routes");
+const secretGrowthHubRoutes = require("./routes/secretGrowthHub.routes");
+const settingRoutes = require("./routes/setting.routes");
 const errorHandler = require("./middlewares/error.middleware");
 const notFound = require("./middlewares/notFound.middleware");
-
 
 const app = express();
 
@@ -64,10 +63,14 @@ app.use(
 
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
 app.use(cookieParser());
 
-
+// Static Uploads Folder Serving (Secret Growth Hub Media / Documents)
+let staticUploadsPath = path.join(__dirname, "../uploads");
+if (!fs.existsSync(staticUploadsPath)) {
+  staticUploadsPath = path.join(__dirname, "uploads");
+}
+app.use("/uploads", express.static(staticUploadsPath));
 
 app.use("/api/test", testRoute);
 app.use("/api/auth/signup", signupRoute);
@@ -75,71 +78,23 @@ app.use("/api/auth/login", loginRoute);
 app.use("/api/auth/logout", logoutRoute);
 app.use("/api/auth/me", meRoute);
 app.use("/api/profile", profileRoute);
-app.use(
-  "/api/auth/forgot-password",
-  forgotPasswordRoute
-);
-app.use(
-  "/api/auth/reset-password",
-  resetPasswordRoute
-);
-app.use(
-  "/api/platforms",
-  platformRoutes
-);
-
+app.use("/api/auth/forgot-password", forgotPasswordRoute);
+app.use("/api/auth/reset-password", resetPasswordRoute);
+app.use("/api/platforms", platformRoutes);
 app.use("/api/packages", packageRoutes);
-
-app.use(
-  "/api/leads",
-  leadRoutes
-);
-
-app.use(
-  "/api/admin",
-  adminRoutes
-);
-
-app.use(
-  "/api/users",
-  userRoutes
-);
-
-// Baki routes ke sath line add karein:
+app.use("/api/leads", leadRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/support", supportRoutes);
-
-app.use(
-  "/api/orders",
-  orderRoutes
-);
-
-app.use(
-  "/api/payments",
-  paymentRoutes
-);
-
-app.use(
-  "/api/downloads",
-  downloadRoutes
-);
-
-app.use(
-  "/api/notifications",
-  notificationRoutes
-);
-
-app.use(
-  "/api/reports",
-  reportRoutes
-);
-
-app.use(
-  "/api/settings",
-  settingRoutes
-);
+app.use("/api/orders", orderRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/downloads", downloadRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/reports", reportRoutes);
+app.use("/api/secret-growth-hub", secretGrowthHubRoutes);
+app.use("/api/settings", settingRoutes);
 
 app.use(notFound);
-
 app.use(errorHandler);
 
 module.exports = app;

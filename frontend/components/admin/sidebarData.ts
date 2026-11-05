@@ -13,6 +13,7 @@ import {
   UserCheck,
   CalendarDays,
   Mail,
+  Sparkles,
 } from "lucide-react";
 
 export const sidebarLinks = [
@@ -82,7 +83,11 @@ export const sidebarLinks = [
     title: "Support Tickets",
     href: "/admin/support",
   icon: LifeBuoy, // from lucide-react
-  },
+  },{
+  title: "Secret Growth Hub",
+  href: "/admin/secret-growth-hub",
+  icon: Sparkles, // from lucide-react
+},
   {
     title: "Settings",
     href: "/admin/settings",

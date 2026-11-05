@@ -15,6 +15,7 @@ import {
   User,
   LifeBuoy,
   GraduationCap,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 
@@ -22,6 +23,7 @@ interface NavItem {
   title: string;
   href: string;
   icon: any;
+  badge?: string; // 👈 yeh optional property jod dein
 }
 
 const navItems: NavItem[] = [
@@ -30,6 +32,12 @@ const navItems: NavItem[] = [
   { title: "Practice", href: "/practice", icon: GraduationCap },
   { title: "My Orders", href: "/orders", icon: ShoppingBag },
   { title: "Downloads", href: "/downloads", icon: Download },
+  {
+  title: "Secret Growth Hub",
+  href: "/secret-growth-hub",
+  icon: Sparkles, // lucide-react se import karein
+  badge: "VIP",
+},
   { title: "Profile", href: "/profile", icon: User },
   { title: "Help & Support", href: "/support", icon: LifeBuoy },
   { title: "Settings", href: "/settings", icon: Settings },
