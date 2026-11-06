@@ -14,10 +14,13 @@ import {
   Trash2,
   Pin,
   ExternalLink,
+  Edit2,
+  Check,
 } from "lucide-react";
 import {
   getAdminHubPosts,
   createAdminHubPost,
+  updateAdminHubPost,
   deleteAdminHubPost,
   HubPost,
 } from "@/services/secretGrowthHubApi";
@@ -27,21 +30,23 @@ export default function AdminSecretGrowthHubPage() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
-  // Form State (ChatGPT / Gemini Style)
+  // Form State
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
   const [content, setContent] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [existingFileName, setExistingFileName] = useState("");
   const [externalLink, setExternalLink] = useState("");
   const [buttonText, setButtonText] = useState("Join Community");
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const creatorBoxRef = useRef<HTMLDivElement | null>(null);
 
-  // Robust URL resolver for uploaded media files
   const getMediaUrl = (fileUrl: string) => {
     if (!fileUrl) return "";
     if (fileUrl.startsWith("http://") || fileUrl.startsWith("https://")) {
-      return fileUrl;
+      return encodeURI(fileUrl);
     }
 
     const rawBaseUrl =
@@ -52,7 +57,7 @@ export default function AdminSecretGrowthHubPage() {
     const cleanBaseUrl = rawBaseUrl.replace(/\/api\/?$/, "").replace(/\/$/, "");
     const cleanFilePath = fileUrl.startsWith("/") ? fileUrl : `/${fileUrl}`;
 
-    return `${cleanBaseUrl}${cleanFilePath}`;
+    return encodeURI(`${cleanBaseUrl}${cleanFilePath}`);
   };
 
   const loadPosts = async () => {
@@ -74,20 +79,45 @@ export default function AdminSecretGrowthHubPage() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setSelectedFile(e.target.files[0]);
+      setExistingFileName("");
     }
   };
 
   const removeSelectedFile = () => {
     setSelectedFile(null);
+    setExistingFileName("");
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
   };
 
-  const handlePublish = async (e: React.FormEvent) => {
+  const resetForm = () => {
+    setEditingPostId(null);
+    setContent("");
+    removeSelectedFile();
+    setExternalLink("");
+    setButtonText("Join Community");
+    setShowLinkInput(false);
+    setIsPinned(false);
+  };
+
+  const handleStartEdit = (post: HubPost) => {
+    setEditingPostId(post._id);
+    setContent(post.content || "");
+    setExternalLink(post.externalLink || "");
+    setButtonText(post.buttonText || "Open Link");
+    setIsPinned(Boolean(post.isPinned));
+    setShowLinkInput(Boolean(post.externalLink));
+    setSelectedFile(null);
+    setExistingFileName(post.fileName || (post.fileUrl ? "Existing Media" : ""));
+
+    creatorBoxRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() && !selectedFile && !externalLink.trim()) {
-      alert("Please add some text, select a file, or add a link.");
+    if (!content.trim() && !selectedFile && !existingFileName && !externalLink.trim()) {
+      alert("Please add text content, an attachment, or a link.");
       return;
     }
 
@@ -100,18 +130,17 @@ export default function AdminSecretGrowthHubPage() {
       if (buttonText.trim()) formData.append("buttonText", buttonText);
       formData.append("isPinned", String(isPinned));
 
-      await createAdminHubPost(formData);
+      if (editingPostId) {
+        formData.append("keepExistingMedia", String(Boolean(existingFileName || selectedFile)));
+        await updateAdminHubPost(editingPostId, formData);
+      } else {
+        await createAdminHubPost(formData);
+      }
 
-      // Form reset
-      setContent("");
-      removeSelectedFile();
-      setExternalLink("");
-      setShowLinkInput(false);
-      setIsPinned(false);
-
+      resetForm();
       loadPosts();
     } catch (err: any) {
-      alert(err?.response?.data?.message || "Failed to publish post");
+      alert(err?.response?.data?.message || "Failed to save post");
     } finally {
       setSubmitting(false);
     }
@@ -121,6 +150,7 @@ export default function AdminSecretGrowthHubPage() {
     if (!confirm("Are you sure you want to delete this post?")) return;
     try {
       await deleteAdminHubPost(id);
+      if (editingPostId === id) resetForm();
       loadPosts();
     } catch (err) {
       alert("Failed to delete post");
@@ -146,12 +176,29 @@ export default function AdminSecretGrowthHubPage() {
         </div>
       </div>
 
-      {/* ========================================================= */}
-      {/* CHATGPT / GEMINI STYLE BROADCAST CREATOR BOX */}
-      {/* ========================================================= */}
-      <div className="relative rounded-3xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm space-y-3">
-        <form onSubmit={handlePublish} className="space-y-3">
-          {/* Main Textarea */}
+      {/* CREATOR / EDIT BOX */}
+      <div
+        ref={creatorBoxRef}
+        className={`relative rounded-3xl border ${
+          editingPostId ? "border-amber-400 ring-2 ring-amber-200" : "border-slate-200"
+        } bg-white p-4 sm:p-5 shadow-sm space-y-3 transition-all`}
+      >
+        {editingPostId && (
+          <div className="flex items-center justify-between pb-2 border-b border-amber-100">
+            <span className="text-xs font-bold text-amber-800 flex items-center gap-1.5">
+              <Edit2 size={13} /> Editing Post
+            </span>
+            <button
+              type="button"
+              onClick={resetForm}
+              className="text-xs text-slate-500 hover:text-slate-800 font-medium cursor-pointer"
+            >
+              Cancel Edit
+            </button>
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-3">
           <textarea
             rows={3}
             placeholder="Write a private message, session note, or instruction for your buyers..."
@@ -160,32 +207,33 @@ export default function AdminSecretGrowthHubPage() {
             className="w-full text-xs sm:text-sm text-slate-800 placeholder-slate-400 bg-transparent outline-none resize-none"
           />
 
-          {/* Selected File Chip Preview */}
-          {selectedFile && (
+          {/* Selected File / Existing Media Chip Preview */}
+          {(selectedFile || existingFileName) && (
             <div className="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-3 py-1.5 text-xs text-slate-700 font-medium border border-slate-200">
-              {selectedFile.type.startsWith("image/") ? (
+              {selectedFile?.type.startsWith("image/") || existingFileName.match(/\.(png|jpg|jpeg|webp)$/i) ? (
                 <ImageIcon size={15} className="text-blue-600" />
-              ) : selectedFile.type.startsWith("video/") ? (
+              ) : selectedFile?.type.startsWith("video/") || existingFileName.match(/\.(mp4|webm|mkv)$/i) ? (
                 <Video size={15} className="text-red-600" />
-              ) : selectedFile.type.startsWith("audio/") ? (
+              ) : selectedFile?.type.startsWith("audio/") || existingFileName.match(/\.(mp3|wav|ogg)$/i) ? (
                 <Mic size={15} className="text-purple-600" />
               ) : (
                 <FileText size={15} className="text-amber-600" />
               )}
               <span className="max-w-[200px] sm:max-w-xs truncate">
-                {selectedFile.name}
+                {selectedFile ? selectedFile.name : `${existingFileName} (Keep)`}
               </span>
               <button
                 type="button"
                 onClick={removeSelectedFile}
                 className="hover:text-red-600 p-0.5 rounded cursor-pointer"
+                title="Remove attachment"
               >
                 <X size={14} />
               </button>
             </div>
           )}
 
-          {/* Optional External Link Inputs (WhatsApp, Zoom, Instagram) */}
+          {/* Link Drawer */}
           {showLinkInput && (
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
               <input
@@ -205,10 +253,9 @@ export default function AdminSecretGrowthHubPage() {
             </div>
           )}
 
-          {/* Bottom Action Bar */}
+          {/* Action Bar */}
           <div className="flex items-center justify-between border-t border-slate-100 pt-3">
             <div className="flex items-center gap-2">
-              {/* Hidden Desktop File Input */}
               <input
                 ref={fileInputRef}
                 type="file"
@@ -218,17 +265,17 @@ export default function AdminSecretGrowthHubPage() {
                 id="hub-desktop-file"
               />
 
-              {/* Clip / Upload Attachment Button */}
               <label
                 htmlFor="hub-desktop-file"
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold cursor-pointer transition-all active:scale-95 shadow-2xs"
-                title="Attach Video, Audio, Image, or PDF from Desktop"
+                title="Attach or replace Video, Audio, Image, or PDF"
               >
                 <Paperclip size={14} className="text-[#0c4731]" />
-                <span className="hidden sm:inline">Attach File</span>
+                <span className="hidden sm:inline">
+                  {existingFileName ? "Replace Media" : "Attach File"}
+                </span>
               </label>
 
-              {/* Toggle External Link */}
               <button
                 type="button"
                 onClick={() => setShowLinkInput(!showLinkInput)}
@@ -242,7 +289,6 @@ export default function AdminSecretGrowthHubPage() {
                 <span className="hidden sm:inline">Add Link</span>
               </button>
 
-              {/* Pin Checkbox */}
               <label className="flex items-center gap-1.5 text-xs text-slate-600 font-medium ml-2 cursor-pointer select-none">
                 <input
                   type="checkbox"
@@ -254,22 +300,28 @@ export default function AdminSecretGrowthHubPage() {
               </label>
             </div>
 
-            {/* Send / Publish Button */}
             <button
               type="submit"
               disabled={submitting}
               className="inline-flex items-center gap-1.5 rounded-2xl bg-[#0c4731] hover:bg-[#083021] text-white px-4 py-2 text-xs font-bold transition-all active:scale-95 shadow-md shadow-emerald-950/20 disabled:bg-slate-300 cursor-pointer"
             >
-              <Send size={13} className="text-[#a3e635]" />
-              <span>{submitting ? "Uploading..." : "Publish Post"}</span>
+              {editingPostId ? (
+                <>
+                  <Check size={13} className="text-[#a3e635]" />
+                  <span>{submitting ? "Updating..." : "Save Changes"}</span>
+                </>
+              ) : (
+                <>
+                  <Send size={13} className="text-[#a3e635]" />
+                  <span>{submitting ? "Uploading..." : "Publish Post"}</span>
+                </>
+              )}
             </button>
           </div>
         </form>
       </div>
 
-      {/* ========================================================= */}
-      {/* PUBLISHED FEED PREVIEW */}
-      {/* ========================================================= */}
+      {/* LIVE FEED */}
       <div className="space-y-4">
         <h2 className="font-bold text-sm text-slate-800">
           Live Feed ({posts.length})
@@ -283,7 +335,7 @@ export default function AdminSecretGrowthHubPage() {
           </div>
         ) : posts.length === 0 ? (
           <div className="p-8 text-center rounded-2xl border border-dashed border-slate-200 bg-slate-50 text-xs text-slate-400">
-            No posts published yet. Use the prompt box above to publish your first video, PDF, or link.
+            No posts published yet.
           </div>
         ) : (
           <div className="space-y-4">
@@ -295,7 +347,6 @@ export default function AdminSecretGrowthHubPage() {
                   key={post._id}
                   className="rounded-3xl border border-slate-200 bg-white p-5 shadow-xs space-y-3.5 relative"
                 >
-                  {/* Top Bar with Type & Pin */}
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="rounded-lg bg-slate-100 text-slate-700 font-bold text-[10px] uppercase px-2 py-0.5 tracking-wider">
@@ -316,24 +367,34 @@ export default function AdminSecretGrowthHubPage() {
                       </span>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(post._id)}
-                      className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
-                      title="Delete Post"
-                    >
-                      <Trash2 size={15} />
-                    </button>
+                    {/* Action Buttons: Edit & Delete */}
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => handleStartEdit(post)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-emerald-700 hover:bg-emerald-50 transition-colors cursor-pointer"
+                        title="Edit Post"
+                      >
+                        <Edit2 size={15} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(post._id)}
+                        className="p-1.5 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        title="Delete Post"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Caption / Content */}
                   {post.content && (
                     <p className="text-xs sm:text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
                       {post.content}
                     </p>
                   )}
 
-                  {/* Media Content Preview */}
                   {post.postType === "IMAGE" && fullFileUrl && (
                     <div className="rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 max-w-xl">
                       <img
@@ -341,20 +402,13 @@ export default function AdminSecretGrowthHubPage() {
                         alt={post.fileName || "Uploaded image"}
                         className="w-full h-auto max-h-[460px] object-cover rounded-2xl"
                         loading="lazy"
-                        onError={(e) => {
-                          console.error("Failed to load image from URL:", fullFileUrl);
-                        }}
                       />
                     </div>
                   )}
 
                   {post.postType === "VIDEO" && fullFileUrl && (
                     <div className="rounded-2xl overflow-hidden border border-slate-200 bg-black">
-                      <video
-                        src={fullFileUrl}
-                        controls
-                        className="w-full max-h-[420px]"
-                      />
+                      <video src={fullFileUrl} controls className="w-full max-h-[420px]" />
                     </div>
                   )}
 
@@ -385,7 +439,6 @@ export default function AdminSecretGrowthHubPage() {
                     </div>
                   )}
 
-                  {/* External Community / Action Button */}
                   {post.externalLink && (
                     <div className="pt-2">
                       <a

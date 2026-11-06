@@ -21,13 +21,11 @@ export interface UserHubResponse {
   posts: HubPost[];
 }
 
-// User Feed Fetch (1st order lock verification)
 export const getSecretGrowthHubFeed = async (): Promise<UserHubResponse> => {
   const response = await api.get<UserHubResponse>("/secret-growth-hub");
   return response.data;
 };
 
-// Admin: Get all posts
 export const getAdminHubPosts = async (): Promise<{
   success: boolean;
   total: number;
@@ -37,7 +35,6 @@ export const getAdminHubPosts = async (): Promise<{
   return response.data;
 };
 
-// Admin: Create Post with Desktop File (Multipart/form-data)
 export const createAdminHubPost = async (
   formData: FormData
 ): Promise<{ success: boolean; message: string; post: HubPost }> => {
@@ -49,7 +46,18 @@ export const createAdminHubPost = async (
   return response.data;
 };
 
-// Admin: Delete Post
+export const updateAdminHubPost = async (
+  id: string,
+  formData: FormData
+): Promise<{ success: boolean; message: string; post: HubPost }> => {
+  const response = await api.put(`/secret-growth-hub/admin/${id}`, formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
+
 export const deleteAdminHubPost = async (
   id: string
 ): Promise<{ success: boolean; message: string }> => {

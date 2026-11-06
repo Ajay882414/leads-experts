@@ -41,7 +41,6 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Mobile apps, Postman ya direct server calls me origin null hota hai
       if (!origin) return callback(null, true);
 
       if (allowedOrigins.includes(origin)) {
@@ -65,12 +64,16 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(cookieParser());
 
-// Static Uploads Folder Serving (Secret Growth Hub Media / Documents)
-let staticUploadsPath = path.join(__dirname, "../uploads");
-if (!fs.existsSync(staticUploadsPath)) {
-  staticUploadsPath = path.join(__dirname, "uploads");
+// Static Uploads Folder Serving (Supports both root backend/uploads & src/uploads)
+const rootUploadsPath = path.resolve(__dirname, "../uploads");
+const srcUploadsPath = path.resolve(__dirname, "uploads");
+
+if (fs.existsSync(rootUploadsPath)) {
+  app.use("/uploads", express.static(rootUploadsPath));
 }
-app.use("/uploads", express.static(staticUploadsPath));
+if (fs.existsSync(srcUploadsPath)) {
+  app.use("/uploads", express.static(srcUploadsPath));
+}
 
 app.use("/api/test", testRoute);
 app.use("/api/auth/signup", signupRoute);

@@ -1,6 +1,8 @@
 const SecretGrowthHub = require("../../models/SecretGrowthHub");
 const Order = require("../../models/Order");
 const asyncHandler = require("../../utils/asyncHandler");
+const fs = require("fs");
+const path = require("path");
 
 // ========================================================
 // USER FEED: GET FEED WITH 1ST COMPLETED ORDER GATE
@@ -105,6 +107,55 @@ const createHubPost = asyncHandler(async (req, res) => {
 });
 
 // ========================================================
+// ADMIN: UPDATE / EDIT POST
+// PUT /api/secret-growth-hub/admin/:id
+// ========================================================
+const updateHubPost = asyncHandler(async (req, res) => {
+  const post = await SecretGrowthHub.findById(req.params.id);
+
+  if (!post) {
+    return res.status(404).json({
+      success: false,
+      message: "Post not found",
+    });
+  }
+
+  const { content, externalLink, buttonText, isPinned, keepExistingMedia } = req.body;
+
+  // Agar new file aayi hai desktop se
+  if (req.file) {
+    post.fileUrl = `/uploads/secret-growth-hub/${req.file.filename}`;
+    post.fileName = req.file.originalname;
+
+    const mime = req.file.mimetype;
+    if (mime.startsWith("image/")) post.postType = "IMAGE";
+    else if (mime.startsWith("video/")) post.postType = "VIDEO";
+    else if (mime.startsWith("audio/")) post.postType = "AUDIO";
+    else if (mime === "application/pdf") post.postType = "PDF";
+  } else if (keepExistingMedia === "false") {
+    // Agar user ne media delete kar di edit karte waqt
+    post.fileUrl = "";
+    post.fileName = "";
+    post.postType = externalLink ? "LINK" : "TEXT";
+  }
+
+  if (content !== undefined) post.content = content;
+  if (externalLink !== undefined) post.externalLink = externalLink;
+  if (buttonText !== undefined) post.buttonText = buttonText;
+  if (isPinned !== undefined) {
+    post.isPinned = isPinned === "true" || isPinned === true;
+  }
+
+  await post.save();
+
+  return res.status(200).json({
+    success: true,
+    message: "Post updated successfully",
+    post,
+  });
+});
+
+// ========================================================
 // ADMIN: DELETE POST
 // DELETE /api/secret-growth-hub/admin/:id
 // ========================================================
@@ -128,5 +179,6 @@ module.exports = {
   getHubFeed,
   getAdminPosts,
   createHubPost,
+  updateHubPost,
   deleteHubPost,
 };
